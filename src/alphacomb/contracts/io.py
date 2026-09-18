@@ -40,6 +40,15 @@ def read_yaml(path: str | Path) -> dict:
             parsed = None
         elif value.lower() in {"true", "false"}:
             parsed = value.lower() == "true"
+        elif value.startswith("[") and value.endswith("]"):
+            # inline list; items may be unquoted (e.g. [CLARABEL, SCS]) or numeric
+            items = [it.strip() for it in value[1:-1].split(",") if it.strip()]
+            parsed = []
+            for it in items:
+                try:
+                    parsed.append(ast.literal_eval(it))
+                except (ValueError, SyntaxError):
+                    parsed.append(it.strip('"').strip("'"))
         else:
             try:
                 parsed = ast.literal_eval(value)
