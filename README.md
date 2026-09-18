@@ -1,4 +1,7 @@
-# alphacomb
+# Machine Learning for Alpha Signal Combination and Portfolio Construction (`alphacomb`)
+
+Repository: https://github.com/HarshitK2814/Machine-Learning-for-Alpha-Signal-Combination-and-Portfolio-Construction
+(public). The Python package is importable as `alphacomb`.
 
 Research code for the paper **"Where Does Machine-Learning Alpha Come From After Trading Costs?
 Nonlinearity, State Dependence and Cost-Aware Learning in Signal Combination."**
