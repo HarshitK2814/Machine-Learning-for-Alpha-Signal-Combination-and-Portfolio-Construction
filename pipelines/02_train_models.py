@@ -36,6 +36,10 @@ def main() -> None:
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--members", type=int, default=5, help="ensemble members for uncertainty cells")
     p.add_argument("--manifest", default=None, help="CSV to append run metadata to")
+    p.add_argument("--benchmarks", nargs="*", default=None,
+                   help="published benchmark presets to run as well (E13), e.g. gkx_nn3 gkx_gbrt")
+    p.add_argument("--seeds", nargs="*", type=int, default=None,
+                   help="run the given cells under several seeds and report dispersion (E56)")
     a = p.parse_args()
 
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
@@ -47,6 +51,20 @@ def main() -> None:
     cells = ALL_CELLS if a.cells == ["all"] else [CellSpec.parse(c) for c in a.cells]
     first, last = (a.years if a.years else (None, None))
     manifest_rows = []
+
+    if a.seeds:
+        from alphacomb.models import compare_to_cell_gap, run_seeds
+
+        for spec in cells:
+            run_cfg = CellRunConfig(horizon=a.horizon, first_test_year=first, last_test_year=last,
+                                    fast=a.fast, uncertainty_members=a.members)
+            table = run_seeds(spec, bundle, risk, list(a.seeds), run_cfg, base_cfg=cfg)
+            out = paths.outputs_root() / f"seed_stability_{spec.code}.csv"
+            table.to_csv(out, index=False)
+            log.info("seed dispersion %s: %s", spec.code, compare_to_cell_gap(table, cell_gap=0.0))
+            print(table.to_string(index=False))
+        return
+
     for spec in cells:
         started = time.time()
         run_cfg = CellRunConfig(horizon=a.horizon, first_test_year=first, last_test_year=last, fast=a.fast,
@@ -62,6 +80,22 @@ def main() -> None:
                        "horizon": a.horizon, "source": source, "fast": a.fast})
         manifest_rows.append(result)
         log.info("%s -> %s (%d rows, %.1f min)", spec.code, result["artefact"], result["rows"], result["minutes"])
+
+    for name in (a.benchmarks or []):
+        from alphacomb.models import run_benchmark
+
+        started = time.time()
+        run_cfg = CellRunConfig(horizon=a.horizon, first_test_year=first, last_test_year=last, fast=a.fast,
+                                seed=a.seed)
+        log.info("=== benchmark %s (E13) ===", name)
+        try:
+            result = run_benchmark(name, bundle, risk, run_cfg, base_cfg=cfg)
+            result.update({"status": "ok", "minutes": round((time.time() - started) / 60, 2),
+                           "horizon": a.horizon, "source": source, "fast": a.fast})
+        except Exception as exc:  # pragma: no cover
+            log.exception("benchmark %s failed: %s", name, exc)
+            result = {"cell": name, "status": "failed", "error": str(exc)}
+        manifest_rows.append(result)
 
     manifest = pd.DataFrame(manifest_rows)
     out = Path(a.manifest) if a.manifest else paths.outputs_root() / "manifest_models.csv"
