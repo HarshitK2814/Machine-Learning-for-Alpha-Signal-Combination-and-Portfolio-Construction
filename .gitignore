@@ -1,0 +1,12 @@
+data/
+outputs/
+mlruns/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+build/
+dist/
+.env
+.ipynb_checkpoints/

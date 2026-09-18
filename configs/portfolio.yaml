@@ -1,0 +1,16 @@
+# Workstream B (Harshit): optimiser settings (inherits limits from configs/base.yaml).
+objective: mean_variance_minus_tc
+risk_aversion_gamma: null      # null -> calibrated on validation to hit target_vol_annual
+alpha_scaling:
+  method: grinold              # alpha = IC_validation * sigma_i * z_score(score)
+  ic_floor: 0.005
+  ic_cap: 0.10
+projection:                    # used for economic-loss cells (C10 -> C11)
+  objective: min_l2_distance
+  keep_gross: true
+long_only_variant:
+  enabled: false
+  tracking_error_max: 0.04
+solver:
+  max_seconds: 30
+  fallback_hold_on_failure: true

@@ -1,0 +1,44 @@
+# Shared configuration (all three workstreams). Changes need agreement from all members.
+data_source: synthetic        # synthetic | real
+data_root: data               # parquet root; overridden by ALPHACOMB_DATA
+outputs_root: outputs
+
+universe:
+  min_price: 5.0
+  exclude_below_nyse_size_pct: 20
+  min_history_months: 12
+  robustness_universes: [all_stocks, nyse_top500]
+
+splits:
+  train_start: "1972-01-31"
+  initial_train_end: "1989-12-31"
+  validation_months: 60
+  first_test_year: 1995
+  last_dev_test_year: 2020
+  lockbox_start: "2021-01-31"
+  lockbox_end: "2025-12-31"
+  refit_frequency: annual
+  train_window: expanding      # expanding | rolling_240m
+  embargo_months: null         # null -> equal to the model's target horizon
+
+costs:
+  commission_bps: 1.0
+  impact_k: 1.0                # multiplier on the square-root impact term
+  impact_power: 1.5            # total cost power on |dw| (0.5 impact + linear trade size)
+  borrow_gc_bps_pa: 25.0
+  borrow_htb_bps_pa: 500.0
+  aum_usd_2020: 1.0e9
+  sensitivity_multipliers: [0.5, 1.0, 2.0, 3.0]
+
+portfolio:
+  gross_max: 2.0
+  dollar_neutral: true
+  beta_abs_max: 0.05
+  industry_abs_max: 0.02
+  weight_abs_max: 0.01
+  adv_participation_max: 0.05
+  target_vol_annual: 0.10
+  solver_order: [CLARABEL, ECOS, SCS]
+
+logging:
+  trials_file: outputs/trials.csv
