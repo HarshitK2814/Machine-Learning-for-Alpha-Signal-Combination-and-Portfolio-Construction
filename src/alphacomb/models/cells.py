@@ -189,6 +189,8 @@ def run_cell(spec: CellSpec | str, bundle: DataBundle, risk: RiskCache, cfg: Cel
                                interaction_states=models_cfg["conditional_linear"]["interaction_states"])
     calendar = split_mod.generate(horizon_months=cfg.horizon, cfg=base_cfg,
                                   first_test_year=cfg.first_test_year, last_test_year=cfg.last_test_year)
+    # keep only the window the calendar actually uses, then prove that window excludes the lockbox
+    df = df[df["date"] <= calendar[-1].test_end].copy()
     split_mod.assert_not_lockbox(df["date"].unique(), base_cfg)
 
     needed = df.loc[df["date"].between(calendar[0].train_start, calendar[-1].test_end), "date"].unique()

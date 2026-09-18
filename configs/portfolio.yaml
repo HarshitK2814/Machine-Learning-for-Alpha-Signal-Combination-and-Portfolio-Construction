@@ -1,6 +1,7 @@
 # Workstream B (Harshit): optimiser settings (inherits limits from configs/base.yaml).
 objective: mean_variance_minus_tc
-risk_aversion_gamma: null      # null -> calibrated on validation to hit target_vol_annual
+risk_aversion_gamma: 25.0      # shared by every cell; recalibrate with portfolio.calibrate_gamma on
+                               # validation dates before the final run (Phase 6 task)
 alpha_scaling:
   method: grinold              # alpha = IC_validation * sigma_i * z_score(score)
   ic_floor: 0.005
