@@ -25,8 +25,9 @@ from ..contracts.interfaces import CellSpec
 from ..contracts.io import load_config, read_yaml
 from ..portfolio.alpha_scaling import grinold_alpha, shrink_by_uncertainty
 from ..risk.cache import RiskCache
-from . import economic, linear, nonlinear
+from . import attention, complexity, economic, linear, nonlinear
 from .base import build_design, rank_ic, select_by_validation, split_frames
+from .conformal import per_stock_uncertainty, split_conformal
 from .uncertainty import select_kappa
 
 log = logging.getLogger(__name__)
@@ -44,6 +45,13 @@ class CellRunConfig:
     economic_max_train_months: int = 240
     validation_months_for_kappa: int = 12
     gamma: float = 25.0
+    # design v2: rungs of the functional-form ladder used inside the nonlinear arm
+    # options: "gbdt_nn" (A1), "complexity_dense" (A2), "complexity_sparse" (A3), "attention" (A4)
+    form_ladder: tuple[str, ...] = ("gbdt_nn",)
+    # design v2: "ensemble" dispersion (D1) or calibrated "conformal" intervals (D2)
+    uncertainty_method: str = "ensemble"
+    conformal_alpha: float = 0.1
+    conformal_calibration_months: int = 24
     diagnostics: list = field(default_factory=list)
 
 
@@ -64,8 +72,16 @@ class _MoEAdapter:
 def _candidates(spec: CellSpec, models_cfg: dict, features, cfg: CellRunConfig):
     members = cfg.uncertainty_members if spec.uses_uncertainty else 1
     if spec.is_nonlinear:
-        yield from nonlinear.candidates(models_cfg, spec.is_conditional, n_members=members, seed=cfg.seed,
-                                        fast=cfg.fast)
+        ladder = tuple(cfg.form_ladder or ("gbdt_nn",))
+        if "gbdt_nn" in ladder:
+            yield from nonlinear.candidates(models_cfg, spec.is_conditional, n_members=members, seed=cfg.seed,
+                                            fast=cfg.fast)
+        arms = tuple(a for a, key in (("dense", "complexity_dense"), ("sparse", "complexity_sparse"))
+                     if key in ladder)
+        if arms:
+            yield from complexity.candidates(n_members=members, seed=cfg.seed, fast=cfg.fast, arms=arms)
+        if "attention" in ladder:
+            yield from attention.candidates(n_members=members, seed=cfg.seed, fast=cfg.fast)
         if spec.is_conditional and features.state_cols:
             moe_cfg = models_cfg["mixture_of_experts"]
             inner = nonlinear.MoECell(n_experts=int(moe_cfg["experts"]),
@@ -118,6 +134,28 @@ def run_prediction_cell(spec: CellSpec, df: pd.DataFrame, features, calendar: li
                       cfg.seed, split.train_end, float(max(kappa_scores.values()) if kappa_scores else 0.0))
 
         pred = best.predict(test, features.all)
+        conformal_report = None
+        if spec.uses_uncertainty and cfg.uncertainty_method == "conformal":
+            # calibrate on validation months (strictly before the test year), then apply to the test
+            val_pred_for_cal = best.predict(val, features.all)
+            frame = pd.concat([
+                pd.DataFrame({"date": val["date"].to_numpy(), "permno": val["permno"].to_numpy(),
+                              "score": val_pred_for_cal["score"].to_numpy(), "y_true": val["y"].to_numpy(),
+                              "unc_sd_ensemble": val_pred_for_cal["unc_sd"].to_numpy()}),
+                pd.DataFrame({"date": test["date"].to_numpy(), "permno": test["permno"].to_numpy(),
+                              "score": pred["score"].to_numpy(), "y_true": np.nan,
+                              "unc_sd_ensemble": pred["unc_sd"].to_numpy()}),
+            ], ignore_index=True)
+            result = split_conformal(frame, calibration_months=cfg.conformal_calibration_months,
+                                     alpha=cfg.conformal_alpha)
+            calibrated = per_stock_uncertainty(frame, result)
+            frame["unc_calibrated"] = calibrated.to_numpy()
+            lookup = frame.set_index(["date", "permno"])["unc_calibrated"]
+            keys = pd.MultiIndex.from_arrays([test["date"].to_numpy(), test["permno"].to_numpy()])
+            pred = pred.copy()
+            pred["unc_sd"] = lookup.reindex(keys).to_numpy()
+            conformal_report = {"mean_coverage": result.mean_coverage, "target": result.target_coverage}
+
         for date, group in test.groupby("date"):
             rm = risk.model(date)
             idx = group["permno"].to_numpy()
@@ -134,7 +172,9 @@ def run_prediction_cell(spec: CellSpec, df: pd.DataFrame, features, calendar: li
             }))
         test_ic = rank_ic(pred["score"].to_numpy(), test["y"].to_numpy(), test["date"])
         diagnostics.append({"cell": spec.code, "split": split.label, "val_rank_ic": val_ic,
-                            "test_rank_ic": test_ic, "kappa": kappa, "params": params})
+                            "test_rank_ic": test_ic, "kappa": kappa, "params": params,
+                            "uncertainty_method": cfg.uncertainty_method if spec.uses_uncertainty else "none",
+                            "conformal_coverage": (conformal_report or {}).get("mean_coverage")})
         log.info("%s %s: val IC %.4f, test IC %.4f, kappa %.2f", spec.code, split.label, val_ic, test_ic, kappa)
     cfg.diagnostics.extend(diagnostics)
     return pd.concat(rows, ignore_index=True) if rows else pd.DataFrame(columns=["date", "permno", "score", "alpha", "unc_sd"])
