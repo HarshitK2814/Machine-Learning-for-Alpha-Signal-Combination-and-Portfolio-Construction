@@ -12,20 +12,32 @@ Harshit = models/portfolio/risk/interpretation, Maham = baselines/statistics/rep
 
 | Workstream | Owner | State |
 |---|---|---|
-| A - data, costs, backtest | Absar | **Not started.** A synthetic stand-in generator lives in `src/alphacomb/synthetic/` so the other workstreams are unblocked (see `docs/HARSHIT_NEEDS_FROM_ABSAR.md`). |
-| B - models, portfolio, risk, interpretation | Harshit | In progress (this repo's current work). |
-| C - baselines, statistics, reporting | Maham | Not started. Contracts and example outputs are ready (see `docs/HARSHIT_PROVIDES.md`). |
+| A - data, costs, backtest | Absar | **Not started.** A synthetic stand-in generator lives in `src/alphacomb/synthetic/` so the other workstreams are unblocked. What is needed, by when, and in what format: `docs/HARSHIT_NEEDS_FROM_ABSAR.md`. |
+| B - models, portfolio, risk, interpretation | Harshit | **Code complete on synthetic data**: 16 factorial cells (E20-E28), cost-aware optimiser (E33), risk model (C7/E64), published benchmarks (E13), seed stability (E56), interpretation (E60-E62). 53 tests pass. Status and next actions: `docs/STATUS.md`. |
+| C - baselines, statistics, reporting | Maham | Not started. Contracts, example outputs and a worked "how to plug a baseline in" snippet are ready: `docs/HARSHIT_PROVIDES.md`. |
+
+No real-data or paper results exist yet, and none can until workstream A delivers contracts C1-C6.
+Everything below runs on the synthetic panel.
 
 ## Quick start
 
 ```bash
 python -m pip install -e .
-python -m alphacomb.synthetic.generate --out data/synthetic      # C1-C6 fixtures
-python pipelines/02_train_models.py --cells all --data synthetic  # C9/C10 predictions
-python pipelines/04_construct_portfolios.py --strategies all      # C11 weights
-python tools/dev_backtest.py --strategies all                     # TEMPORARY stand-in for C12
-pytest -q
+python pipelines/run_all.py --smoke               # generate data, 2 cells, 2 years, end to end
+pytest -q                                         # 53 tests
+
+# or stage by stage
+python -m alphacomb.synthetic.generate --out data/synthetic          # C1-C6 fixtures + truth.json
+python pipelines/02_train_models.py --cells all --years 1995 2020     # C9/C10
+python pipelines/02_train_models.py --cells N-S-P-0 --seeds 0 1 2 3 4 # seed dispersion (E56)
+python pipelines/02_train_models.py --cells L-S-P-0 --benchmarks gkx_nn3 gkx_gbrt   # E13
+python pipelines/04_construct_portfolios.py --strategies all          # C11 weights
+python pipelines/04_construct_portfolios.py --strategies all --cost-multiplier 2.0  # cost sensitivity
+python tools/dev_backtest.py --strategies all                         # TEMPORARY stand-in for C12
 ```
+
+Cell codes are `<form>-<conditioning>-<objective>-<uncertainty>`, for example `N-C-E-U` is nonlinear,
+state-conditional, economic loss, with uncertainty shrinkage (the full model).
 
 ## Repository layout (CODEOWNERS)
 
