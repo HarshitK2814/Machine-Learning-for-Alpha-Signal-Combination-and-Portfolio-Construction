@@ -1,6 +1,6 @@
 # Workstream B status (Harshit)
 
-Updated: 2026-09-19. Synthetic data only. **No real-data or paper results exist.**
+Updated: 2026-09-20. Synthetic data only. **No real-data or paper results exist.**
 
 ## Done
 
@@ -14,8 +14,17 @@ Updated: 2026-09-19. Synthetic data only. **No real-data or paper results exist.
 | Uncertainty shrinkage with validation-tuned kappa | E28 | Done | nested at kappa = 0 |
 | Interpretation: economic importance, implied weights, state dependence, LTA tilts | E60-E62 | Done | `tests/interpret` (5 tests) |
 | Pipelines 02 and 04, temporary dev backtest | - | Done | smoke run on the full synthetic panel |
+| Design v2 frontier: complexity ladder, conformal, attention, robust optimisation | E65-E68 | Done | `tests/models/test_frontier.py` (16 tests) |
+| Falsification audit: zero-predictability null, placebo, inflation gap | E69 | Done, 4 fixes open | `docs/FALSIFICATION_AUDIT.md` |
+| **After-tax ledger: lots, wash sales, holding periods, 4 investor regimes** | **E70-E72 (new)** | **Done** | `tests/tax` (22 tests) |
+| **Tax terms inside the optimiser, with the s1091 block** | **E73 (new)** | **Done** | `tests/portfolio/test_tax_terms.py` (11 tests) |
+| **Self-adapting combination: Hedge with fixed share, drift detection** | **E74-E75 (new)** | **Done** | `tests/adaptive` (15 tests) |
+| Pipelines 06 (after-tax) and 07 (adaptive) | - | Done | run on the 2003-2020 synthetic span |
 
-Total: 48 tests, all passing.
+Total: 117 tests, 116 passing and 1 skipped (a solver-dependent optimiser path).
+
+Contracts bumped to **v1.1.0**, additively: optional `targets.div_next` (the dividend part of
+`ret_next`) and optional tax columns on `returns` (C12). Nothing existing breaks.
 
 ## Verified on the synthetic panel (development check, not a result)
 
@@ -43,3 +52,9 @@ Total: 48 tests, all passing.
 2. Add the published-benchmark presets (E13) behind the same interface.
 3. Re-run `calibrate_gamma` and freeze the value in `configs/portfolio.yaml`.
 4. Review Absar's first C1-C6 delivery against `docs/HARSHIT_NEEDS_FROM_ABSAR.md`.
+5. Close the four falsification-audit fixes in `docs/FALSIFICATION_AUDIT.md`, starting with the
+   strict null.
+6. Run the three-arm tax-aware construction comparison (tax-blind / tax-aware / tax-aware +
+   wash-block). The code path exists; it has not been measured over the full span.
+7. Ask Absar for `div_next` (CRSP `RET` minus `RETX`). Until it arrives, dividend tax is an
+   assumption, not a measurement.

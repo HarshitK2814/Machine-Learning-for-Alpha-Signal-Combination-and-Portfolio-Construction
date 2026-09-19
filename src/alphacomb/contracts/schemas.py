@@ -14,7 +14,7 @@ from dataclasses import dataclass, field
 import numpy as np
 import pandas as pd
 
-VERSION = "1.0.0"
+VERSION = "1.1.0"   # 1.1.0: optional targets.div_next (additive, no breaking change)
 
 
 class SchemaError(ValueError):
@@ -97,6 +97,10 @@ SCHEMAS: dict[str, Schema] = {
             Column("r_6m", "float", nullable=True),
             Column("r_12m", "float", nullable=True),
             Column("ret_next", "float", nullable=True),
+            # Additive, optional: the dividend component of ret_next, used by the after-tax ledger
+            # to separate dividend tax from capital-gains tax. When absent the ledger falls back to
+            # a flat configured yield and reports it as an assumption rather than a measurement.
+            Column("div_next", "float", required=False, nullable=True, minimum=0.0),
         ),
     ),
     "states": Schema(
@@ -163,6 +167,14 @@ SCHEMAS: dict[str, Schema] = {
             Column("cost_borrow", "float", minimum=0.0),
             Column("long_ret", "float"),
             Column("short_ret", "float"),
+            # Additive, optional: the tax ledger written by alphacomb.tax.after_tax_backtest.
+            # Absar's C12 engine is not required to produce these; strategies evaluated gross of
+            # tax simply omit them.
+            Column("after_tax_ret", "float", required=False, nullable=True),
+            Column("tax_ret", "float", required=False, nullable=True),
+            Column("realised_st", "float", required=False, nullable=True),
+            Column("realised_lt", "float", required=False, nullable=True),
+            Column("wash_disallowed", "float", required=False, nullable=True),
         ),
         keys=("date",),
     ),

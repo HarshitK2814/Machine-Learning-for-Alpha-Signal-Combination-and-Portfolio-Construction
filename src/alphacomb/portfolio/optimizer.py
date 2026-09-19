@@ -22,6 +22,7 @@ from ..contracts.io import read_yaml
 from ..contracts import paths
 from ..risk.structural import RiskModel
 from .cost_terms import cost_inputs_for, cvx_borrow_cost, cvx_trade_cost
+from .tax_terms import TaxState, apply_wash_block, cvx_tax_cost
 
 log = logging.getLogger(__name__)
 
@@ -44,6 +45,9 @@ class OptimizerConfig:
     long_only: bool = False
     tracking_error_max: float = 0.04
     fallback_hold_on_failure: bool = True
+    tax_aware: bool = False          # put the tax consequence of a trade in the objective
+    tax_harvest_haircut: float = 1.0  # how usable a realised loss is; sensitivity parameter
+    wash_block: bool = False         # forbid repurchasing a name inside the s1091 window
 
     @staticmethod
     def from_files(cfg: dict | None = None, portfolio_cfg: dict | None = None) -> "OptimizerConfig":
@@ -101,8 +105,13 @@ def _risk_factor(risk: RiskModel) -> tuple[np.ndarray, np.ndarray]:
 
 
 def construct(date, alpha: pd.Series, w_prev: pd.Series | None, risk: RiskModel,
-              cost_inputs: pd.DataFrame, cfg: OptimizerConfig | None = None) -> OptimizationResult:
-    """Solve the cost-aware mean-variance problem for one month (contract C11)."""
+              cost_inputs: pd.DataFrame, cfg: OptimizerConfig | None = None,
+              tax_state: TaxState | None = None) -> OptimizationResult:
+    """Solve the cost-aware mean-variance problem for one month (contract C11).
+
+    ``tax_state`` is optional and comes from the same tax-lot ledger that scores the result, so the
+    optimiser cannot be optimising against a tax model the accountant would not recognise.
+    """
     import cvxpy as cp
 
     cfg = cfg or OptimizerConfig.from_files()
@@ -135,9 +144,19 @@ def construct(date, alpha: pd.Series, w_prev: pd.Series | None, risk: RiskModel,
     risk_term = cp.sum_squares(L.T @ (B.T @ w)) + cp.sum(cp.multiply(d, cp.square(w)))
     cost_term = cvx_trade_cost(dw, spread, sigma_d, adv, cfg.aum_usd, k, cfg.commission_bps)
     borrow_term = cvx_borrow_cost(w, borrow)
-    objective = cp.Maximize(a @ w - 0.5 * cfg.gamma * risk_term - cost_term - borrow_term)
+    tax_term, tax_cons = 0.0, []
+    if cfg.tax_aware and tax_state is not None and not tax_state.empty:
+        g_vec, rate_vec, blocked = tax_state.aligned(permnos)
+        tax_term, tax_cons = cvx_tax_cost(w, prev, g_vec, rate_vec,
+                                          allow_harvest=tax_state.allow_harvest,
+                                          harvest_haircut=cfg.tax_harvest_haircut)
+        if cfg.wash_block:
+            tax_cons += apply_wash_block(w, prev, blocked)
+
+    objective = cp.Maximize(a @ w - 0.5 * cfg.gamma * risk_term - cost_term - borrow_term - tax_term)
 
     cons = [cp.norm1(w) <= cfg.gross_max, cp.abs(w) <= pos_cap, cp.abs(dw) <= adv_cap]
+    cons += tax_cons
     if cfg.dollar_neutral and not cfg.long_only:
         cons.append(cp.sum(w) == 0)
     if cfg.long_only:
@@ -171,7 +190,8 @@ def construct(date, alpha: pd.Series, w_prev: pd.Series | None, risk: RiskModel,
         predicted_vol=risk.volatility(weights),
         expected_cost=float(cost_term.value) if hasattr(cost_term, "value") else float("nan"),
         turnover=float(np.abs(trade).sum() / 2),
-        diagnostics={"n_assets": n, "gross": float(np.abs(weights).sum()), "net": float(weights.sum())},
+        diagnostics={"n_assets": n, "gross": float(np.abs(weights).sum()), "net": float(weights.sum()),
+                     "tax_term": float(tax_term.value) if hasattr(tax_term, "value") else 0.0},
     )
 
 

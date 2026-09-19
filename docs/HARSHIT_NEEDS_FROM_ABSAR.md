@@ -14,7 +14,7 @@ Status legend: **BLOCKING** = workstream B cannot produce real-data results with
 | C1 | `data/real/universe.parquet` | `date, permno, in_universe, me, price, exchcd, ff49, nyse_size_pct` | Defines the cross-section each month; `ff49` drives the optimiser's industry constraints; `me` drives specific-risk shrinkage by size decile | **BLOCKING** | Week 9 |
 | C2 | `data/real/signals.parquet` | `date, permno, sig_*` in [-0.5, 0.5], `miss_<theme>` | The model features. Must already be cross-sectionally rank-normalised with missing values set to 0 and flagged | **BLOCKING** | Week 9 |
 | C3 | `data/real/signal_meta.csv` | `signal, theme, pub_year, source` | Theme composites (13) drive the risk model, the conditional interactions and every interpretation output | **BLOCKING** | Week 9 |
-| C4 | `data/real/targets.parquet` | `date, permno, r_1m, r_3m, r_6m, r_12m, ret_next` | `r_*` are training targets; `ret_next` is what the economic cells maximise and what weight drift uses | **BLOCKING** | Week 9 |
+| C4 | `data/real/targets.parquet` | `date, permno, r_1m, r_3m, r_6m, r_12m, ret_next`, **optional `div_next`** | `r_*` are training targets; `ret_next` is what the economic cells maximise and what weight drift uses. `div_next` is the **dividend component** of `ret_next` and is new in contract v1.1.0 | **BLOCKING** (`div_next` NEEDED LATER) | Week 9 |
 | C5 | `data/real/states.parquet` | `date, MKTVOL, BEAR, ILLIQ, SENT, CREDIT, TERM, INFL, DRATE, DISP, FMOM_<theme>` | The conditioning factor of the design. Must be lagged and standardised with an expanding window only | **BLOCKING** | Week 10 |
 | C6 | `data/real/cost_inputs.parquet` | `date, permno, spread, sigma_d, adv_usd, borrow_fee` | Enters the optimiser objective, the position/trade caps and the economic cells' training loss | **BLOCKING** | Week 12 |
 | - | `data/real/states_placebo.parquet` | same as C5 | Placebo test E53 (shuffled states must destroy the conditioning gain) | NEEDED LATER | Week 14 |
@@ -36,6 +36,12 @@ Status legend: **BLOCKING** = workstream B cannot produce real-data results with
 6. **`adv_usd` in dollars**, because participation caps are computed as `adv_usd * 5% / AUM`.
 7. **Coverage from 1972** (or the earliest year you can support) so the expanding training window has
    enough history before the first test year, 1995.
+8. **`div_next` is the dividend part of `ret_next`**, as a non-negative fraction, so that
+   `ret_next - div_next` is the price return. The after-tax ledger needs the split because dividends
+   and capital gains are taxed differently and at different times. It is an **additive optional
+   column** (contract v1.1.0): if you do not supply it, nothing breaks - the ledger falls back to a
+   flat configured yield and labels the result an assumption rather than a measurement. CRSP
+   `RET` minus `RETX` gives it directly.
 
 ## 3. The cost function must agree exactly
 
