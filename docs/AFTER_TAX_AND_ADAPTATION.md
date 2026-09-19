@@ -153,10 +153,19 @@ outcomes, and inherit a regret bound.
 > that our experts are **cells of a controlled factorial design** rather than arbitrary algorithms,
 > so the weight path reads as "which design ingredient is currently worth paying for".
 >
-> **Before the adaptive section is written**, read arXiv 2111.15365 in full and record whether they
-> already benchmark against the equal-weighted blend of the same experts. If they do, even that
-> comparison is theirs. Their BOA rule is also *stronger* than the plain Hedge implemented here
+> **Full text read, 20 September 2026.** Their experts are the 13 Gu-Kelly-Xiu models on the GKX
+> dataset (94 characteristics, >30k US stocks), aggregated on *portfolio weights*, test 1987-2016.
+> They **do** benchmark the equal-weighted blend (`PtfUNI`, SR 2.56 vs BOA 2.77), and they report a
+> universe - bottom-1000 market cap - where **the blend wins (SR 3.07)**. So that comparison is
+> theirs too. Their BOA rule is also *stronger* than the plain Hedge implemented here
 > (Wintenberger 2017), so we must either adopt BOA or justify the simpler rule.
+>
+> **What survives, and it is not nothing.** The paper contains **no transaction-cost model at all**
+> (turnover of ~120% a year is reported, never charged) and the word "tax" appears **zero times**.
+> Their Sharpe of 2.77 is a gross number on a book that turns over 120% a year. Our entire framework
+> charges spread, impact and borrow inside the optimiser and now taxes on top. "Online aggregation
+> scored on a reward the investor could actually keep" is still open - it is just a much smaller
+> claim than "we built an adaptive combiner".
 
 * `hedge.py` — exponentially weighted average forecaster (Vovk 1990; Littlestone–Warmuth 1994;
   Freund–Schapire 1997; Cesa-Bianchi–Lugosi 2006). Cumulative performance falls short of the best
