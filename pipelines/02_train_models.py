@@ -38,11 +38,23 @@ def main() -> None:
     p.add_argument("--manifest", default=None, help="CSV to append run metadata to")
     p.add_argument("--benchmarks", nargs="*", default=None,
                    help="published benchmark presets to run as well (E13), e.g. gkx_nn3 gkx_gbrt")
+    p.add_argument("--after-tax-objective", default=None, metavar="REGIME",
+                   help="train economic cells on net-of-cost-AND-TAX utility, e.g. taxable_us_top_bracket")
+    p.add_argument("--harvest-haircut", type=float, default=1.0,
+                   help="how usable a realised loss is in the training objective")
+    p.add_argument("--suffix", default="", help="append to strategy names, e.g. '_aftertax'")
     p.add_argument("--seeds", nargs="*", type=int, default=None,
                    help="run the given cells under several seeds and report dispersion (E56)")
     a = p.parse_args()
 
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+    tax_regime = None
+    if a.after_tax_objective:
+        from alphacomb.tax import get_regime
+
+        tax_regime = get_regime(a.after_tax_objective)
+        if not a.suffix:
+            a.suffix = "_aftertax"
     cfg = load_config("base")
     source = a.data or cfg["data_source"]
     bundle = load_bundle(source)
@@ -68,8 +80,11 @@ def main() -> None:
     for spec in cells:
         started = time.time()
         run_cfg = CellRunConfig(horizon=a.horizon, first_test_year=first, last_test_year=last, fast=a.fast,
-                                seed=a.seed, uncertainty_members=a.members)
-        log.info("=== cell %s (%s) ===", spec.code, spec.describe())
+                                seed=a.seed, uncertainty_members=a.members,
+                                tax_regime=tax_regime, tax_harvest_haircut=a.harvest_haircut,
+                                strategy_suffix=a.suffix)
+        log.info("=== cell %s (%s)%s ===", spec.code, spec.describe(),
+                 f" [after-tax objective: {tax_regime.name}]" if tax_regime else "")
         try:
             result = run_cell(spec, bundle, risk, run_cfg, base_cfg=cfg)
         except Exception as exc:  # pragma: no cover - keeps a long batch alive

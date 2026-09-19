@@ -75,7 +75,10 @@ class EconomicPolicy:
 
     def __init__(self, nonlinear: bool = True, hidden: tuple[int, ...] = (16, 8), gamma: float = 25.0,
                  gross: float = 2.0, learning_rate: float = 5e-3, max_epochs: int = 40, patience: int = 5,
-                 bptt_months: int = 12, seed: int = 0, device: str | None = None, n_members: int = 1):
+                 bptt_months: int = 12, seed: int = 0, device: str | None = None, n_members: int = 1,
+                 tax_short_rate: float = 0.0, tax_long_rate: float = 0.0,
+                 tax_harvest_haircut: float = 1.0, tax_long_term_months: float = 12.0,
+                 tax_boundary_tau: float = 2.0):
         self.nonlinear = bool(nonlinear)
         self.hidden = tuple(hidden)
         self.gamma = float(gamma)
@@ -87,6 +90,13 @@ class EconomicPolicy:
         self.seed = int(seed)
         self.device = device
         self.n_members = int(n_members)
+        # After-tax objective. Zero rates reproduce the net-of-cost policy exactly, so the
+        # tax-aware arm nests the tax-blind one and the comparison is about the objective only.
+        self.tax_short_rate = float(tax_short_rate)
+        self.tax_long_rate = float(tax_long_rate)
+        self.tax_harvest_haircut = float(tax_harvest_haircut)
+        self.tax_long_term_months = float(tax_long_term_months)
+        self.tax_boundary_tau = float(tax_boundary_tau)
         self.nets: list = []
         self.mu_: np.ndarray | None = None
         self.sd_: np.ndarray | None = None
@@ -123,6 +133,47 @@ class EconomicPolicy:
         denom = centred.abs().sum() + 1e-8
         return gross * centred / denom
 
+    @property
+    def tax_aware(self) -> bool:
+        return max(self.tax_short_rate, self.tax_long_rate) > 0.0
+
+    def _tax(self, w, w_prev, gain_prev, age_prev, batch, torch):
+        """Differentiable tax accrual for one month; returns (tax, gain_next, age_next).
+
+        Exact lot accounting is not differentiable, so the policy is trained against a tracked
+        average-cost approximation:
+
+        * ``gain`` is the embedded unrealised gain of each position in weight units. It grows by
+          ``w * r`` each month and is realised in proportion to how much of the position is closed.
+        * ``age`` is the value-weighted holding period in months: buying dilutes it, holding adds
+          to it. The statutory boundary (s1222) is a step function, so it is smoothed with a
+          sigmoid of width ``tax_boundary_tau``. The policy needs a gradient through that boundary,
+          which is the whole point of telling it the boundary exists.
+        * Short positions are charged the short-term rate unconditionally (s1233).
+
+        This approximation is used **only for training**. Scoring is always done by the exact
+        lot-level ledger in ``alphacomb.tax``, which applies HIFO, real holding periods and the
+        wash-sale rule. The gap between what the policy believed it would pay and what the ledger
+        actually charged is itself a diagnostic worth reporting.
+        """
+        eps = 1e-8
+        abs_prev, abs_w = w_prev.abs(), w.abs()
+        same_side = ((torch.sign(w_prev.detach()) * torch.sign(w.detach())) > 0).float()
+        retained = torch.minimum(abs_prev, abs_w) * same_side
+        closed_frac = torch.clamp((abs_prev - retained) / (abs_prev + eps), 0.0, 1.0)
+
+        realised = gain_prev * closed_frac
+        is_short = (w_prev.detach() < 0).float()
+        boundary = torch.sigmoid((age_prev - self.tax_long_term_months) / self.tax_boundary_tau)
+        rate = self.tax_short_rate + (self.tax_long_rate - self.tax_short_rate) * boundary * (1 - is_short)
+        tax = (rate * torch.relu(realised)
+               - self.tax_harvest_haircut * rate * torch.relu(-realised)).sum()
+
+        r = torch.tensor(batch.r, device=w.device)
+        gain_next = gain_prev * (1.0 - closed_frac) + w * r
+        age_next = (retained * (age_prev + 1.0)) / (abs_w + eps)
+        return tax, gain_next, torch.clamp(age_next, min=0.0)
+
     def _utility(self, w, w_prev, batch, torch):
         r = torch.tensor(batch.r, device=w.device)
         dw = w - w_prev
@@ -145,6 +196,8 @@ class EconomicPolicy:
         for chunk in chunks:
             prev_w = None
             prev_permnos = None
+            prev_gain = None
+            prev_age = None
             if optimiser is not None:
                 optimiser.zero_grad()
             chunk_utility = 0.0
@@ -154,14 +207,25 @@ class EconomicPolicy:
                 w = self._weights(raw, self.gross)
                 if prev_w is None:
                     w_prev = torch.zeros_like(w)
+                    gain_prev = torch.zeros_like(w)
+                    age_prev = torch.zeros_like(w)
                 else:
                     aligned = pd.Index(prev_permnos).get_indexer(batch.permnos)
                     mask = torch.tensor((aligned >= 0).astype("float32"), device=device)
-                    safe = np.clip(aligned, 0, None)
-                    w_prev = prev_w[torch.tensor(safe, device=device)] * mask
+                    safe = torch.tensor(np.clip(aligned, 0, None), device=device)
+                    w_prev = prev_w[safe] * mask
+                    gain_prev = prev_gain[safe] * mask
+                    age_prev = prev_age[safe] * mask
                 utility = self._utility(w, w_prev, batch, torch)
+                if self.tax_aware:
+                    tax, gain_next, age_next = self._tax(w, w_prev, gain_prev, age_prev, batch, torch)
+                    utility = utility - tax
+                else:
+                    gain_next = torch.zeros_like(w)
+                    age_next = torch.zeros_like(w)
                 chunk_utility = chunk_utility + utility
                 prev_w, prev_permnos = w, batch.permnos
+                prev_gain, prev_age = gain_next, age_next
                 total += float(utility.detach())
                 count += 1
             if optimiser is not None and count:
@@ -169,6 +233,8 @@ class EconomicPolicy:
                 torch.nn.utils.clip_grad_norm_(net.parameters(), 5.0)
                 optimiser.step()
                 prev_w = prev_w.detach() if prev_w is not None else None
+                prev_gain = prev_gain.detach() if prev_gain is not None else None
+                prev_age = prev_age.detach() if prev_age is not None else None
         return total / max(count, 1)
 
     # ------------------------------------------------------------------ api
@@ -230,15 +296,29 @@ class EconomicPolicy:
         return pd.concat(rows, ignore_index=True) if rows else pd.DataFrame(columns=["date", "permno", "w_prop"])
 
 
-def candidates(models_cfg: dict, nonlinear: bool, gamma: float, seed: int = 0, n_members: int = 1, fast: bool = False):
-    """(policy, params) pairs for the economic arm."""
+def candidates(models_cfg: dict, nonlinear: bool, gamma: float, seed: int = 0, n_members: int = 1,
+               fast: bool = False, tax_regime=None, harvest_haircut: float = 1.0):
+    """(policy, params) pairs for the economic arm.
+
+    ``tax_regime`` is an ``alphacomb.tax.TaxRegime``. Passing one switches the training objective
+    from net-of-cost utility to net-of-cost-and-tax utility. Passing ``None`` (the default)
+    reproduces the existing policy exactly, so the two arms are nested and the comparison isolates
+    the objective.
+    """
+    tax_short = float(getattr(tax_regime, "short_term_rate", 0.0) or 0.0)
+    tax_long = float(getattr(tax_regime, "long_term_rate", 0.0) or 0.0)
+    tax_months = float(getattr(tax_regime, "long_term_months", 12) or 12)
     cfg = models_cfg["economic_policy"]
     hidden_options = [tuple(cfg["hidden"])] if not fast else [tuple(cfg["hidden"])]
     lrs = [cfg["learning_rate"]] if fast else [cfg["learning_rate"], cfg["learning_rate"] * 2]
     for hidden in hidden_options:
         for lr in lrs:
             params = {"model": "economic_policy", "nonlinear": nonlinear, "hidden": list(hidden),
-                      "learning_rate": lr, "n_members": n_members}
+                      "learning_rate": lr, "n_members": n_members,
+                      "tax_regime": getattr(tax_regime, "name", None)}
             yield EconomicPolicy(nonlinear=nonlinear, hidden=hidden, gamma=gamma, learning_rate=lr,
                                  max_epochs=12 if fast else cfg["max_epochs"], patience=cfg["patience"],
-                                 bptt_months=cfg["bptt_months"], seed=seed, n_members=n_members), params
+                                 bptt_months=cfg["bptt_months"], seed=seed, n_members=n_members,
+                                 tax_short_rate=tax_short, tax_long_rate=tax_long,
+                                 tax_long_term_months=tax_months,
+                                 tax_harvest_haircut=harvest_haircut), params
