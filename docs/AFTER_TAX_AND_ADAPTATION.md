@@ -18,16 +18,42 @@ default regime encoded here, is of the same order as the trading cost. Jeffrey a
 question — *is your alpha big enough to cover its taxes?* — has never been asked of a machine-learning
 signal-combination pipeline.
 
-This gives us a claim that is **new, testable, and small enough to defend**:
+### CORRECTED after the prior-art search of 20 September 2026
 
-> The ranking of machine-learning signal-combination designs is not invariant to the investor's tax
-> status. Designs that win on net-of-cost Sharpe are not the designs that win after tax, and the
-> reordering is driven by a measurable channel: holding-period composition, not turnover alone.
+The first draft of this section claimed the reordering itself as new. **It is not.** A literature
+search (raw results in `ML_Alpha_Signal_Combination_Research/sources/`) found that the mechanism is
+already established at the style level:
 
-That claim is falsifiable. If the ranking turns out to be invariant, we report that, and it is still
-a finding worth a table: it would tell the literature its gross-of-tax results generalise.
+* **Israel & Moskowitz (2012)** and **Krasner & Sosner (2024)**: tax awareness shifts exposure away
+  from value and toward momentum, precisely because deferring gains means holding recent winners.
+* **Krasner & Sosner (2024)**: the net capital losses of a tax-aware long-short book come mainly
+  from *deferral of short-term gains*, not from elevated loss harvesting - and can exceed 100% of
+  initial capital within three years.
+* **Sialm & Sosner (2018)**: the s1233 character asymmetry that makes long/short tax-efficient.
+* Tax-aware long/short is a **~$150bn industry** (AQR and competitors). The mechanics we implemented
+  - wash sales, HIFO, harvesting, deferral - are industry standard.
+
+So the surviving claim is narrower, and it takes the reordering as its **prior**, not its finding:
+
+> Tax awareness is known to tilt factor exposures toward momentum. Does the same mechanism change
+> which *machine-learning combination design ingredient* is worth paying for? Specifically: does the
+> net-of-cost attribution across nonlinearity, conditioning, economic objective and uncertainty
+> survive after tax, or does the ranking of ingredients reorder?
+
+That is falsifiable and, as far as four web searches could establish, unanswered. If the ranking
+turns out to be invariant, we report that: it would tell the literature its gross-of-tax results
+generalise.
+
+**Claims we may NOT make** (see `03_Research_Gaps/Closest_Prior_Art_Tracker.md` rows 25-39):
+first to evaluate equities after tax; first to analyse a long/short book after tax; first to show
+momentum is tax-inefficient; first to use HIFO; first to model wash sales.
 
 **Status: [proposal]. The numbers in section 5 are a synthetic-data rehearsal, not a result.**
+
+**Search-quality caveat.** The negative result - no academic paper evaluates high-dimensional ML
+signal combination after tax - rests on four general web searches, because `parallel-cli` is not
+installed here and no research API keys are configured. It is weak evidence and must be re-run
+against Google Scholar, SSRN full text and practitioner publication lists before submission.
 
 ---
 
@@ -114,6 +140,24 @@ shows how much performance adaptive search manufactures under a no-predictabilit
 **The version that does:** fix the aggregation rule *ex ante*, feed it only realised out-of-sample
 outcomes, and inherit a regret bound.
 
+> ### THIS LAYER IS A METHOD, NOT A CONTRIBUTION
+> The prior-art search found **Remlinger, Alasseur, Brière & Mikael (2023), "Expert Aggregation for
+> Financial Forecasting"** (*J. Finance and Data Science*; arXiv 2111.15365), which applies Bernstein
+> Online Aggregation to combine **several ML models' individual stock return forecasts** into
+> **long-short strategies**, and reports that the aggregate beats the individual algorithms on Sharpe
+> and shortfall at similar turnover, including under non-stationarity.
+>
+> That is this layer. We may not claim novelty for aggregating over models, for stock-level
+> long-short application, for the regret bound, or for beating the members. The only differences
+> left are that our reward is realised **after-tax** net return rather than pre-tax performance, and
+> that our experts are **cells of a controlled factorial design** rather than arbitrary algorithms,
+> so the weight path reads as "which design ingredient is currently worth paying for".
+>
+> **Before the adaptive section is written**, read arXiv 2111.15365 in full and record whether they
+> already benchmark against the equal-weighted blend of the same experts. If they do, even that
+> comparison is theirs. Their BOA rule is also *stronger* than the plain Hedge implemented here
+> (Wintenberger 2017), so we must either adopt BOA or justify the simpler rule.
+
 * `hedge.py` — exponentially weighted average forecaster (Vovk 1990; Littlestone–Warmuth 1994;
   Freund–Schapire 1997; Cesa-Bianchi–Lugosi 2006). Cumulative performance falls short of the best
   single model *in hindsight* by at most O(√(T log N)), without knowing in advance which model that
@@ -185,6 +229,10 @@ Crossref pass confirms them.
 | **Sialm & Sosner (2018)** | **Taxes, shorting and active management — the closest work** | **Long/short tax treatment for factor portfolios. Does not do ML combination, and does not attribute across design ingredients. Threat: HIGH** |
 | Israel & Moskowitz (2012) | Tax efficiency of equity styles | Style portfolios, not learned combinations |
 | Chaudhuri, Burnham & Lo (2020) | Empirical evaluation of tax-loss-harvesting alpha | Harvesting as the strategy, not as a constraint on an alpha pipeline |
+| **Remlinger, Alasseur, Brière & Mikael (2023)** | **BOA over ML stock-return forecasts, long-short strategies, beats its members** | **Nothing, on the algorithm. Our only difference is the after-tax reward and the factorial experts. Threat: HIGH** |
+| **Krasner & Sosner (2024)** | **Tax benefit comes from gain deferral; tax awareness tilts value → momentum** | **Style level, not ML design level. Their result is our prior. Threat: HIGH** |
+| Sosner, Krasner & Pyne (2018) | Character vs deferral decomposition of the long-only relaxation | We reuse their vocabulary |
+| Wintenberger (2017) | Bernstein Online Aggregation | Stronger than our Hedge; adopt or justify |
 | Cover (1991); Blum & Kalai (1999); Li & Hoi (2014) | Universal portfolios, online portfolio selection | Aggregate over *assets*; we aggregate over *models*, scored after tax |
 | Herbster & Warmuth (1998) | Tracking the best expert | The rule we use, cited not claimed |
 | Gama et al. (2014) | Concept-drift adaptation survey | Source of the detector, cited not claimed |
