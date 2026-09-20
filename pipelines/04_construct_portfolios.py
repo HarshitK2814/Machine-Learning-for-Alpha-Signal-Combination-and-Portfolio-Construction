@@ -19,7 +19,8 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from alphacomb.contracts import load_bundle, load_config, new_run_id, paths, read_table, write_table  # noqa: E402
+from alphacomb.contracts import (append_manifest, load_bundle, load_config, new_run_id, paths,  # noqa: E402
+                                 read_table, write_table)
 from alphacomb.portfolio import OptimizerConfig, TaxState, construct, project  # noqa: E402
 from alphacomb.tax import TaxConfig, TaxLotLedger, get_regime  # noqa: E402
 from alphacomb.risk import RiskCache, StructuralRiskModel  # noqa: E402
@@ -163,7 +164,7 @@ def main() -> None:
                       name, held, months, 100 * held_share, 100 * a.max_held_share)
     manifest = pd.DataFrame(rows)
     path = paths.outputs_root() / "manifest_portfolios.csv"
-    manifest.to_csv(path, mode="a", header=not path.exists(), index=False)
+    append_manifest(manifest, path)
     print(manifest.to_string(index=False))
     print(f"\nmanifest: {path}")
 

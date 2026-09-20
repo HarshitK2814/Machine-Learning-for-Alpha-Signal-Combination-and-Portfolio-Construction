@@ -18,7 +18,7 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from alphacomb.contracts import load_bundle, load_config, new_run_id, paths  # noqa: E402
+from alphacomb.contracts import append_manifest, load_bundle, load_config, new_run_id, paths  # noqa: E402
 from alphacomb.contracts.interfaces import ALL_CELLS, CellSpec  # noqa: E402
 from alphacomb.models import CellRunConfig, run_cell  # noqa: E402
 from alphacomb.risk import RiskCache, StructuralRiskModel  # noqa: E402
@@ -115,7 +115,7 @@ def main() -> None:
     manifest = pd.DataFrame(manifest_rows)
     out = Path(a.manifest) if a.manifest else paths.outputs_root() / "manifest_models.csv"
     out.parent.mkdir(parents=True, exist_ok=True)
-    manifest.to_csv(out, mode="a", header=not out.exists(), index=False)
+    append_manifest(manifest, out)
     print(manifest.to_string(index=False))
     print(f"\nmanifest: {out}\ntrials:   {paths.trials_path()}")
 

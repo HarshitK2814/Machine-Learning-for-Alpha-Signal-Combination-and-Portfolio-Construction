@@ -46,7 +46,12 @@ def construction_quality() -> pd.DataFrame:
     path = paths.outputs_root() / "manifest_portfolios.csv"
     if not path.exists():
         return pd.DataFrame(columns=["strategy", "held_share"])
-    frame = pd.read_csv(path)
+    try:
+        frame = pd.read_csv(path)
+    except pd.errors.ParserError:
+        log.warning("manifest_portfolios.csv is damaged by header drift; construction quality "
+                    "unavailable. Re-run stage 04 to regenerate it.")
+        return pd.DataFrame(columns=["strategy", "held_share"])
     if "held_share" not in frame.columns:
         return pd.DataFrame(columns=["strategy", "held_share"])
     latest = frame.dropna(subset=["held_share"]).groupby("strategy").tail(1)
