@@ -138,6 +138,16 @@ def construct(date, alpha: pd.Series, w_prev: pd.Series | None, risk: RiskModel,
 
     adv_cap = np.clip(adv * cfg.adv_participation_max / cfg.aum_usd, 1e-6, None)
     pos_cap = np.minimum(cfg.weight_abs_max, np.maximum(adv_cap, 1e-5))
+    # A position that drifts above its cap cannot always be traded back inside it in one month:
+    # |w_i| <= pos_cap and |w_i - prev_i| <= adv_cap have an empty intersection whenever
+    # |prev_i| - adv_cap > pos_cap. Left alone this makes the whole problem infeasible, the solver
+    # fails, the caller holds stale weights, prev drifts further and the next month is worse - a
+    # self-reinforcing failure that silently turns a strategy into a stale buy-and-hold. It bites
+    # hardest in small illiquid names, where adv_cap is smallest, so it penalises exactly the cells
+    # that trade them and would have looked like "nonlinearity adds no net value".
+    # A real desk unwinds an over-cap position as fast as the participation limit allows rather
+    # than teleporting, so that is what we encode: the cap relaxes only as far as feasibility needs.
+    pos_cap = np.maximum(pos_cap, np.abs(prev) - adv_cap)
 
     w = cp.Variable(n)
     dw = w - prev
@@ -155,10 +165,21 @@ def construct(date, alpha: pd.Series, w_prev: pd.Series | None, risk: RiskModel,
 
     objective = cp.Maximize(a @ w - 0.5 * cfg.gamma * risk_term - cost_term - borrow_term - tax_term)
 
-    cons = [cp.norm1(w) <= cfg.gross_max, cp.abs(w) <= pos_cap, cp.abs(dw) <= adv_cap]
+    # The same feasibility argument applies to the gross budget: if the book drifts above
+    # gross_max by more than one month of participation-capped trading, ||w||_1 <= gross_max and
+    # |dw| <= adv_cap have no common solution. Relax to the minimum reachable level so the book
+    # walks back to budget instead of the solver failing and the caller freezing the portfolio.
+    gross_cap = max(cfg.gross_max, float(np.abs(prev).sum() - adv_cap.sum()))
+    net_slack = 0.0
+    cons = [cp.norm1(w) <= gross_cap, cp.abs(w) <= pos_cap, cp.abs(dw) <= adv_cap]
     cons += tax_cons
     if cfg.dollar_neutral and not cfg.long_only:
-        cons.append(cp.sum(w) == 0)
+        # Third instance of the same feasibility trap: sum(w) == 0 is unreachable in one month if
+        # the book has drifted net-long or net-short by more than the participation caps allow.
+        # An equality cannot be relaxed gracefully, so it becomes a band of exactly the width
+        # feasibility requires - zero in the normal case, where it is identical to the equality.
+        net_slack = max(0.0, abs(float(prev.sum())) - float(adv_cap.sum()))
+        cons.append(cp.abs(cp.sum(w)) <= net_slack)
     if cfg.long_only:
         cons += [w >= 0, cp.sum(w) == 1]
     cons.append(cp.abs(beta @ w) <= cfg.beta_abs_max)
@@ -166,15 +187,27 @@ def construct(date, alpha: pd.Series, w_prev: pd.Series | None, risk: RiskModel,
         cons.append(cp.abs(risk.B[col].to_numpy(dtype=float) @ w) <= cfg.industry_abs_max)
 
     problem = cp.Problem(objective, cons)
-    status = "failed"
+    # Escalate rather than accept the first answer. CLARABEL is fast but reports
+    # "optimal_inaccurate" on this problem's scaling (trade caps near 1e-6 against a gross budget
+    # of 2), where SCS returns a clean "optimal" with an objective agreeing to five significant
+    # figures. Take the first genuinely optimal solution; fall back to the best inaccurate one.
+    status, used_solver = "failed", ""
+    fallback = None
     for solver in available_solvers(cfg.solver_order):
         try:
             problem.solve(solver=getattr(cp, solver), verbose=False)
-            if w.value is not None and problem.status in {"optimal", "optimal_inaccurate"}:
-                status = problem.status
+            if w.value is None:
+                continue
+            if problem.status == "optimal":
+                status, used_solver = problem.status, solver
                 break
+            if problem.status == "optimal_inaccurate" and fallback is None:
+                fallback = (np.asarray(w.value).ravel().copy(), solver)
         except Exception as exc:  # pragma: no cover - solver availability varies
             log.debug("solver %s failed on %s: %s", solver, date, exc)
+    if status != "optimal" and fallback is not None:
+        w.value, used_solver = fallback[0], fallback[1]
+        status = "optimal_inaccurate"
     if status == "failed" or w.value is None:
         held = pd.Series(prev, index=permnos)
         log.warning("optimiser failed on %s; holding previous weights", pd.Timestamp(date).date())
@@ -191,7 +224,13 @@ def construct(date, alpha: pd.Series, w_prev: pd.Series | None, risk: RiskModel,
         expected_cost=float(cost_term.value) if hasattr(cost_term, "value") else float("nan"),
         turnover=float(np.abs(trade).sum() / 2),
         diagnostics={"n_assets": n, "gross": float(np.abs(weights).sum()), "net": float(weights.sum()),
-                     "tax_term": float(tax_term.value) if hasattr(tax_term, "value") else 0.0},
+                     "tax_term": float(tax_term.value) if hasattr(tax_term, "value") else 0.0,
+                     "solver": used_solver,
+                     # both recorded so a binding relaxation is visible in the manifest rather
+                     # than silently changing what the constraint means
+                     "gross_cap": float(gross_cap), "net_slack": float(net_slack),
+                     "cap_relaxed": bool(gross_cap > cfg.gross_max + 1e-12
+                                         or float(pos_cap.max()) > cfg.weight_abs_max + 1e-12)},
     )
 
 
@@ -220,6 +259,8 @@ def project(date, w_prop: pd.Series, risk: RiskModel, cost_inputs: pd.DataFrame,
     w = cp.Variable(n)
     cons = [cp.norm1(w) <= cfg.gross_max, cp.abs(w) <= pos_cap, cp.abs(beta @ w) <= cfg.beta_abs_max]
     if cfg.dollar_neutral and not cfg.long_only:
+        # project() has no previous book - a proposal is not a position - so there is no drift to
+        # accommodate and dollar neutrality stays a hard equality.
         cons.append(cp.sum(w) == 0)
     if cfg.long_only:
         cons += [w >= 0, cp.sum(w) == 1]
