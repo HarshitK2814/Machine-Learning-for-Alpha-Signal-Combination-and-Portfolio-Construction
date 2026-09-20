@@ -40,7 +40,7 @@ def discover(kind: str) -> dict[str, Path]:
 
 
 def build_weights(strategy: str, artefact: Path, kind: str, bundle, risk: RiskCache, cfg: OptimizerConfig,
-                  run_id: str, ledger: TaxLotLedger | None = None) -> Path:
+                  run_id: str, ledger: TaxLotLedger | None = None) -> tuple[Path, dict]:
     """Construct weights month by month.
 
     When ``ledger`` is supplied the optimiser is told, before each trade, what that trade would cost
@@ -85,8 +85,9 @@ def build_weights(strategy: str, artefact: Path, kind: str, bundle, risk: RiskCa
     frame = pd.concat(weights_rows, ignore_index=True)
     out = paths.weights_path(strategy, run_id)
     write_table(frame, out, "weights")
-    log.info("%s: %d months, statuses %s", strategy, len(weights_rows), pd.Series(statuses).value_counts().to_dict())
-    return out
+    counts = pd.Series(statuses).value_counts().to_dict()
+    log.info("%s: %d months, statuses %s", strategy, len(weights_rows), counts)
+    return out, counts
 
 
 def main() -> None:
@@ -105,6 +106,9 @@ def main() -> None:
     p.add_argument("--harvest-haircut", type=float, default=1.0,
                    help="how usable a realised loss is (1.0 = fully offsets other gains)")
     p.add_argument("--suffix", default="", help="append to the strategy name, e.g. '_taxaware'")
+    p.add_argument("--max-held-share", type=float, default=0.02,
+                   help="fail the run if more than this share of months fall back to held weights "
+                        "(see docs/SILENT_OPTIMISER_FAILURE.md)")
     a = p.parse_args()
 
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
@@ -128,7 +132,7 @@ def main() -> None:
         raise SystemExit("no model outputs found; run pipelines/02_train_models.py first")
     wanted = None if a.strategies == ["all"] else set(a.strategies)
 
-    rows = []
+    rows, failures = [], []
     for (kind, strategy), artefact in sorted(available.items(), key=lambda kv: kv[0][1]):
         if wanted and strategy not in wanted:
             continue
@@ -137,11 +141,26 @@ def main() -> None:
         run_id = new_run_id(f"pf_{name}")
         ledger = (TaxLotLedger(get_regime(a.tax_regime)) if a.tax_aware and kind == "predictions"
                   else None)
-        out = build_weights(name, artefact, kind, bundle, risk, opt, run_id, ledger)
+        out, counts = build_weights(name, artefact, kind, bundle, risk, opt, run_id, ledger)
+        months = sum(counts.values())
+        held = counts.get("failed_hold", 0)
+        held_share = held / months if months else 0.0
         rows.append({"strategy": name, "source_artefact": str(artefact), "weights": str(out),
                      "run_id": run_id, "cost_multiplier": a.cost_multiplier, "aum": opt.aum_usd,
                      "gamma": opt.gamma, "tax_aware": a.tax_aware, "wash_block": a.wash_block,
+                     "months": months, "n_optimal": counts.get("optimal", 0),
+                     "n_inaccurate": counts.get("optimal_inaccurate", 0), "n_held": held,
+                     "held_share": round(held_share, 4),
                      "minutes": round((time.time() - started) / 60, 2)})
+        if held_share > a.max_held_share:
+            # A held month is last month's book, not this month's model. A run with many of them
+            # describes a stale portfolio while still producing a well-formed return series, and
+            # the failure is correlated with which names a cell trades - so it is not comparable
+            # to a clean cell. Fail loudly rather than let it reach a results table.
+            failures.append((name, held, months, held_share))
+            log.error("%s: %d of %d months (%.1f%%) are HELD weights, above the --max-held-share "
+                      "threshold of %.1f%%. This strategy is not comparable to a clean one.",
+                      name, held, months, 100 * held_share, 100 * a.max_held_share)
     manifest = pd.DataFrame(rows)
     path = paths.outputs_root() / "manifest_portfolios.csv"
     manifest.to_csv(path, mode="a", header=not path.exists(), index=False)

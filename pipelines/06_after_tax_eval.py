@@ -27,12 +27,30 @@ from alphacomb.tax import LotMethod, TaxConfig, after_tax_backtest, get_regime, 
 log = logging.getLogger("stage06")
 
 REPORT_COLUMNS = [
-    "strategy", "regime", "lot_method", "months", "gross_sharpe", "net_sharpe", "after_tax_sharpe",
+    "strategy", "held_share", "regime", "lot_method", "months", "gross_sharpe", "net_sharpe", "after_tax_sharpe",
     "gross_mean_ann", "net_mean_ann", "after_tax_mean_ann", "after_tax_liq_mean_ann",
     "cost_drag_ann_bps", "tax_drag_ann_bps", "total_drag_ann_bps", "tax_share_of_gross",
     "wash_disallowed_ann_bps", "lt_share_of_gains", "turnover_mean", "max_drawdown",
     "deferred_tax_ret", "terminal_nav_multiple",
 ]
+
+
+def construction_quality() -> pd.DataFrame:
+    """Held-weight share per strategy, from the portfolio manifest.
+
+    A month that fell back to held weights is last month's book, not this month's model. Carrying
+    the share into every results row means a reader never has to take on trust that the optimiser
+    succeeded - and never compares a stale cell with a clean one without seeing it.
+    See docs/SILENT_OPTIMISER_FAILURE.md.
+    """
+    path = paths.outputs_root() / "manifest_portfolios.csv"
+    if not path.exists():
+        return pd.DataFrame(columns=["strategy", "held_share"])
+    frame = pd.read_csv(path)
+    if "held_share" not in frame.columns:
+        return pd.DataFrame(columns=["strategy", "held_share"])
+    latest = frame.dropna(subset=["held_share"]).groupby("strategy").tail(1)
+    return latest[["strategy", "held_share"]].reset_index(drop=True)
 
 
 def main() -> None:
@@ -85,7 +103,17 @@ def main() -> None:
                     write_table(frame, paths.returns_path(folder.name, run_id), "returns")
 
     report = pd.DataFrame(rows)
+    quality = construction_quality()
+    report = report.merge(quality, on="strategy", how="left")
     report = report[[c for c in REPORT_COLUMNS if c in report.columns]]
+    stale = report.loc[report["held_share"].fillna(0) > 0.02, "strategy"].unique()
+    if len(stale):
+        log.warning("STALE: %s fell back to held weights on more than 2%% of months. Their rows "
+                    "below describe a drifting portfolio, not the model.", ", ".join(sorted(stale)))
+    unknown = report.loc[report["held_share"].isna(), "strategy"].unique()
+    if len(unknown):
+        log.warning("held_share unknown for %s - manifest predates the check; re-run stage 04 "
+                    "before reporting these.", ", ".join(sorted(unknown)))
     out = paths.outputs_root() / "summary_after_tax.csv"
     report.to_csv(out, index=False)
     pd.set_option("display.width", 250)
