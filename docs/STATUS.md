@@ -1,6 +1,6 @@
 # Workstream B status (Harshit)
 
-Updated: 2026-09-20. Synthetic data only. **No real-data or paper results exist.**
+Updated: 2026-09-20 (second revision). Synthetic data only. **No real-data or paper results exist.**
 
 ## Done
 
@@ -21,7 +21,23 @@ Updated: 2026-09-20. Synthetic data only. **No real-data or paper results exist.
 | **Self-adapting combination: Hedge with fixed share, drift detection** | **E74-E75 (new)** | **Done** | `tests/adaptive` (15 tests) |
 | Pipelines 06 (after-tax) and 07 (adaptive) | - | Done | run on the 2003-2020 synthetic span |
 
-Total: 117 tests, 116 passing and 1 skipped (a solver-dependent optimiser path).
+| **Optimiser feasibility under drifted weights** | **fix** | **Done** | `tests/portfolio/test_cap_feasibility.py` (4 tests) |
+| Stale-portfolio guard in stage 04, construction quality in stage 06 | - | Done | `--max-held-share`, `held_share` column |
+
+Total: **130 tests, all passing, none skipped.**
+
+### A bug worth knowing about before reading any number in this repo
+
+The first 216-month walk-forward was **void**. Two cells had silently degraded into stale
+buy-and-holds (`cell_N-C-P-0` held weights on 69% of months, `cell_N-S-P-0` on 43%) because three
+optimiser constraints become infeasible once weights drift past what ADV-capped trading can unwind.
+Nothing crashed; the output was contract-valid the whole way through. The failure was correlated
+with the treatment - it hit the cells that trade small illiquid names - so it was on course to
+produce "nonlinearity adds no net value" as an artefact of the solver.
+
+Fixed, guarded and written up in `docs/SILENT_OPTIMISER_FAILURE.md`. Every strategy now reports its
+held-weight share, and stage 04 exits non-zero above 2%. After the fix all five full-span
+strategies solve 216/216 optimal.
 
 Contracts bumped to **v1.1.0**, additively: optional `targets.div_next` (the dividend part of
 `ret_next`) and optional tax columns on `returns` (C12). Nothing existing breaks.
