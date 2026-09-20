@@ -27,6 +27,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from alphacomb.adaptive import (HedgeConfig, adaptation_report, build_members, combine,  # noqa: E402
                                 compare, member_rewards, refit_schedule)
+from alphacomb.adaptive.meta import equal_weight_alpha  # noqa: E402
 from alphacomb.contracts import load_bundle, load_config, new_run_id, paths, write_table  # noqa: E402
 from alphacomb.portfolio import OptimizerConfig, construct  # noqa: E402
 from alphacomb.risk import RiskCache, StructuralRiskModel  # noqa: E402
@@ -100,7 +101,18 @@ def main() -> None:
     write_table(weights, paths.weights_path("adaptive_hedge", run_id), "weights")
 
     combined_returns = after_tax_backtest(weights, bundle, cfg, tax_cfg)
-    table = compare(members, combined_returns, a.reward)
+
+    # The benchmark that actually isolates adaptation. "adaptive_hedge" averages member ALPHAS and
+    # re-optimises once; averaging member RETURNS instead compares three separately optimised books.
+    # Those differ for reasons that have nothing to do with the online rule - forecast averaging
+    # smooths the alpha, which lowers turnover and cost. Holding the pipeline fixed and changing
+    # only the weights is the comparison that answers "does adapting help?".
+    log.info("building the fixed-weight alpha blend (the like-for-like benchmark)")
+    eq_alpha = equal_weight_alpha(members)
+    eq_weights = weights_from_alpha(eq_alpha, bundle, risk, opt)
+    eq_returns = after_tax_backtest(eq_weights, bundle, cfg, tax_cfg)
+
+    table = compare(members, combined_returns, a.reward, fixed_weight_returns=eq_returns)
     report = adaptation_report(weight_panel, members, a.reward)
 
     out_dir = paths.outputs_root()
@@ -123,18 +135,28 @@ def main() -> None:
 
 
 def _verdict(table: pd.DataFrame) -> None:
-    """State plainly whether the adaptive rule earned its place."""
+    """State plainly whether ADAPTATION earned its place - not whether blending did."""
     try:
-        adaptive = table[table["kind"] == "adaptive"]["after_tax_sharpe"].iloc[0]
-        blend = table[table["strategy"] == "equal_weight_blend"]["after_tax_sharpe"].iloc[0]
-        best_member = table[table["kind"] == "member"]["after_tax_sharpe"].max()
-    except (IndexError, KeyError):
+        adaptive = float(table[table["kind"] == "adaptive"]["after_tax_sharpe"].iloc[0])
+        best_member = float(table[table["kind"] == "member"]["after_tax_sharpe"].max())
+    except (IndexError, KeyError, ValueError):
         return
+    fixed = table[table["strategy"] == "equal_weight_alpha"]["after_tax_sharpe"]
     print("\nverdict")
-    print(f"  adaptive {adaptive:.3f} vs equal-weight blend {blend:.3f} vs best single member {best_member:.3f}")
-    if adaptive <= blend:
-        print("  the adaptive rule did NOT beat an equal-weighted blend of the same models.")
-        print("  that is a result, not a bug: report it rather than tuning until it reverses.")
+    print(f"  adaptive {adaptive:.3f} vs best single member {best_member:.3f}")
+    if not len(fixed):
+        print("  NO like-for-like benchmark was built, so this says nothing about adaptation.")
+        return
+    fixed = float(fixed.iloc[0])
+    gap = adaptive - fixed
+    print(f"  adaptive {adaptive:.3f} vs FIXED equal-weight alpha blend {fixed:.3f}  ({gap:+.3f})")
+    print("  The second line is the one that matters: same members, same optimiser, same ledger,")
+    print("  only the combination weights differ. The first line mostly measures the value of")
+    print("  averaging forecasts, which is not what the adaptive rule is for.")
+    if gap <= 0.02:
+        print("  ADAPTATION DID NOT PAY. The online rule is no better than fixing the weights at")
+        print("  1/N. Report that. It matches Remlinger et al. (2023), who find the uniform")
+        print("  mixture beats their online rule on small-cap stocks.")
 
 
 if __name__ == "__main__":

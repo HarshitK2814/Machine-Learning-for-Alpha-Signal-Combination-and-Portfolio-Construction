@@ -11,11 +11,11 @@ from .drift import DriftEvent, PageHinkley, calibrate_threshold, detect, refit_s
 from .hedge import (HedgeAggregator, HedgeConfig, HedgeState, best_in_hindsight,  # noqa: F401
                     equal_weight_benchmark, run_aggregation)
 from .meta import (MemberResult, adaptation_report, assert_causal, build_members,  # noqa: F401
-                   combine, compare, member_rewards)
+                   combine, compare, equal_weight_alpha, member_rewards)
 
 __all__ = [
     "DriftEvent", "HedgeAggregator", "HedgeConfig", "HedgeState", "MemberResult", "PageHinkley",
     "adaptation_report", "assert_causal", "best_in_hindsight", "build_members", "calibrate_threshold",
-    "combine", "compare", "detect", "equal_weight_benchmark", "member_rewards", "refit_schedule",
+    "combine", "compare", "detect", "equal_weight_alpha", "equal_weight_benchmark", "member_rewards", "refit_schedule",
     "run_aggregation",
 ]

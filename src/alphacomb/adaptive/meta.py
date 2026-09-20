@@ -121,17 +121,53 @@ def combine(members: list[MemberResult], cfg: HedgeConfig | None = None,
     return weight_panel, alpha
 
 
+def equal_weight_alpha(members: list[MemberResult]) -> pd.DataFrame:
+    """Blend member alphas with fixed 1/N weights - the benchmark that isolates adaptation.
+
+    Comparing the adaptive combination against the mean of the members' *realised returns* answers
+    the wrong question. That benchmark averages three separately optimised books, while the adaptive
+    arm averages forecasts and optimises once. Averaging forecasts smooths the alpha, which lowers
+    turnover and therefore cost, so the two differ for reasons that have nothing to do with the
+    online rule. On our first run the adaptive arm scored 0.851 against 0.673 for the return blend
+    while its weights sat at 0.31/0.34/0.35 - essentially uniform. Almost all of that gap was
+    forecast averaging being credited to adaptation.
+
+    This blend runs the identical pipeline - same members, same optimiser, same ledger - and
+    changes only the weights. The difference between it and the adaptive arm is the value of
+    adapting, and nothing else.
+    """
+    frames = []
+    n = len(members)
+    for m in members:
+        table = m.predictions[["date", "permno", "score", "alpha"]].copy()
+        table[["score", "alpha"]] = table[["score", "alpha"]] / n
+        frames.append(table)
+    out = (pd.concat(frames, ignore_index=True)
+             .groupby(["date", "permno"], as_index=False)[["score", "alpha"]].sum())
+    out["permno"] = out["permno"].astype("int32")
+    return out.sort_values(["date", "permno"]).reset_index(drop=True)
+
+
 def compare(members: list[MemberResult], combined_returns: pd.DataFrame,
-            reward_column: str = "after_tax_ret") -> pd.DataFrame:
-    """Adaptive versus every benchmark it has to beat before the result means anything."""
+            reward_column: str = "after_tax_ret",
+            fixed_weight_returns: pd.DataFrame | None = None) -> pd.DataFrame:
+    """Adaptive versus every benchmark it has to beat before the result means anything.
+
+    ``fixed_weight_returns`` is the like-for-like benchmark: the same members blended at 1/N,
+    through the same optimiser and ledger. Without it this table cannot separate the value of
+    adapting from the value of blending, and the adaptive row will flatter itself.
+    """
     rewards = member_rewards(members, reward_column)
     rows = []
     for name in rewards.columns:
         m = next(x for x in members if x.name == name)
         rows.append({"strategy": name, "kind": "member", **summarise_after_tax(m.returns)})
     eq = rewards.mean(axis=1)
-    rows.append({"strategy": "equal_weight_blend", "kind": "benchmark",
+    rows.append({"strategy": "equal_weight_return_blend", "kind": "not_like_for_like",
                  **_summary_from_series(eq)})
+    if fixed_weight_returns is not None:
+        rows.append({"strategy": "equal_weight_alpha", "kind": "benchmark",
+                     **summarise_after_tax(fixed_weight_returns)})
     best = rewards.sum().idxmax()
     rows.append({"strategy": f"best_in_hindsight[{best}]", "kind": "not_implementable",
                  **_summary_from_series(rewards[best])})

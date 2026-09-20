@@ -209,7 +209,18 @@ python pipelines/07_adaptive_combine.py --members all --share 0.05
 
 ## 5. Results
 
-*(filled in by the run recorded in `docs/AFTER_TAX_RESULTS.md`)*
+Full write-up in **`docs/AFTER_TAX_RESULTS.md`**. Headline, 216 months on synthetic data:
+
+* A taxable top-bracket investor keeps **an after-tax Sharpe of 0.35-0.70** where the tax-exempt
+  investor the literature assumes sees **0.51-0.99**. Tax takes 14-24% of gross return; under
+  s475(f) mark-to-market, 37-39%.
+* **Turnover does not explain the tax bill.** Turnover spans 1.09x across five books while tax as a
+  share of gross spans 1.71x, and ranking by long-term share of gains is perfectly monotonic with
+  the tax share (Spearman -1.000, n=5). This is the mechanism the claim rests on.
+* **Two negative results, both kept.** Training the policy on after-tax utility cut the tax bill by
+  7.4 bps and gave up 30.1 bps of pre-tax return - it lost. And the adaptive rule scored 0.851
+  against 0.854 for fixing the weights at 1/N, so **adaptation added nothing**; the apparent gain
+  over single members is forecast averaging, not online learning.
 
 ---
 
