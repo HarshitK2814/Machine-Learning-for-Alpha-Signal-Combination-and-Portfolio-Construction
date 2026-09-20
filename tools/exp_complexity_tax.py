@@ -46,7 +46,7 @@ log = logging.getLogger("exp_complexity")
 
 
 def run_rung(n_feat: int, penalty: str, bundle, cfg, risk, opt, calendar, df, features, seed: int,
-             train_rows: int):
+             train_rows: int, ridge_alpha: float = 1e3):
     """Walk-forward one complexity rung and return its predictions (contract C9 shape).
 
     Complexity is indexed by the **feature count P**, with the training sample subsampled to a
@@ -68,8 +68,11 @@ def run_rung(n_feat: int, penalty: str, bundle, cfg, risk, opt, calendar, df, fe
         if len(train) > train_rows:
             train = train.iloc[rng.choice(len(train), size=train_rows, replace=False)]
         c = n_feat / max(len(train), 1)
+        # alpha and gamma come from the calibrated defaults. Hardcoding alpha=1e-6 here is what
+        # made the first two runs meaningless: every rung sat in the noise-fitting regime and
+        # validation IC was indistinguishable from zero.
         model = ComplexityCell(complexity=c, penalty=penalty, max_features=n_feat,
-                               alpha=1e-6 if penalty == "ridge" else 1e-4, seed=seed)
+                               alpha=ridge_alpha if penalty == "ridge" else 1e-4, seed=seed)
         model.fit(train, val, features.all, "y")
         val_pred = model.predict(val, features.all)["score"].to_numpy()
         ic = rank_ic(val_pred, val["y"].to_numpy(), val["date"])
@@ -116,6 +119,8 @@ def main() -> None:
     p = argparse.ArgumentParser(description="Complexity x tax mechanism test (P1/P2/P3).")
     p.add_argument("--features", nargs="+", type=int, default=[50, 200, 500, 1000, 2000, 4000],
                    help="number of random features P; with --train-rows this sweeps c = P/T")
+    p.add_argument("--ridge-alpha", type=float, default=1e3,
+                   help="ridge strength; must be large enough to control a P-dimensional fit")
     p.add_argument("--train-rows", type=int, default=2000,
                    help="subsample size T, so that c = P/T crosses the interpolating boundary")
     p.add_argument("--penalty", default="ridge", choices=["ridge", "l1"])
@@ -145,7 +150,7 @@ def main() -> None:
         log.info("=== P = %d features (T = %d, c = %.3g), %s ===",
                  n_feat, a.train_rows, n_feat / a.train_rows, a.penalty)
         preds = run_rung(n_feat, a.penalty, bundle, cfg, risk, opt, calendar, df, features,
-                         a.seed, a.train_rows)
+                         a.seed, a.train_rows, a.ridge_alpha)
         if preds is None or preds.empty:
             log.warning("P=%d produced no predictions", n_feat)
             continue
@@ -160,7 +165,7 @@ def main() -> None:
             frame = after_tax_backtest(weights, bundle, cfg, tc)
             s = summarise_after_tax(frame)
             results.append({"n_features": n_feat, "complexity": c, "penalty": a.penalty, "regime": regime,
-                            "months": s["months"], "val_ic": float(preds["val_ic"].iloc[0]),
+                            "months": s["months"], "val_ic": float(preds["val_ic"].mean()),
                             "turnover_mean": s["turnover_mean"],
                             "lt_share_of_gains": s["lt_share_of_gains"],
                             "tax_share_of_gross": s["tax_share_of_gross"],
