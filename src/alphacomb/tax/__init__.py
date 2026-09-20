@@ -6,12 +6,17 @@ order of magnitude as the trading cost, so "net of costs" is not the same as "ne
 answers the question the literature skips: what does the investor actually keep?
 """
 from .backtest import TaxConfig, after_tax_backtest, compare_regimes, summarise_after_tax  # noqa: F401
+from .jurisdictions import (CHINA_A, GERMANY, HONG_KONG, INDIA, JAPAN, JURISDICTIONS,  # noqa: F401
+                            SINGAPORE, TAIWAN, UNITED_KINGDOM, UNITED_STATES, Jurisdiction,
+                            TransactionTaxes, get_jurisdiction, identification_table)
 from .lots import Lot, LotMethod, RealisedGain, TaxLotLedger  # noqa: F401
 from .regimes import (FUND_OFFSHORE, REGIMES, TAXABLE_US, TAX_EXEMPT, TRADER_475F,  # noqa: F401
                       TaxRegime, get_regime)
 
 __all__ = [
-    "FUND_OFFSHORE", "Lot", "LotMethod", "REGIMES", "RealisedGain", "TAXABLE_US", "TAX_EXEMPT",
+    "CHINA_A", "FUND_OFFSHORE", "GERMANY", "HONG_KONG", "INDIA", "JAPAN", "JURISDICTIONS",
+    "Jurisdiction", "SINGAPORE", "TAIWAN", "TransactionTaxes", "UNITED_KINGDOM", "UNITED_STATES",
+    "get_jurisdiction", "identification_table", "Lot", "LotMethod", "REGIMES", "RealisedGain", "TAXABLE_US", "TAX_EXEMPT",
     "TRADER_475F", "TaxConfig", "TaxLotLedger", "TaxRegime", "after_tax_backtest", "compare_regimes",
     "get_regime", "summarise_after_tax",
 ]
