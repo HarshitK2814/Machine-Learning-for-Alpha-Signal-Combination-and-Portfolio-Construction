@@ -94,64 +94,78 @@ the answer.
 
 ## 4. What we found
 
-### 4.1 The overhang does not compound
+**Revised 22 September 2026.** The first version of this section concluded that the overhang is
+small and cancelled by an accumulated loss carryforward. **That conclusion was an artefact of
+testing an unlevered, tax-blind book** - which is not the product under dispute. Once the tax-aware
+optimiser was repaired and the leverage sweep run properly, the result reversed.
 
-Our 216-month book, taxable US top bracket. Overhang as a share of reported performance:
+### 4.1 Tax-awareness, not leverage, is what creates the overhang
 
-| Horizon | 3y | 5y | 10y | 15y | 18y |
-|---|---|---|---|---|---|
-| Overhang share | 10.1% | 2.7% | 0.4% | 4.5% | 3.0% |
+216 months, taxable US top bracket, embedded gain as a share of NAV, first checkpoint to last:
 
-It peaks early and stays small. The embedded gain sits between 1% and 4% of NAV, because a
-dollar-neutral book turning over 15% a month never accumulates a large unrealised position.
+| Book | Embedded gain 3y → 18y | Sheltered by carryforward | Net deferred tax |
+|---|---|---|---|
+| gross 2, tax-blind | +2.7% → **+3.6%** | 0% | +0.85% |
+| gross 4, tax-blind | +2.1% → **+3.4%** | 17% | +0.82% |
+| gross 6, tax-blind | +1.5% → **+3.9%** | 25% | +0.93% |
+| gross 2, **tax-aware** | +8.9% → **+22.4%** | 16% | **+3.41%** |
+| gross 4, **tax-aware** | +13.7% → **+26.2%** | 4% | **+5.65%** |
+| gross 6, **tax-aware** | +17.2% → **+39.4%** | 24% | **+5.87%** |
 
-### 4.2 The liability is cancelled by an asset nobody counts
+Every tax-aware book accumulates. Every tax-blind book does not. Leverage amplifies the size - 22%
+of NAV at gross 2 against 39% at gross 6 - but it is the **objective**, not the leverage, that
+switches the phenomenon on.
 
-For the tax-aware arm at 18 years:
+### 4.2 The carryforward does NOT cancel it
 
-| | share of NAV |
-|---|---|
-| Embedded gain — the "hidden liability" | **+1.71%** |
-| Loss carryforward — the asset | **+3.80%** |
-| **Net deferred tax** | **0.00%** |
+This is where the earlier conclusion was wrong. On the unlevered tax-blind book the carryforward
+(3.8% of NAV) exceeded the embedded gain (1.7%) and the net liability was zero. On a tax-aware
+book the carryforward covers only **4% to 25%** of a much larger embedded gain, and the net deferred
+tax settles at **roughly 5.9% of NAV**.
 
-A strategy that harvests aggressively builds a loss carryforward, and that carryforward shelters the
-embedded gain when it is finally realised. **Measuring the embedded gain alone overstates what the
-investor owes.** The first version of our own module hid the carryforward; a test forced it into the
-open, and it turned out to be the most important quantity in the comparison.
+The mechanism is not mysterious. A tax-aware optimiser holds winners and sells losers. Selling
+losers generates carryforward, but holding winners grows the embedded gain faster, so the shelter
+falls behind.
 
-### 4.3 Carryforward *life* barely matters; carryforward *existence* does
+### 4.3 What this means for the dispute
 
-| Carryforward regime | Net deferred tax | After-tax return |
-|---|---|---|
-| US, indefinite | 0.00% | 855 bps |
-| India, 8 years | 0.00% | 855 bps |
-| Japan, 3 years | 0.00% | 855 bps |
-| **None at all** | **0.41%** | **781 bps** |
+On our book, moved toward the product's design, **the criticism has support**:
 
-Even a three-year life is enough, because a continuously harvesting strategy keeps replacing the
-balance. Only removing relief entirely bites — and it costs about **74 bps a year**, roughly 9% of
-the after-tax return. That connects directly to `alphacomb.tax.jurisdictions`: Germany ring-fences
-share losses to share gains, Japan separates listed from unlisted.
+* the stock of unrealised gain accumulates rather than recycling - 17% to 39% of NAV over fifteen
+  years at gross 6;
+* the loss carryforward does not cover it;
+* a realised-basis report - **the one the standard mandates** - understates what the investor owes
+  by about **5.9% of NAV**.
+
+Note the two measures point different ways and both are in the table. The overhang as a share of
+*annualised* performance **falls** with horizon (25.2% at 3 years to 15.7% at 18) simply because one
+stock of liability is spread over more years. The **stock itself** more than doubles. The criticism
+is about the stock. Our own verdict function originally checked the ratio and therefore reported
+"does not grow" - a reminder that the summary statistic has to match the claim being tested.
 
 ## 5. What we have NOT shown, and why it matters
 
 **Our strategy is not the product under dispute.** Three differences, each of which cuts against
 generalising:
 
-1. **No leverage.** TALS uses leverage — often well past 100% gross — *specifically* to create more
-   positions and therefore more harvesting opportunities. Ours is a gross-2.0 dollar-neutral book.
-2. **No deliberate deferral.** The criticism is about a strategy engineered to defer gains on the
-   long side. Ours optimises after-tax utility but is not built to maximise deferral.
-3. **Synthetic data.** The embedded-gain trajectory depends on the return process, and ours is one
-   we wrote.
+1. ~~No leverage~~ **addressed**: the sweep runs gross 2, 4 and 6. Leverage amplifies the embedded
+   gain but does not cause it.
+2. ~~No deliberate deferral~~ **partly addressed**: the tax-aware arm holds winners and sells
+   losers, which is the mechanism. It is still not tuned to maximise deferral the way a commercial
+   product would be, so our magnitudes are probably a **lower bound**.
+3. **Synthetic data.** Unchanged and still the binding limitation. The embedded-gain trajectory
+   depends on the return process, and ours is one we wrote.
+4. **Our optimiser was broken until 21 September.** Three attempts were needed. The numbers above
+   come from the repaired version with zero solver failures across all six cells, but the history
+   is in `STATUS.md` and a reader is entitled to weigh it.
 
 So the honest claim is narrow:
 
-> We have built and validated the instrument that can settle this dispute, and shown that on a
-> conventional ML long/short book the deferral overhang is small, does not compound, and is offset
-> by an accumulated loss carryforward. **Whether that holds for a levered, deliberately deferring
-> product on real data is exactly the question, and it is open.**
+> We have built and validated the instrument, and shown on synthetic data that a **tax-aware**
+> book accumulates an embedded gain the loss carryforward does not cover, reaching 39% of NAV and
+> leaving roughly 5.9% of NAV in unreported deferred tax - while an otherwise identical tax-blind
+> book does not. **Whether the magnitudes hold on real data, and whether a real product's design
+> sits closer to our tax-aware or tax-blind arm, are both open.**
 
 Anyone claiming we have vindicated or refuted AQR from this is misreading it.
 

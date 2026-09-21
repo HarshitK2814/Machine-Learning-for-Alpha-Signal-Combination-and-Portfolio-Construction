@@ -139,38 +139,50 @@ def main() -> None:
     _verdict(out, traj)
 
 
-def _verdict(out: pd.DataFrame, traj: pd.DataFrame) -> None:
-    print("\nverdict")
+def _verdict(out, traj) -> None:
+    """Two different questions, and the first version only asked one of them.
+
+    ``overhang_share`` is the deferred liability as a share of ANNUALISED reported performance. It
+    shrinks mechanically as the horizon lengthens, because one stock of liability is divided across
+    more years. Checking only that answers "is the gap widening per year", which is not the
+    criticism.
+
+    The criticism is that the STOCK of unrealised gain accumulates - "perpetually deferring the
+    realization of gains". That is ``embedded_gain_pct_nav``, and it is what has to be checked.
+    """
     hi = out[out["gross"] == out["gross"].max()]
-    aware = hi[hi["tax_aware"]]
-    blind = hi[~hi["tax_aware"]]
-    if aware.empty or blind.empty:
-        print("  incomplete sweep")
-        return
-    a_share = float(aware["overhang_share"].iloc[0])
-    b_share = float(blind["overhang_share"].iloc[0])
-    print(f"  at the highest gross, overhang share: tax-aware {a_share:+.4f} vs "
-          f"tax-blind {b_share:+.4f}")
+    aware, blind = hi[hi["tax_aware"]], hi[~hi["tax_aware"]]
+    print("\nverdict")
+    if not aware.empty and not blind.empty:
+        print(f"  at the highest gross, overhang share: tax-aware "
+              f"{float(aware['overhang_share'].iloc[0]):+.4f} vs tax-blind "
+              f"{float(blind['overhang_share'].iloc[0]):+.4f}")
 
-    worst = traj.loc[traj["overhang_share"].abs().idxmax()]
-    print(f"  largest overhang anywhere in the sweep: {worst['overhang_share']:+.4f} "
-          f"at gross={worst['gross']:g}, tax_aware={worst['tax_aware']}, "
-          f"{worst['years']:.0f} years")
-
-    grew = []
+    print("\n  accumulation of the embedded gain (the quantity the criticism is about):")
+    accumulating = []
     for (g, t), sub in traj.groupby(["gross", "tax_aware"]):
         sub = sub.sort_values("months")
-        if len(sub) >= 3 and sub["overhang_share"].iloc[-1] > sub["overhang_share"].iloc[0] + 0.02:
-            grew.append((g, t))
-    if grew:
-        print(f"  overhang GREW with age in: {grew}")
-        print("  consistent with the criticism: deferral accumulating rather than being recycled.")
+        first = float(sub["embedded_gain_pct_nav"].iloc[0])
+        last = float(sub["embedded_gain_pct_nav"].iloc[-1])
+        shelter = float(sub["carryforward_pct_nav"].iloc[-1])
+        net = float(sub["deferred_tax_pct_nav"].iloc[-1])
+        covered = ("fully sheltered by carryforward" if shelter >= last
+                   else f"only {shelter / max(last, 1e-9):.0%} sheltered")
+        print(f"    gross={g:g} tax_aware={str(t):<5}  {first:+.1%} -> {last:+.1%} of NAV, "
+              f"{covered}, net deferred tax {net:+.2%}")
+        if last > first + 0.05:
+            accumulating.append((g, bool(t)))
+
+    print("\nVERDICT")
+    if accumulating:
+        print(f"  the embedded gain ACCUMULATES in: {accumulating}")
+        print("  that is the pattern the criticism describes. Where the carryforward no longer")
+        print("  covers it, the deferred liability is real and a realised-basis report understates")
+        print("  what the investor owes.")
     else:
-        print("  overhang did NOT grow with age in any cell.")
-        print("  the carryforward keeps cancelling the embedded gain, so on this book the")
-        print("  'perpetually deferring' criticism does not bite. That is a result, not a defence")
-        print("  of the product - our book is still not the levered, deliberately deferring")
-        print("  design under dispute, and this runs on synthetic data.")
+        print("  the embedded gain does not accumulate in any cell.")
+    print("  Caveat unchanged: synthetic data, and our book approximates the product under")
+    print("  dispute rather than being it.")
 
 
 if __name__ == "__main__":
