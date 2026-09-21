@@ -9,14 +9,18 @@ The term added to the objective is
     tax(w) = sum_i  rate_i * max(g_i, 0) * pos(w_prev_i - w_i)      (gains: a cost of selling)
            - sum_i  rate_i * |min(g_i, 0)| * s_i                     (losses: a benefit of selling)
 
-where ``g_i`` is the embedded gain per dollar of position i, ``rate_i`` is the blended statutory
-rate the ledger would apply to that position today, and ``s_i`` is a bounded sell variable with
-``0 <= s_i <= w_prev_i`` and ``s_i <= w_prev_i - w_i``.
+where ``g_i`` is the embedded gain per dollar of position i and ``rate_i`` is the blended statutory
+rate the ledger would apply to that position today.
 
-Convexity. The first sum is convex (``pos`` is convex, coefficients are non-negative), so its
-negative is concave and safe inside a maximisation. The second sum needs the auxiliary variable:
-writing it directly as a function of ``w`` would make the objective non-concave. Bounding ``s_i`` by
-the existing position is what stops the solver from manufacturing unlimited harvesting.
+Convexity. The gain term is convex (``pos`` is convex, coefficients are non-negative), so its
+negative is concave and safe inside a maximisation. The loss term is **affine** in ``w`` and so is
+safe in either direction.
+
+An earlier version modelled the loss term with an auxiliary sell variable constrained by
+``s <= w_prev - w``. That constraint implies ``w <= w_prev``, which silently forbade the optimiser
+from ever increasing a position, and the problem went infeasible within a few months. A constraint
+introduced to model an objective term must never restrict the decision variable. The affine form
+needs no variable and no constraint.
 
 The wash-sale trap. An optimiser with a harvesting reward and no further constraint will sell a
 loser and buy it straight back the next month - and s1091 will disallow exactly that loss. This is
@@ -100,27 +104,42 @@ def cvx_tax_cost(w, w_prev: np.ndarray, gain_rate: np.ndarray, tax_rate: np.ndar
     rate = np.asarray(tax_rate, dtype=float)
     is_long = prev > 0
 
+    # Build cp.pos() only over the names whose coefficient is non-zero. CVXPY introduces an
+    # auxiliary variable per element of pos(), so writing it across the whole universe doubled the
+    # problem size for nothing: the coefficient is zero except for LONG positions carrying an
+    # embedded GAIN, which is typically a small minority of names. The larger problem is what made
+    # the tax-aware path take 98-150 minutes per run against 6 for the tax-blind path, and it is
+    # the likeliest cause of the solver failures that remained after the formulation was fixed.
     gain_coeff = np.where(is_long, rate * np.clip(g, 0.0, None), 0.0)
-    expr = gain_coeff @ cp.pos(prev - w)
+    taxed_idx = np.flatnonzero(gain_coeff > 0)
     cons: list = []
+    if len(taxed_idx):
+        expr = gain_coeff[taxed_idx] @ cp.pos(prev[taxed_idx] - w[taxed_idx])
+    else:
+        expr = cp.Constant(0.0)
 
-    # The harvesting variable exists only for LONG positions, and so must its constraints.
+    # The harvesting credit is LINEAR in w and never needed an auxiliary variable.
     #
-    # An earlier version created `s` over every name and imposed `s <= prev - w` on all of them.
-    # For a short, prev < 0 forces s = 0 through `s <= max(prev, 0)` and nonnegativity, and the
-    # second constraint then reads 0 <= prev - w, i.e. w <= prev < 0: **the short could only ever
-    # get more negative, never be covered.** The book ratcheted its shorts open until the optimiser
-    # went infeasible, and the tax-aware arms of the leverage sweep returned -117% a year.
+    # Two versions of this were wrong, in the same way, and the second fix only mirrored the first.
+    # The formulation was `s >= 0` with `s <= prev - w`, which together imply **w <= prev**: every
+    # position could only ever shrink. Restricting it to longs stopped shorts being frozen open and
+    # left longs frozen shut. Combined with the gross-exposure constraint the problem went
+    # infeasible within a few months, and the tax-aware arms failed on roughly 130 of 216 months.
     #
-    # Restricting the variable to the long subset is not a patch on the symptom - harvesting a loss
-    # means selling something you own, which is a long-side operation. Short-side losses are handled
-    # by the gain term and by s1233 in the ledger.
+    # The mistake was the auxiliary variable itself. **A constraint introduced to model an objective
+    # term must never restrict the decision variable**, and `s <= prev - w` does exactly that.
+    #
+    # The credit for selling a loser is `rate * |g| * (prev - w)` over the part sold. As a function
+    # of w that is affine: `-rate*|g|*w + const`. It goes straight into the objective with no
+    # variable and no constraint, and the whole infeasibility disappears.
+    #
+    # Exactness: the expression is exact for a sale (w <= prev) and a bounded linear extrapolation
+    # for a purchase (w > prev), where it mildly discourages adding to a loser. The coefficient is
+    # bounded by `rate` (at most ~0.41 with g clipped to [-1, 1]), the same order as the alphas, so
+    # the extrapolation cannot dominate the objective the way the old 4000x credits did.
     loss_coeff = np.where(is_long, rate * np.clip(-g, 0.0, None), 0.0) * float(harvest_haircut)
-    long_idx = np.flatnonzero(is_long)
-    if allow_harvest and len(long_idx) and float(loss_coeff[long_idx].max(initial=0.0)) > 0:
-        s = cp.Variable(len(long_idx), nonneg=True)
-        cons += [s <= prev[long_idx], s <= prev[long_idx] - w[long_idx]]
-        expr = expr - loss_coeff[long_idx] @ s
+    if allow_harvest and float(loss_coeff.max(initial=0.0)) > 0:
+        expr = expr + loss_coeff @ w          # == -loss_coeff @ (prev - w) up to a constant
     return expr, cons
 
 

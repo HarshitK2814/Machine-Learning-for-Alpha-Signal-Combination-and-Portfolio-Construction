@@ -37,8 +37,14 @@ def test_convex_term_matches_the_direct_computation_for_gains():
                                               rel=1e-6)
 
 
-def test_harvesting_reward_is_bounded_by_the_position():
-    """Without the bound the solver would manufacture unlimited loss harvesting."""
+def test_harvesting_reward_is_bounded_by_the_position_limits():
+    """The credit is affine in w, so what bounds it is the position limits, not a side constraint.
+
+    The old formulation bounded it with an auxiliary variable `s <= prev - w`, which also implied
+    `w <= prev` and silently froze every position. The affine form is bounded by whatever caps the
+    caller already imposes on w - here |w| <= 0.05 - and the coefficient itself is bounded by the
+    statutory rate.
+    """
     prev = np.array([0.02, 0.02])
     gain = np.array([-0.30, -0.30])             # both positions are at a loss
     rate = np.full(2, 0.408)
@@ -48,8 +54,8 @@ def test_harvesting_reward_is_bounded_by_the_position():
     problem.solve()
     assert problem.status in {"optimal", "optimal_inaccurate"}
     assert np.isfinite(problem.value)
-    best = 0.408 * 0.30 * prev.sum()            # cannot harvest more than the whole position
-    assert problem.value <= best + 1e-6
+    # coefficient is rate * |g| = 0.408 * 0.30 per name, applied over the |w| <= 0.05 box
+    assert problem.value <= 0.408 * 0.30 * 0.05 * len(prev) + 1e-6
 
 
 def test_harvest_haircut_scales_the_benefit():
@@ -60,12 +66,14 @@ def test_harvest_haircut_scales_the_benefit():
     def solved(haircut):
         w = cp.Variable(1)
         expr, cons = cvx_tax_cost(w, prev, gain, rate, harvest_haircut=haircut)
-        p = cp.Problem(cp.Maximize(-expr), cons + [w >= 0, w <= 0.05])
+        p = cp.Problem(cp.Maximize(-expr), cons + [w >= -0.05, w <= 0.05])
         p.solve()
         return p.value
 
+    # with the affine credit the optimiser sells (w -> -0.05) and the value scales with the haircut
     assert solved(0.0) == pytest.approx(0.0, abs=1e-8)
     assert solved(1.0) > solved(0.5) > solved(0.0) - 1e-9
+    assert solved(1.0) == pytest.approx(2 * solved(0.5), rel=1e-6), "haircut must scale linearly"
 
 
 def test_wash_block_forbids_re_establishing_a_blocked_name():
@@ -182,8 +190,8 @@ def test_harvesting_variable_does_not_freeze_short_positions():
         f"the short must be coverable: reached {w.value[1]:.4f} from {prev[1]:.4f}")
 
 
-def test_harvesting_still_works_on_the_long_leg():
-    """Restricting to longs must not disable harvesting where it belongs."""
+def test_harvesting_applies_to_the_long_leg_only():
+    """A short is not something you can harvest a loss on by selling; the credit must ignore it."""
     prev = np.array([0.02, -0.02])
     gain = np.array([-0.30, -0.30])
     rate = np.full(2, 0.408)
@@ -192,7 +200,28 @@ def test_harvesting_still_works_on_the_long_leg():
     problem = cp.Problem(cp.Maximize(-expr), cons + [cp.abs(w) <= 0.05])
     problem.solve()
     assert problem.value > 1e-9, "the long-side harvesting credit vanished"
-    assert problem.value <= 0.408 * 0.30 * 0.02 + 1e-6, "credit exceeds the long position"
+    # the credit is driven entirely by the long leg: the short leg contributes nothing
+    assert problem.value <= 0.408 * 0.30 * 0.05 + 1e-6
+
+
+def test_the_tax_term_generates_no_constraints_at_all():
+    """The whole class of infeasibility came from constraints this term should never have had."""
+    prev = np.array([0.02, -0.01, 0.03])
+    gain = np.array([-0.4, 0.2, -0.1])
+    rate = np.full(3, 0.408)
+    _, cons = cvx_tax_cost(cp.Variable(3), prev, gain, rate, allow_harvest=True)
+    assert cons == [], f"tax term must not constrain w, got {len(cons)} constraints"
+
+
+def test_a_long_position_can_still_be_increased():
+    """The exact failure: s >= 0 with s <= prev - w implied w <= prev, freezing every position."""
+    prev = np.array([0.02])
+    w = cp.Variable(1)
+    expr, cons = cvx_tax_cost(w, prev, np.array([-0.3]), np.array([0.408]))
+    problem = cp.Problem(cp.Maximize(w[0]), cons + [cp.abs(w) <= 0.05])
+    problem.solve()
+    assert w.value[0] > prev[0] + 1e-6, (
+        f"a held long must be able to grow: reached {w.value[0]:.4f} from {prev[0]:.4f}")
 
 
 def test_a_book_of_only_shorts_adds_no_harvesting_constraints():
