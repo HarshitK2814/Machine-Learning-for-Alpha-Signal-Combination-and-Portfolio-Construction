@@ -67,6 +67,8 @@ class _YearBook:
         self.regime = regime
         self.reset()
         self.carryforward = 0.0      # positive number = losses available to offset future gains
+        self._vintages: list[list[float]] = []   # [[year, amount], ...] for expiry accounting
+        self._year = 0
 
     def reset(self) -> None:
         self.st = 0.0
@@ -108,15 +110,36 @@ class _YearBook:
             deduction = self.short_div_paid * r.ordinary_dividend_rate
         return gains_tax + div_tax - deduction
 
-    def close_year(self) -> None:
-        """Roll unusable losses into the carryforward and start a fresh year."""
+    def close_year(self, year: int | None = None) -> None:
+        """Roll unusable losses into the carryforward, expire old vintages, start a fresh year.
+
+        Carryforward life matters more than it looks. A strategy that harvests aggressively builds
+        a loss balance that shelters its embedded gains later, which is what makes the "hidden
+        deferred liability" criticism of tax-aware long/short weaker than it appears - but only
+        where the balance survives. The US allows indefinite carryforward; Japan allows three years.
+        Under a short life the shelter evaporates and the liability is real.
+        """
         r = self.regime
+        if year is not None:
+            self._year = year
         total = self.st + self.lt - self.carryforward
         if total < 0:
             usable = min(-total, r.annual_ordinary_offset)
-            self.carryforward = (-total - usable) if r.loss_carryforward else 0.0
+            fresh = (-total - usable) if r.loss_carryforward else 0.0
+            self._vintages = [[self._year, fresh]] if fresh > 0 else []
         else:
-            self.carryforward = 0.0
+            # gains absorbed the balance, oldest vintages first
+            absorbed = self.carryforward
+            for v in self._vintages:
+                take = min(v[1], absorbed)
+                v[1] -= take
+                absorbed -= take
+            self._vintages = [v for v in self._vintages if v[1] > 1e-12]
+
+        life = getattr(r, "carryforward_years", float("inf"))
+        if life != float("inf"):
+            self._vintages = [v for v in self._vintages if self._year - v[0] < life]
+        self.carryforward = float(sum(v[1] for v in self._vintages))
         self.reset()
 
 
@@ -249,7 +272,7 @@ def after_tax_backtest(weights: pd.DataFrame, bundle, cfg: dict, tax_cfg: TaxCon
         })
 
         if date.month == 12:
-            book.close_year()
+            book.close_year(date.year)
         if nav_next <= 0:
             break
         # rescale lots so the book keeps matching NAV after costs and tax are paid out of capital

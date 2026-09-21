@@ -22,7 +22,13 @@ Statutory structure encoded here (US federal, individual):
   * s1091      wash sale: a loss is disallowed if substantially identical property is acquired
                 within 30 days before or after the sale; the loss is added to the new lot's basis
   * s1211(b)   an individual's net capital loss is deductible against ordinary income only up to
-                $3,000 per year; the excess carries forward (s1212(b))
+                $3,000 per year; the excess carries forward (s1212(b)), indefinitely in the US
+
+Carryforward life and ring-fencing are first-class fields because they turn out to decide whether a
+deferred tax liability is real. A strategy that harvests aggressively accumulates a loss
+carryforward which shelters its embedded gain - but only where that carryforward survives long
+enough and is not ring-fenced away from the gains it would offset. The US allows indefinite,
+unfenced carryforward; Japan allows three years; Germany ring-fences share losses to share gains.
   * s1411      3.8% net investment income tax on top of the capital-gains rate
   * s263(h)    substitute dividend payments on a short position held 45 days or less are
                 capitalised into the basis of the short rather than deducted currently
@@ -57,6 +63,8 @@ class TaxRegime:
     short_dividend_capitalise_days: int = 46  # s263(h) threshold
     annual_ordinary_offset: float = 3_000.0  # s1211(b)
     loss_carryforward: bool = True
+    carryforward_years: float = float("inf")  # how long an unused loss survives
+    losses_ring_fenced: bool = False          # relief confined to one asset bucket
     payment_month: int = 4                # cash-basis accounting pays in April of the next year
     notes: str = ""
 

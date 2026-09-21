@@ -100,9 +100,32 @@ def test_trajectory_covers_several_horizons(small_panel, weights, cfg):
     assert ((gains > 0) == (gap > -1e-12)).all() or (gains.abs() < 1e-9).all(), out
 
 
-def test_verdict_language_scales_with_the_overhang_share(small_panel, weights, cfg):
+def test_verdict_covers_every_regime_the_arithmetic_can_produce(small_panel, weights, cfg):
+    """Five outcomes are possible and the verdict must name the right one.
+
+    An earlier version fired the "embedded losses" branch on an overhang of -1e-9 - floating-point
+    zero - and so mislabelled a strategy whose embedded gains were simply sheltered by an
+    accumulated loss carryforward. The branch now needs a tolerance, and the zero case
+    distinguishes "nothing deferred" from "liability cancelled by a deferred tax asset".
+    """
     r = deferral_overhang(weights, small_panel, cfg)
-    assert any(word in r.verdict for word in ("small", "material", "LARGE"))
+    assert any(word in r.verdict for word in
+               ("small", "material", "LARGE", "NEGATIVE", "ZERO", "zero")), r.verdict
+
+
+def test_carryforward_is_reported_so_the_netting_is_auditable(small_panel, weights, cfg):
+    """A deferred tax liability can be cancelled by a deferred tax asset; both must be visible."""
+    r = deferral_overhang(weights, small_panel, cfg)
+    assert hasattr(r, "terminal_carryforward")
+    assert np.isfinite(r.terminal_carryforward)
+    assert r.terminal_carryforward >= -1e-12, "a carryforward is a non-negative loss balance"
+
+
+def test_tiny_floating_point_overhang_is_not_called_embedded_losses(small_panel, weights, cfg):
+    """The exact bug: -1e-9 is zero, not evidence of an embedded loss position."""
+    r = deferral_overhang(weights, small_panel, cfg, regime="trader_475f_mtm")
+    assert abs(r.overhang_ann) < 1e-6
+    assert "NEGATIVE overhang" not in r.verdict, r.verdict
 
 
 def test_decomposition_accounts_for_every_component(small_panel, weights, cfg):

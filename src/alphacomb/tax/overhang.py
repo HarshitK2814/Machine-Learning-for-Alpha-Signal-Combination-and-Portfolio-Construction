@@ -42,6 +42,13 @@ The sign matters and runs both ways. A book carrying embedded **losses** has a *
 liquidating would realise a tax credit, so the realised-basis report **understates** what the
 investor owns. Only a book carrying embedded **gains** is flattered by realised-basis reporting.
 
+**And a deferred tax liability can be cancelled by a deferred tax asset.** A strategy that harvests
+aggressively accumulates a loss carryforward, and that carryforward shelters the embedded gain when
+it is eventually realised. Measuring the embedded gain alone therefore *overstates* what the
+investor owes. The ledger nets the two, and ``terminal_carryforward`` is reported alongside
+``terminal_deferred_tax`` so the netting is auditable rather than implicit - this turned out to be
+the single most important quantity in the comparison, and the first version of this module hid it.
+
 What this module does NOT claim
 -------------------------------
 It does not say deferral is illegitimate. Deferring tax is valuable - money kept today compounds,
@@ -74,7 +81,8 @@ class OverhangResult:
                                       # NEGATIVE = deferred tax ASSET from embedded losses
     overhang_share: float             # overhang as a share of reported performance
     terminal_embedded_gain: float     # unrealised gain at the end, as a share of NAV
-    terminal_deferred_tax: float      # tax owed on it, as a share of NAV
+    terminal_deferred_tax: float      # tax owed on it AFTER netting the carryforward
+    terminal_carryforward: float      # loss carryforward available to shelter it, share of NAV
     embedded_gain_path: pd.Series
     verdict: str
 
@@ -112,8 +120,13 @@ def deferral_overhang(weights: pd.DataFrame, bundle, cfg: dict,
 
     embedded = frame.set_index("date")["unrealised"]
     terminal_gain = float(embedded.iloc[-1])
+    carryforward = float(frame["carryforward"].iloc[-1]) if "carryforward" in frame else 0.0
 
-    if overhang < 0:
+    # Tolerance, not a raw sign test. The first version fired the "embedded losses" branch on an
+    # overhang of -1e-9, which is floating-point zero, and mislabelled a strategy whose embedded
+    # gains were simply fully sheltered by an accumulated loss carryforward.
+    tol = max(1e-6, 1e-4 * abs(pre))
+    if overhang < -tol:
         # Embedded LOSSES, not gains. Liquidating would realise them and generate a tax credit, so
         # the liquidation figure is HIGHER than the realised-basis one. The strategy carries a
         # deferred tax ASSET. A first version of this module asserted that liquidation can only
@@ -122,6 +135,14 @@ def deferral_overhang(weights: pd.DataFrame, bundle, cfg: dict,
         verdict = ("NEGATIVE overhang: the book carries embedded LOSSES, so liquidation would "
                    "realise a tax credit. The realised-basis report UNDERSTATES what the investor "
                    "owns - the opposite of the criticism levelled at tax-aware long/short")
+    elif abs(overhang) <= tol:
+        if carryforward > 1e-9 and terminal_gain > 1e-9:
+            verdict = ("ZERO overhang because the embedded gain is fully sheltered by an "
+                       f"accumulated loss carryforward of {carryforward:.4f} of NAV. The deferred "
+                       "tax LIABILITY and the deferred tax ASSET offset. Reporting the embedded "
+                       "gain alone would overstate what the investor owes")
+        else:
+            verdict = "zero overhang: nothing material is deferred"
     elif abs(share) < 0.10:
         verdict = ("small overhang: reported performance is substantially realised, consistent "
                    "with a pre-tax-alpha explanation")
@@ -136,7 +157,7 @@ def deferral_overhang(weights: pd.DataFrame, bundle, cfg: dict,
         months=months, pre_liquidation_ann=pre, liquidation_ann=liquidation,
         overhang_ann=overhang, overhang_share=share,
         terminal_embedded_gain=terminal_gain, terminal_deferred_tax=deferred,
-        embedded_gain_path=embedded, verdict=verdict)
+        terminal_carryforward=carryforward, embedded_gain_path=embedded, verdict=verdict)
 
 
 def overhang_trajectory(weights: pd.DataFrame, bundle, cfg: dict,
@@ -168,6 +189,7 @@ def overhang_trajectory(weights: pd.DataFrame, bundle, cfg: dict,
             "overhang_ann": res.overhang_ann,
             "overhang_share": res.overhang_share,
             "embedded_gain_pct_nav": res.terminal_embedded_gain,
+            "carryforward_pct_nav": res.terminal_carryforward,
             "deferred_tax_pct_nav": res.terminal_deferred_tax,
         })
     return pd.DataFrame(rows)
@@ -227,6 +249,7 @@ def harvesting_decomposition(weights: pd.DataFrame, bundle, cfg: dict,
         "realised_long_term_ann": realised_lt,
         "wash_disallowed_ann": wash,
         "embedded_gain_pct_nav": res.terminal_embedded_gain,
+        "carryforward_pct_nav": res.terminal_carryforward,
         "deferred_tax_pct_nav": res.terminal_deferred_tax,
         "unrealised_share_of_total_gains": deferral_share,
         "verdict": res.verdict,
