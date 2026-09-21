@@ -10,13 +10,16 @@ from .jurisdictions import (CHINA_A, GERMANY, HONG_KONG, INDIA, JAPAN, JURISDICT
                             SINGAPORE, TAIWAN, UNITED_KINGDOM, UNITED_STATES, Jurisdiction, LossRelief,
                             TransactionTaxes, get_jurisdiction, identification_table)
 from .lots import Lot, LotMethod, RealisedGain, TaxLotLedger  # noqa: F401
+from .overhang import (OverhangResult, deferral_overhang, harvesting_decomposition,  # noqa: F401
+                       overhang_trajectory)
 from .regimes import (FUND_OFFSHORE, REGIMES, TAXABLE_US, TAX_EXEMPT, TRADER_475F,  # noqa: F401
                       TaxRegime, get_regime)
 
 __all__ = [
     "CHINA_A", "FUND_OFFSHORE", "GERMANY", "HONG_KONG", "INDIA", "JAPAN", "JURISDICTIONS",
     "Jurisdiction", "LossRelief", "SINGAPORE", "TAIWAN", "TransactionTaxes", "UNITED_KINGDOM", "UNITED_STATES",
-    "get_jurisdiction", "identification_table", "Lot", "LotMethod", "REGIMES", "RealisedGain", "TAXABLE_US", "TAX_EXEMPT",
+    "get_jurisdiction", "identification_table", "OverhangResult", "deferral_overhang",
+    "harvesting_decomposition", "overhang_trajectory", "Lot", "LotMethod", "REGIMES", "RealisedGain", "TAXABLE_US", "TAX_EXEMPT",
     "TRADER_475F", "TaxConfig", "TaxLotLedger", "TaxRegime", "after_tax_backtest", "compare_regimes",
     "get_regime", "summarise_after_tax",
 ]
