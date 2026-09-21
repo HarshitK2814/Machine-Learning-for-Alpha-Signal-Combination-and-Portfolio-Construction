@@ -1,6 +1,6 @@
 # Workstream B status (Harshit)
 
-Updated: 2026-09-20 (second revision). Synthetic data only. **No real-data or paper results exist.**
+Updated: 2026-09-21. Synthetic data only. **No real-data or paper results exist.**
 
 ## Done
 
@@ -25,6 +25,22 @@ Updated: 2026-09-20 (second revision). Synthetic data only. **No real-data or pa
 | Stale-portfolio guard in stage 04, construction quality in stage 06 | - | Done | `--max-held-share`, `held_share` column |
 
 Total: **130 tests, all passing, none skipped.**
+
+### KNOWN BROKEN: the tax-aware optimiser path
+
+`--tax-aware` construction does **not** work. Two bugs were found and fixed on 21 September - an
+unbounded embedded gain rate producing 4000x phantom harvesting credits, and a harvesting
+constraint that forbade covering short positions - and it is **still** failing on roughly half of
+all months (128 of 216 at gross 2, 102 of 216 at gross 4). It is also extremely slow: 98 to 150
+minutes per 216-month run against 6 minutes for the tax-blind path.
+
+**Do not report any result from the tax-aware optimiser arm.** The evaluation ledger
+(`alphacomb.tax`) is unaffected and every after-tax number in `docs/AFTER_TAX_RESULTS.md` and
+`docs/PRACTITIONER_GAP.md` stands, because the ledger never builds the optimiser's tax term.
+
+Next diagnostic step: the auxiliary harvesting variable plus the cap-relaxation constraints are
+probably jointly infeasible in some months. Instrument `construct()` to report which constraint
+set is binding when it fails, rather than guessing a third time.
 
 ### A bug worth knowing about before reading any number in this repo
 
