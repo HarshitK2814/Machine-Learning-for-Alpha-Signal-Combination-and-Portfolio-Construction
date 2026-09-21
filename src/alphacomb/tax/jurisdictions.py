@@ -99,6 +99,59 @@ class TransactionTaxes:
 
 
 @dataclass(frozen=True)
+class LossRelief:
+    """How broadly a realised capital loss can be used. The SECOND architectural dimension.
+
+    Added 21 September 2026 after checking the model against industry practice, and it corrected a
+    mistaken assumption of ours.
+
+    We had assumed the feature that makes US tax-aware long/short work is the **holding-period
+    wedge** - the 17-point gap at twelve months. The industry says otherwise. The roughly $70bn AQR
+    runs in tax-aware long/short rests on the unusual breadth of US **loss relief**: capital losses
+    offset capital gains without ring-fencing, plus up to $3,000 of ordinary income a year, carried
+    forward indefinitely. Elsewhere relief is narrower:
+
+    * **Germany** - losses on shares may offset gains on shares only, ring-fenced away from
+      interest and dividends.
+    * **Japan** - listed and unlisted share losses cannot be netted against each other.
+    * **United Kingdom** - losses offset gains only, never other income.
+    * **India** - short-term losses offset both short- and long-term gains, long-term losses offset
+      long-term gains only. Eight-year carryforward.
+
+    These two dimensions - the wedge and loss-relief breadth - vary **independently** across
+    countries, which is better for us than one dimension would be: they identify two different
+    channels. The wedge governs the *rate* applied to gains; relief breadth governs whether
+    harvesting losses is worth anything at all.
+
+    Our own framing had the wrong primary mechanism relative to practice. Recorded here rather than
+    quietly corrected.
+    """
+
+    offsets_same_asset_gains: bool = True      # losses against gains in the same asset class
+    offsets_other_capital_gains: bool = True   # losses against gains in OTHER asset classes
+    ordinary_income_offset: float = 0.0        # annual amount deductible against ordinary income
+    carryforward_years: float = float("inf")   # 0 = none, inf = indefinite
+    ring_fenced: bool = False                  # relief confined to one bucket
+    notes: str = ""
+
+    @property
+    def breadth(self) -> float:
+        """A crude 0-1 index of how usable a realised loss is. Ordinal, not cardinal."""
+        score = 0.0
+        if self.offsets_same_asset_gains:
+            score += 0.4
+        if self.offsets_other_capital_gains:
+            score += 0.3
+        if self.ordinary_income_offset > 0:
+            score += 0.2
+        if self.carryforward_years == float("inf"):
+            score += 0.1
+        elif self.carryforward_years >= 5:
+            score += 0.05
+        return round(score, 3)
+
+
+@dataclass(frozen=True)
 class Jurisdiction:
     """A country's complete architecture: how gains are taxed AND how trading is taxed."""
 
@@ -107,6 +160,7 @@ class Jurisdiction:
     currency: str
     regime: TaxRegime
     transaction: TransactionTaxes = field(default_factory=TransactionTaxes)
+    loss_relief: LossRelief = field(default_factory=LossRelief)
     annual_exempt_local: float = 0.0   # annual capital-gains exemption in local currency
     notes: str = ""
 
@@ -127,6 +181,22 @@ class Jurisdiction:
         tt = "high_ttax" if self.transaction.statutory_round_trip > 0.0005 else "low_ttax"
         return f"{hp}/{tt}"
 
+    @property
+    def harvesting_viable(self) -> bool:
+        """Is systematic loss harvesting worth doing here at all?
+
+        It needs a positive rate **on capital gains** to shelter against AND relief broad enough to
+        use the losses. This is the industry's binding constraint, and it is what confines tax-aware
+        long/short to the United States.
+
+        Testing ``regime.taxable`` here was wrong: that is true whenever any rate is positive,
+        including dividends, which marked Taiwan and China as viable when neither taxes capital
+        gains on listed shares at all. Harvesting a capital loss is worthless where capital gains
+        are untaxed.
+        """
+        taxes_gains = max(self.regime.short_term_rate, self.regime.long_term_rate) > 0
+        return taxes_gains and self.loss_relief.breadth >= 0.7
+
 
 # ---------------------------------------------------------------------------------------------
 # The jurisdictions. All rates [verify].
@@ -142,6 +212,12 @@ UNITED_STATES = Jurisdiction(
     transaction=TransactionTaxes(
         brokerage=0.0002, regulator_fee=0.0000278,   # SEC Section 31 fee, sell side [verify]
         notes="No securities transaction tax. SEC fee is tiny and sell-side only."),
+    loss_relief=LossRelief(
+        offsets_same_asset_gains=True, offsets_other_capital_gains=True,
+        ordinary_income_offset=3_000.0, carryforward_years=float("inf"), ring_fenced=False,
+        notes="The broadest relief in this set, and the reason tax-aware long/short is a US "
+              "product: losses net freely against gains, plus $3,000 of ordinary income a "
+              "year, carried forward indefinitely. [verify]"),
     notes="LARGE holding-period wedge (17 points at exactly 12 months), NO transaction tax. "
           "The cell where the holding-period channel should be strongest and cleanest.",
 )
@@ -165,6 +241,11 @@ INDIA = Jurisdiction(
         regulator_fee=0.000001,   # SEBI turnover fee, Rs 10 per crore [verify]
         notes="Plus stamp duty 0.015% on the buy side, folded into `buy`. DP charges are a flat "
               "per-scrip amount on sells and are not modelled. [verify]"),
+    loss_relief=LossRelief(
+        offsets_same_asset_gains=True, offsets_other_capital_gains=True,
+        ordinary_income_offset=0.0, carryforward_years=8, ring_fenced=False,
+        notes="Short-term losses offset both STCG and LTCG; long-term losses offset LTCG "
+              "only. No relief against ordinary income. Eight-year carryforward. [verify]"),
     annual_exempt_local=125_000.0,
     notes="MODERATE holding-period wedge (7.5 points, 12-month boundary) AND a LARGE round-trip "
           "transaction tax. The cell that separates the two channels: if complexity hurts here "
@@ -180,6 +261,11 @@ GERMANY = Jurisdiction(
         notes="Abgeltungsteuer 25% + 5.5% solidarity surcharge = 26.375%, FLAT, with NO "
               "holding-period distinction. Church tax excluded. [verify]"),
     transaction=TransactionTaxes(brokerage=0.0005, notes="No financial transaction tax. [verify]"),
+    loss_relief=LossRelief(
+        offsets_same_asset_gains=True, offsets_other_capital_gains=False,
+        ordinary_income_offset=0.0, carryforward_years=float("inf"), ring_fenced=True,
+        notes="RING-FENCED: share losses offset share gains only, not interest or dividends. "
+              "This, not the flat rate, is why US-style harvesting does not transfer. [verify]"),
     annual_exempt_local=1_000.0,   # Sparer-Pauschbetrag [verify]
     notes="PLACEBO. A flat rate means there is no holding-period boundary to cross, so the "
           "holding-period channel is switched off by law. Any complexity penalty observed here "
@@ -194,6 +280,10 @@ JAPAN = Jurisdiction(
         long_term_months=0, wash_sale_rule=False,
         notes="15% national + 0.315% reconstruction surtax + 5% local = 20.315%, FLAT. [verify]"),
     transaction=TransactionTaxes(brokerage=0.0005, notes="No transaction tax. [verify]"),
+    loss_relief=LossRelief(
+        offsets_same_asset_gains=True, offsets_other_capital_gains=False,
+        ordinary_income_offset=0.0, carryforward_years=3, ring_fenced=True,
+        notes="RING-FENCED between listed and unlisted shares; three-year carryforward. [verify]"),
     notes="Second PLACEBO, independent of Germany. Two flat-rate countries in different regions "
           "guard against the placebo result being a European artefact.",
 )
@@ -212,6 +302,10 @@ UNITED_KINGDOM = Jurisdiction(
         brokerage=0.0005,
         notes="SDRT 0.5% on purchases only - an asymmetric transaction tax, unlike India's "
               "symmetric STT. [verify]"),
+    loss_relief=LossRelief(
+        offsets_same_asset_gains=True, offsets_other_capital_gains=True,
+        ordinary_income_offset=0.0, carryforward_years=float("inf"), ring_fenced=False,
+        notes="Losses offset gains only, never other income. Indefinite carryforward. [verify]"),
     annual_exempt_local=3_000.0,   # [verify]
     notes="A third architecture: flat CGT + a wash-sale rule + a BUY-SIDE-ONLY transaction tax. "
           "Isolates the wash-sale rule from the holding-period wedge, which the US confounds.",
@@ -315,6 +409,9 @@ def identification_table() -> "object":
             "wedge_points": round(100 * j.wedge, 2),
             "boundary_months": j.regime.long_term_months,
             "wash_rule": j.regime.wash_sale_rule,
+            "loss_breadth": j.loss_relief.breadth,
+            "ring_fenced": j.loss_relief.ring_fenced,
+            "harvesting_viable": j.harvesting_viable,
             "ttax_buy_bps": round(1e4 * j.transaction.buy, 1),
             "ttax_sell_bps": round(1e4 * j.transaction.sell, 1),
             "statutory_rt_bps": round(1e4 * j.transaction.statutory_round_trip, 2),
