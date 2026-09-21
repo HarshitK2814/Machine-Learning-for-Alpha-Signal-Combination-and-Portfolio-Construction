@@ -104,11 +104,23 @@ def cvx_tax_cost(w, w_prev: np.ndarray, gain_rate: np.ndarray, tax_rate: np.ndar
     expr = gain_coeff @ cp.pos(prev - w)
     cons: list = []
 
+    # The harvesting variable exists only for LONG positions, and so must its constraints.
+    #
+    # An earlier version created `s` over every name and imposed `s <= prev - w` on all of them.
+    # For a short, prev < 0 forces s = 0 through `s <= max(prev, 0)` and nonnegativity, and the
+    # second constraint then reads 0 <= prev - w, i.e. w <= prev < 0: **the short could only ever
+    # get more negative, never be covered.** The book ratcheted its shorts open until the optimiser
+    # went infeasible, and the tax-aware arms of the leverage sweep returned -117% a year.
+    #
+    # Restricting the variable to the long subset is not a patch on the symptom - harvesting a loss
+    # means selling something you own, which is a long-side operation. Short-side losses are handled
+    # by the gain term and by s1233 in the ledger.
     loss_coeff = np.where(is_long, rate * np.clip(-g, 0.0, None), 0.0) * float(harvest_haircut)
-    if allow_harvest and float(loss_coeff.max(initial=0.0)) > 0:
-        s = cp.Variable(len(prev), nonneg=True)
-        cons += [s <= np.clip(prev, 0.0, None), s <= prev - w]
-        expr = expr - loss_coeff @ s
+    long_idx = np.flatnonzero(is_long)
+    if allow_harvest and len(long_idx) and float(loss_coeff[long_idx].max(initial=0.0)) > 0:
+        s = cp.Variable(len(long_idx), nonneg=True)
+        cons += [s <= prev[long_idx], s <= prev[long_idx] - w[long_idx]]
+        expr = expr - loss_coeff[long_idx] @ s
     return expr, cons
 
 

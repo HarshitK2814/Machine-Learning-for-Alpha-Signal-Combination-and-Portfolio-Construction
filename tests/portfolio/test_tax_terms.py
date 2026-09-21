@@ -159,3 +159,47 @@ def test_optimiser_with_tax_awareness_holds_embedded_gains(small_panel):
     sold_blind = float(np.clip(prev[winners] - blind.weights.reindex(winners).fillna(0), 0, None).sum())
     sold_aware = float(np.clip(prev[winners] - aware.weights.reindex(winners).fillna(0), 0, None).sum())
     assert sold_aware <= sold_blind + 1e-9, "the tax term must not increase sales of embedded gains"
+
+
+def test_harvesting_variable_does_not_freeze_short_positions():
+    """The bug that returned -117% a year on every tax-aware book.
+
+    `s <= prev - w` was imposed on every name. For a short, prev < 0 forces s = 0, and the
+    constraint then reads 0 <= prev - w, i.e. w <= prev < 0 - the short could only get MORE
+    negative and could never be covered. The book ratcheted its shorts open until the optimiser
+    went infeasible.
+    """
+    prev = np.array([0.02, -0.02])          # one long, one short
+    gain = np.array([-0.30, -0.30])
+    rate = np.full(2, 0.408)
+    w = cp.Variable(2)
+    expr, cons = cvx_tax_cost(w, prev, gain, rate, allow_harvest=True)
+
+    problem = cp.Problem(cp.Maximize(w[1]), cons + [cp.abs(w) <= 0.05])
+    problem.solve()
+    assert problem.status in {"optimal", "optimal_inaccurate"}
+    assert w.value[1] > prev[1] + 1e-6, (
+        f"the short must be coverable: reached {w.value[1]:.4f} from {prev[1]:.4f}")
+
+
+def test_harvesting_still_works_on_the_long_leg():
+    """Restricting to longs must not disable harvesting where it belongs."""
+    prev = np.array([0.02, -0.02])
+    gain = np.array([-0.30, -0.30])
+    rate = np.full(2, 0.408)
+    w = cp.Variable(2)
+    expr, cons = cvx_tax_cost(w, prev, gain, rate, allow_harvest=True)
+    problem = cp.Problem(cp.Maximize(-expr), cons + [cp.abs(w) <= 0.05])
+    problem.solve()
+    assert problem.value > 1e-9, "the long-side harvesting credit vanished"
+    assert problem.value <= 0.408 * 0.30 * 0.02 + 1e-6, "credit exceeds the long position"
+
+
+def test_a_book_of_only_shorts_adds_no_harvesting_constraints():
+    prev = np.array([-0.02, -0.03])
+    w = cp.Variable(2)
+    expr, cons = cvx_tax_cost(w, prev, np.array([-0.3, -0.3]), np.full(2, 0.408))
+    problem = cp.Problem(cp.Maximize(cp.sum(w)), cons + [cp.abs(w) <= 0.05])
+    problem.solve()
+    assert problem.status in {"optimal", "optimal_inaccurate"}
+    assert np.all(w.value > prev + 1e-6), "shorts must remain free to cover"
