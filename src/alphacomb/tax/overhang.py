@@ -20,14 +20,22 @@ The measurement gap
 embedded unrealised gain - a **deferred tax liability** the investor owns but does not see on a
 realised-basis performance report.
 
-The USIPC After-Tax Performance Standards and the SEC require mutual funds to report **both** a
-pre-liquidation and a mark-to-liquidation figure, precisely so that this liability is visible:
+What the USIPC After-Tax Performance Standards actually require (checked against the primary
+document, 21 September 2026, after an earlier version of this docstring got it wrong):
+
+* **A.1.a mandates the pre-liquidation method** - it is required, not one of two options.
+* The standard itself states that this method "may understate the total tax burden".
+* **Mark-to-liquidation is discussed but not required.**
+* **A.4.e requires disclosing the percentage of unrealised capital gains**, but not the tax implied
+  by them and not the loss carryforward that may offset it.
+* **A.2.a covers tax-aware separately managed accounts**, so this is not a mutual-fund-only regime.
 
     liquidation value = market value - tax rate * (market value - cost basis)
 
-Tax-aware long/short is generally sold through separately managed accounts and private funds, not
-mutual funds, so that dual-reporting requirement does not bite in the same way. The industry
-standard is the pre-liquidation number.
+So the gap is precise: the mandated disclosure gives the numerator and withholds both the tax and
+the offset. An investor seeing "unrealised gains are 1.7% of assets" cannot tell whether that is a
+real future bill or one already covered by an accumulated loss balance - and on our own tax-aware
+arm the carryforward was 3.8% of NAV, more than covering it.
 
 This module computes both from the lot-level ledger, and the **overhang** between them:
 

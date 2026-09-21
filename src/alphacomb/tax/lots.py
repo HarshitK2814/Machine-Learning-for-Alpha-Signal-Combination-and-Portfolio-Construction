@@ -24,6 +24,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from enum import Enum
 
+import numpy as np
 import pandas as pd
 
 from .regimes import TaxRegime
@@ -132,12 +133,25 @@ class TaxLotLedger:
         asof = pd.Timestamp(asof)
         lots = [lot for lot in self.lots.get(permno, []) if lot.side == 1]
         value = sum(lot.value for lot in lots)
-        if value <= 0:
+        basis = sum(lot.basis for lot in lots)
+        if value <= 0 or basis <= 0:
             return 0.0, 0.0
         gain = sum(lot.value - lot.basis for lot in lots)
         taxed = sum((lot.value - lot.basis) * self._rate(lot, asof, closing_short=False) for lot in lots)
         rate = taxed / gain if abs(gain) > 1e-12 else 0.0
-        return gain / value, rate
+
+        # Clip to [-1, 1]. For a winner gain/value is naturally bounded above by 1, but for a loser
+        # it is unbounded below: a position down 99.99% reports an embedded loss of 9999x its
+        # remaining value. Fed to the optimiser as a per-dollar harvesting credit that is roughly
+        # 4000, against alphas of order 0.01, it destroys the conditioning of the problem and the
+        # book explodes. That happened: the tax-aware arms of the leverage sweep reported
+        # annualised returns of -112,000% because NAV hit zero in the first months.
+        #
+        # The clip is not a fudge. The optimiser term is a LINEAR approximation to the tax
+        # consequence of a trade, valid near the current position. Once a holding has lost most of
+        # its value the linearisation is meaningless, and -1 (the whole remaining position is
+        # embedded loss) is the largest statement about it that still means anything.
+        return float(np.clip(gain / value, -1.0, 1.0)), rate
 
     # ---------------------------------------------------------------- trading
     def buy(self, permno: int, date, value: float) -> Lot:

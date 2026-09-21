@@ -26,19 +26,59 @@ accounts, citing operational and regulatory tail risk. Goldman and BNY Pershing 
 
 ## 2. Why this is a measurement question, not a rhetorical one
 
-Deferring a gain does not remove the tax. It accumulates an embedded unrealised gain — a **deferred
+Deferring a gain does not remove the tax. It accumulates an embedded unrealised gain - a **deferred
 tax liability** the investor owns but does not see on a realised-basis performance report.
 
-The **USIPC After-Tax Performance Standards** and the SEC require mutual funds to report *both* a
-pre-liquidation and a mark-to-liquidation figure for exactly this reason:
+### What the standard actually says (checked against the primary document, 21 Sep 2026)
 
-    liquidation value = market value - tax rate * (market value - cost basis)
+An earlier version of this file claimed the USIPC After-Tax Performance Standards and the SEC
+**require both** a pre-liquidation and a mark-to-liquidation figure. **That was wrong.** Reading the
+standard itself corrects it, and the truth is sharper:
 
-TALS is sold through separately managed accounts and private funds, where that dual requirement does
-not bite the same way. **The number the industry reports is the pre-liquidation one.**
+**A.1.a — pre-liquidation is MANDATED, not offered as one of two:**
 
-So the question "is this pre-tax alpha or deferred tax?" has an arithmetic answer, and the
-arithmetic needs a lot-level ledger. We have one.
+> "Firms **must** utilize a realized basis 'pre-liquidation' calculation methodology, namely a
+> methodology equivalent to the After-Tax Modified Dietz Method, the After-Tax Modified BAI
+> (Linked Internal Rate of Return) Method or the After-Tax Daily Valuation Method."
+
+**And the standard says in its own words that this method can understate the burden:**
+
+> "By ignoring such future taxes, the 'pre-liquidation' method **may understate the total tax
+> burden** on security returns during the measurement period."
+
+Mark-to-liquidation is *discussed* - the standard notes it "would appear to be more conservative by
+taking into account all capital gain taxes ... even on unrealized profits" but "may be distorted" -
+and it is **not required**.
+
+**A.4.e — what IS required is the raw ingredient, not the computed liability:**
+
+> "Firms **must** report the percentage of unrealized capital gains as compared to total after-tax
+> composite assets as of the end of each (annual period end)."
+
+**A.2.a — and it does cover tax-aware separately managed accounts:**
+
+> "All actual, fee-paying, discretionary portfolios that are **managed on a tax-aware basis** (i.e.,
+> taking into account the client's tax profile when conducting security buy and sell decisions)
+> **must** be included in at least one of the firm's after-tax composites."
+
+### The gap, stated precisely
+
+The disclosure regime requires the **numerator** - the percentage of unrealised capital gains - and
+mandates a return methodology that its own text says may understate the tax burden. It does **not**
+require:
+
+1. the **tax** implied by those unrealised gains, or
+2. the **loss carryforward** that offsets it.
+
+Our work shows (2) is decisive. On our tax-aware arm the embedded gain was 1.71% of NAV and the
+carryforward 3.80% - so the liability was fully cancelled. **An investor reading the mandated
+disclosure sees a 1.71% unrealised gain and has no way to know whether it represents a real future
+tax bill or one already covered by an accumulated loss balance.** Both readings are consistent with
+the required disclosure, and they differ by the entire amount.
+
+That is a narrower claim than "the industry hides the liability", and a much more defensible one:
+**the mandated disclosure is not sufficient to distinguish a sheltered embedded gain from an
+unsheltered one, and the difference is material.**
 
 ## 3. What we built
 
@@ -146,6 +186,9 @@ nobody has published what it costs.
    harvesting-driven. Then re-run sections 4.1–4.3. This is the experiment that speaks to the
    dispute.
 2. **Real data.** Still the binding constraint on everything.
-3. **Verify the USIPC and SEC reporting requirements against the primary documents** before any
-   claim about what the industry is or is not obliged to disclose. Currently `[verify]` from
-   secondary sources.
+3. ~~Verify the USIPC and SEC reporting requirements~~ **DONE 21 Sep 2026.** The primary
+   document was read and it corrected our claim: pre-liquidation is mandated rather than one of
+   two required figures, and what must be disclosed is the percentage of unrealised gains, not
+   the tax on them or the carryforward offsetting them. Section 2 is rewritten. The remaining
+   `[verify]` item is the SEC mutual-fund rule specifically, which this document describes only
+   in passing.

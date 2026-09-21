@@ -134,3 +134,37 @@ def test_embedded_gain_rate_reports_what_selling_would_cost(taxable):
     assert g == pytest.approx(25.0 / 125.0)
     assert rate == pytest.approx(taxable.short_term_rate)
     assert led.embedded_gain_rate(999, "2020-02-29") == (0.0, 0.0)
+
+
+def test_embedded_gain_rate_is_bounded_for_a_collapsed_position(taxable):
+    """An unbounded gain rate blew up the optimiser; this pins the clip.
+
+    gain/value is naturally bounded above by 1 for a winner, but unbounded BELOW for a loser: a
+    position down 99.99% reports an embedded loss of 9999x its remaining value. Handed to the
+    optimiser as a per-dollar harvesting credit of roughly 4000, against alphas of order 0.01, it
+    destroyed the conditioning and the book exploded - the tax-aware arms of the leverage sweep
+    reported annualised returns of -112,000% because NAV hit zero in the first months.
+    """
+    for drop in (-0.5, -0.9, -0.99, -0.9999):
+        led = TaxLotLedger(taxable)
+        led.buy(1, "2020-01-31", 100.0)
+        led.accrue_returns(pd.Series({1: drop}))
+        g, rate = led.embedded_gain_rate(1, "2020-06-30")
+        assert -1.0 - 1e-12 <= g <= 1.0 + 1e-12, f"drop {drop} gave gain rate {g}"
+        assert abs(g) * rate <= 1.0, "harvesting credit per dollar sold must stay below 100%"
+
+
+def test_embedded_gain_rate_is_unclipped_in_the_normal_range(taxable):
+    """The clip must not distort ordinary positions."""
+    led = TaxLotLedger(taxable)
+    led.buy(1, "2020-01-31", 100.0)
+    led.accrue_returns(pd.Series({1: 0.25}))
+    g, _ = led.embedded_gain_rate(1, "2020-06-30")
+    assert g == pytest.approx(25.0 / 125.0)      # 0.2, well inside the band
+
+
+def test_embedded_gain_rate_handles_a_worthless_position(taxable):
+    led = TaxLotLedger(taxable)
+    led.buy(1, "2020-01-31", 100.0)
+    led.accrue_returns(pd.Series({1: -1.0}))
+    assert led.embedded_gain_rate(1, "2020-06-30") == (0.0, 0.0)
