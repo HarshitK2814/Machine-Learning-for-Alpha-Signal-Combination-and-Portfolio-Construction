@@ -74,3 +74,42 @@ constraint-feasible. Please keep the C12 column set unchanged so the statistics 
    number, but the constraint count changes).
 4. Will `r_3m`, `r_6m` and `r_12m` be cumulative excess returns over t+1..t+h? The horizon comparison
    (E52) assumes so.
+
+---
+
+## 4. NEW AND URGENT: international panels (added 21 September 2026)
+
+The research claim has been reframed around **cross-country identification** (see
+`05_Selected_Research_Design/REFRAMED_CLAIM.md`). The identification requires panels from countries
+whose tax *architectures* differ in kind, not just in level. This is a materially larger data ask
+than the original US-only design and it needs to be scoped **now**, not after the US results land.
+
+| Priority | Country | Why this one specifically | Contracts needed |
+|---|---|---|---|
+| **1** | **United States** | 17-point holding-period wedge, almost no transaction tax. The treatment at full strength | C1-C6, as already specified |
+| **2** | **Germany or Japan** | **Flat capital-gains rate: no holding-period boundary exists in law.** This is the placebo the whole identification rests on. Without at least one flat-rate country there is no paper | C1-C6 |
+| **3** | **India** | Moderate wedge (7.5 pts) AND large transaction tax (STT both sides). The single country that discriminates between the two channels | C1-C6 + STT/stamp/GST schedule |
+| 4 | Taiwan or UK | High transaction tax, flat rate. Separates the turnover channel cleanly | C1-C6 |
+| 5 | Hong Kong or Singapore | Zero capital-gains tax. Anchors the comparison: net-of-cost *is* after-tax | C1-C6 |
+
+**Minimum viable set: US + one flat-rate country + India.** Two countries is not enough - with only
+the US and India, the wedge and the transaction tax are still confounded.
+
+### What is different from the US specification
+
+1. **Local currency throughout.** Do not convert. Taxes are levied in local currency and thresholds
+   (India's Rs 1.25 lakh exemption, Germany's Sparer-Pauschbetrag) are nominal local amounts.
+2. **`div_next`** matters more here: several jurisdictions tax dividends at a different rate from
+   gains, and China's dividend rate is itself holding-period dependent.
+3. **Statutory charge schedules** per country, by date: transaction taxes change. India's STT and
+   LTCG rates both changed materially in 2024. A single constant rate across the sample is wrong.
+4. **Local universe filters.** The `$5` price screen and NYSE size percentile are US conventions and
+   do not transfer. Each country needs its own documented liquidity screen.
+5. **Local trading calendars and holidays** for the month-end convention.
+
+### What I need from you first, before any data work
+
+A one-page feasibility note: which of these countries you can actually source (CRSP equivalents,
+Compustat Global, local vendors), at what history depth, and at what cost. **If only the US is
+feasible, tell me this week** - the claim has to change back, and it is better to know now than
+after a year of work.

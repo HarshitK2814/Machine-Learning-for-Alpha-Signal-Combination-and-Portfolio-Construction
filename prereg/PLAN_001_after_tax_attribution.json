@@ -1,0 +1,43 @@
+{
+  "title": "After-tax attribution of ML signal combination: cross-country identification",
+  "primary_outcome": "After-tax net return per month of a dollar-neutral long/short book, taxable US top bracket, HIFO lots, accrual accounting. Secondary: the same under each of the nine jurisdictions in alphacomb.tax.jurisdictions.",
+  "selection_rule": "Within each cell, the configuration with the highest validation rank IC on the validation window of each walk-forward split. No selection across cells: every cell is reported. No selection on test-period or lockbox data.",
+  "cells": [
+    "L-S-P-0",
+    "L-S-P-U",
+    "L-S-E-0",
+    "L-S-E-U",
+    "L-C-P-0",
+    "L-C-P-U",
+    "L-C-E-0",
+    "L-C-E-U",
+    "N-S-P-0",
+    "N-S-P-U",
+    "N-S-E-0",
+    "N-S-E-U",
+    "N-C-P-0",
+    "N-C-P-U",
+    "N-C-E-0",
+    "N-C-E-U"
+  ],
+  "grids": {
+    "default": {
+      "shrinkage": [
+        "low",
+        "high"
+      ],
+      "capacity": [
+        "small",
+        "large"
+      ]
+    }
+  },
+  "n_seeds": 1,
+  "n_refits": 26,
+  "lockbox_note": "2021-2025 is sealed behind ALPHACOMB_FREEZE_TAG and is opened exactly once, after the 1995-2020 results are written and this plan is closed. If the lockbox contradicts the development result, both are reported.",
+  "created_utc": "2026-09-21T01:21:04.038926+00:00",
+  "notes": "Pre-registered BEFORE the real-data (C1-C6) confirmatory run. Written because running the inference layer on the synthetic results showed that at the realised trial count of 539 nothing survived deflation: the expected maximum Sharpe from a 539-trial no-skill search is 0.727 and our best was 0.695. A small N is only honest if it was fixed in advance, which is what this file is for. Anything fitted outside the grid below is EXPLORATORY and may never be reported as a confirmatory result.",
+  "fingerprint": "cae8140b7e2b7ee4",
+  "n_configurations": 64,
+  "n_fits": 1664
+}

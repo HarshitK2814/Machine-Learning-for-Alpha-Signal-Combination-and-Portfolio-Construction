@@ -19,9 +19,21 @@ def _plan(**kw) -> PreRegistration:
 
 def test_planned_count_is_computed_from_the_grid_not_asserted():
     plan = _plan()
-    assert plan.n_planned_trials == 2 * 3 * 2            # cells x alpha x depth
-    assert _plan(n_seeds=5).n_planned_trials == 2 * 3 * 2 * 5
-    assert _plan(n_refits=4).n_planned_trials == 2 * 3 * 2 * 4
+    assert plan.n_configurations == 2 * 3 * 2            # cells x alpha x depth
+    assert _plan(n_seeds=5).n_configurations == 2 * 3 * 2 * 5
+
+
+def test_refits_do_not_inflate_the_configuration_count():
+    """Refitting one configuration across a walk-forward produces one strategy, not many.
+
+    Bailey and Lopez de Prado's N counts strategies that could have been reported. Multiplying by
+    refits would make N enormous and the deflated Sharpe unachievable for any honest walk-forward.
+    The fit count is kept separately as the conservative bound.
+    """
+    plan = _plan(n_refits=26)
+    assert plan.n_configurations == 12
+    assert plan.n_fits == 12 * 26
+    assert plan.n_planned_trials == plan.n_configurations
 
 
 def test_configurations_inside_the_grid_are_planned_and_others_are_not():

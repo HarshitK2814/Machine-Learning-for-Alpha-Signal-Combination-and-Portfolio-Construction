@@ -65,8 +65,13 @@ class PreRegistration:
 
     # ------------------------------------------------------------------ counting
     @property
-    def n_planned_trials(self) -> int:
-        """The N that goes into the deflated Sharpe ratio. Computed, never asserted."""
+    def n_configurations(self) -> int:
+        """Distinct strategy configurations in the plan: cells x grid x seeds.
+
+        This is the N for the deflated Sharpe ratio when the grid is fixed in advance. Bailey and
+        Lopez de Prado's N counts the *strategies that could have been reported*, and refitting one
+        configuration across a walk-forward produces one strategy, not one per refit.
+        """
         total = 0
         for cell in self.cells:
             grid = self.grids.get(cell, self.grids.get("default", {}))
@@ -74,7 +79,23 @@ class PreRegistration:
             for values in grid.values():
                 combos *= max(len(values), 1)
             total += combos
-        return int(total * max(self.n_seeds, 1) * max(self.n_refits, 1))
+        return int(total * max(self.n_seeds, 1))
+
+    @property
+    def n_fits(self) -> int:
+        """Configurations x refits: the total number of models actually estimated.
+
+        Reported as a conservative upper bound. It is the right N only if hyperparameters are
+        re-selected from scratch at every refit, which makes the effective search larger than the
+        grid suggests. Our pipeline does re-select per split, so both numbers are published and the
+        paper states which one each table uses.
+        """
+        return int(self.n_configurations * max(self.n_refits, 1))
+
+    @property
+    def n_planned_trials(self) -> int:
+        """Backwards-compatible alias for the configuration count."""
+        return self.n_configurations
 
     def planned_configurations(self, cell: str) -> list[dict]:
         grid = self.grids.get(cell, self.grids.get("default", {}))
@@ -114,7 +135,8 @@ class PreRegistration:
         path.parent.mkdir(parents=True, exist_ok=True)
         blob = asdict(self)
         blob["fingerprint"] = self.fingerprint
-        blob["n_planned_trials"] = self.n_planned_trials
+        blob["n_configurations"] = self.n_configurations
+        blob["n_fits"] = self.n_fits
         path.write_text(json.dumps(blob, indent=2, default=str), encoding="utf-8")
         return path
 
@@ -122,7 +144,8 @@ class PreRegistration:
     def load(path: str | Path) -> "PreRegistration":
         blob = json.loads(Path(path).read_text(encoding="utf-8"))
         stored = blob.pop("fingerprint", None)
-        blob.pop("n_planned_trials", None)
+        for k in ("n_planned_trials", "n_configurations", "n_fits"):
+            blob.pop(k, None)
         plan = PreRegistration(**blob)
         if stored and stored != plan.fingerprint:
             raise ValueError(
