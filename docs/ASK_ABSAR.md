@@ -106,7 +106,7 @@ So this is not a one-way ask — here is what is waiting:
 
 ## The honest caveat about our side
 
-The **tax-aware optimiser path is broken** and we are not hiding it. Two bugs fixed on 21 September
-and it still fails on about half of all months. It is quarantined, it is marked in `STATUS.md`, and
-no result from it is reported. Everything else — the evaluation ledger, the factorial cells, the
-inference — is working and tested.
+The tax-aware optimiser path was broken for most of 21 September and is **now fixed** - 36 of 36
+months solving optimally and three times faster, after three attempts at the same bug. The story is
+in `STATUS.md`. Nothing else was affected: the evaluation ledger never builds the optimiser's tax
+term, so every after-tax number already published stands.

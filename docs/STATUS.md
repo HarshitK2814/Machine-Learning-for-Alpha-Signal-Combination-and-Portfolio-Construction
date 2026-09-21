@@ -26,21 +26,31 @@ Updated: 2026-09-21. Synthetic data only. **No real-data or paper results exist.
 
 Total: **130 tests, all passing, none skipped.**
 
-### KNOWN BROKEN: the tax-aware optimiser path
+### The tax-aware optimiser path: broken for most of 21 September, now fixed
 
-`--tax-aware` construction does **not** work. Two bugs were found and fixed on 21 September - an
-unbounded embedded gain rate producing 4000x phantom harvesting credits, and a harvesting
-constraint that forbade covering short positions - and it is **still** failing on roughly half of
-all months (128 of 216 at gross 2, 102 of 216 at gross 4). It is also extremely slow: 98 to 150
-minutes per 216-month run against 6 minutes for the tax-blind path.
+Worth recording because it took three attempts and the first two looked like fixes.
 
-**Do not report any result from the tax-aware optimiser arm.** The evaluation ledger
-(`alphacomb.tax`) is unaffected and every after-tax number in `docs/AFTER_TAX_RESULTS.md` and
-`docs/PRACTITIONER_GAP.md` stands, because the ledger never builds the optimiser's tax term.
+The harvesting term was modelled with an auxiliary sell variable constrained by
+`s <= prev - w`. With `s >= 0` that implies **`w <= prev`**: every position could only ever shrink.
+Restricting `s` to long positions stopped shorts being frozen open and left longs frozen shut -
+the failure rate moved from roughly 60% of months to 36%, which looked like progress and was not.
 
-Next diagnostic step: the auxiliary harvesting variable plus the cap-relaxation constraints are
-probably jointly infeasible in some months. Instrument `construct()` to report which constraint
-set is binding when it fails, rather than guessing a third time.
+The error was the auxiliary variable itself. **A constraint introduced to model an objective term
+must never restrict the decision variable.** The credit `rate * |g| * (prev - w)` is affine in `w`
+and needs no variable at all.
+
+Separately, `cp.pos()` was built across all 556 names when the coefficient is non-zero only for
+long positions carrying an embedded gain. CVXPY adds an auxiliary variable per element, so the
+problem was roughly twice the necessary size.
+
+    before   ~60% of months failed, 98-150 min per 216-month run
+    after    36 of 36 months optimal, 311s for 36 months (3x faster)
+
+Two one-line tests now pin it: the tax term must generate **no constraints at all**, and a held
+long must still be able to grow. Both test properties of the problem rather than internals of the
+implementation - which is the lesson, because three existing tests had to be rewritten after the
+fix, and one of them had asserted the bound came from `s <= prev`. That assertion encoded the bug
+and would have defended it indefinitely.
 
 ### A bug worth knowing about before reading any number in this repo
 
