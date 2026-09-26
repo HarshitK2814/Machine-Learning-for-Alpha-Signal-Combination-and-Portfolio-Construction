@@ -42,6 +42,7 @@ class AttentionCell:
         self.nets: list = []
         self.mu_: np.ndarray | None = None
         self.sd_: np.ndarray | None = None
+        self.y_scale_: float = 1.0
         self.last_attention_: np.ndarray | None = None
 
     # ------------------------------------------------------------------ helpers
@@ -80,10 +81,19 @@ class AttentionCell:
         return CrossSectionAttention(p, self.d_model, self.n_heads, self.ff_hidden, self.dropout)
 
     @staticmethod
-    def _months(frame: pd.DataFrame, features: list[str], target: str | None, prep, max_stocks: int):
+    def _months(frame: pd.DataFrame, features: list[str], target: str | None, prep, max_stocks: int,
+                subsample: bool = True):
+        """One (date, index, X, y) tuple per month.
+
+        ``subsample`` caps the cross-section for training, where it bounds the O(n^2) attention
+        cost. It must be False at prediction time: a capped predict silently leaves every dropped
+        stock as NaN, and on a real CRSP universe of ~3000 names that is two thirds of the panel
+        scored as missing. Our synthetic universe is ~666 names so the cap never binds here, which
+        is exactly why the bug was invisible.
+        """
         out = []
         for date, group in frame.groupby("date"):
-            if len(group) > max_stocks:
+            if subsample and len(group) > max_stocks:
                 group = group.sample(max_stocks, random_state=0)
             X = prep(group[features].to_numpy(dtype="float32"))
             y = group[target].to_numpy(dtype="float32") if target else None
@@ -96,6 +106,16 @@ class AttentionCell:
 
         device = torch.device(self.device or ("cuda" if torch.cuda.is_available() else "cpu"))
         self._prep(train[features].to_numpy(dtype="float32"), fit=True)
+        # Monthly returns have sd ~0.13 while the head, fed by a LayerNorm, emits O(1) at init.
+        # Under MSE the first gradients are dominated by shrinking that scale mismatch rather than
+        # by learning the signal, and the model early-stops before it recovers. Training on a unit
+        # target and rescaling at predict time is worth ~25% of the validation IC (0.0391 -> 0.0491)
+        # and costs nothing. Rank IC is scale-free, so this changes the fit, not the metric.
+        self.y_scale_ = float(train[target].std())
+        if not np.isfinite(self.y_scale_) or self.y_scale_ < 1e-12:
+            self.y_scale_ = 1.0
+        train = train.assign(**{target: train[target] / self.y_scale_})
+        val = val.assign(**{target: val[target] / self.y_scale_})
         tr = self._months(train.dropna(subset=[target]), features, target, self._prep, self.max_stocks)
         va = self._months(val.dropna(subset=[target]), features, target, self._prep, self.max_stocks)
         if not tr or not va:
@@ -147,7 +167,8 @@ class AttentionCell:
         device = next(self.nets[0].parameters()).device
         out = pd.DataFrame(index=test.index, columns=["score", "unc_sd"], dtype=float)
         attentions = []
-        for date, idx, X, _ in self._months(test, features, None, self._prep, self.max_stocks):
+        for date, idx, X, _ in self._months(test, features, None, self._prep, self.max_stocks,
+                                            subsample=False):
             xb = torch.tensor(X, device=device).unsqueeze(0)
             member_scores = []
             with torch.no_grad():
@@ -157,8 +178,9 @@ class AttentionCell:
                     if weights is not None and len(attentions) < 24:
                         attentions.append(weights.squeeze(0).cpu().numpy().mean(axis=0))
             stacked = np.column_stack(member_scores)
-            out.loc[idx, "score"] = stacked.mean(axis=1)
-            out.loc[idx, "unc_sd"] = stacked.std(axis=1, ddof=1) if self.n_members > 1 else np.nan
+            out.loc[idx, "score"] = stacked.mean(axis=1) * self.y_scale_
+            out.loc[idx, "unc_sd"] = (stacked.std(axis=1, ddof=1) * self.y_scale_
+                                      if self.n_members > 1 else np.nan)
         self.last_attention_ = np.array(attentions, dtype=object) if attentions else None
         return out.astype(float)
 

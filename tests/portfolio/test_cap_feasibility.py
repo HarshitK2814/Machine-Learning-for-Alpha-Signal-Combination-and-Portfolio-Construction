@@ -111,6 +111,47 @@ def test_solver_escalation_reports_which_solver_answered(setup):
         pytest.skip("solver unavailable for this configuration")
     assert res.status in {"optimal", "optimal_inaccurate"}
     assert res.diagnostics.get("solver"), "the answering solver must be recorded"
-    # a fresh book is already inside every constraint, so nothing should be relaxed
-    assert res.diagnostics["net_slack"] == pytest.approx(0.0)
-    assert "cap_relaxed" in res.diagnostics, "a binding relaxation must be visible, not silent"
+    # A fresh book is already inside every constraint, so nothing should be breached. The
+    # diagnostic names changed on 22 September when the relaxations were replaced by a hard solve
+    # with a verified soft fallback: `net_slack`/`cap_relaxed` became per-bound violations, which
+    # say which bound bent and by how much rather than only that something did.
+    assert res.diagnostics["n_violated"] == 0, res.diagnostics.get("violated")
+    assert res.diagnostics["max_violation"] == pytest.approx(0.0)
+    assert "pos_cap_relaxed" in res.diagnostics, "a binding relaxation must be visible, not silent"
+
+
+def test_solver_choice_is_made_on_feasibility_not_on_status(setup):
+    """A feasible `optimal_inaccurate` must beat an infeasible `optimal`.
+
+    The defect this pins is the one that reached published results. `solve_escalating` preferred
+    the first solver reporting `optimal`, justified by the objectives agreeing to five significant
+    figures - which they do. The solutions do not: on this problem SCS returns `optimal` with 139
+    of 827 names over their position cap (worst 3.54x), while CLARABEL returns `optimal_inaccurate`
+    with none over. The rule compared objectives and never measured the constraints, so it selected
+    the infeasible book on every month.
+
+    The caps being breached are the ADV participation limits, so the consequence is positions that
+    could not be traded at the modelled impact cost, concentrated in the least liquid names - the
+    same population the treatment cells trade.
+    """
+    import numpy as np
+    from alphacomb.portfolio.cost_terms import cost_inputs_for
+
+    bundle, cfg, risk, opt, dates = setup
+    date = dates[-13]
+    res = construct(date, _alpha(bundle, date), None, risk.model(date), bundle.cost_inputs, opt)
+    if res.status.startswith("failed"):
+        pytest.skip("solver unavailable for this configuration")
+
+    w = res.weights
+    ci = cost_inputs_for(date, bundle.cost_inputs, w.index)
+    adv_cap = np.clip(ci["adv_usd"].to_numpy() * opt.adv_participation_max / opt.aum_usd, 1e-6, None)
+    pos_cap = np.minimum(opt.weight_abs_max, np.maximum(adv_cap, 1e-5))
+    over = (w.abs().to_numpy() - pos_cap) > 1e-9
+    assert not over.any(), (
+        f"{int(over.sum())} of {len(w)} names exceed their position cap "
+        f"(worst {float(np.max(w.abs().to_numpy() / pos_cap)):.2f}x) on a fresh book; the solver "
+        f"chosen was {res.diagnostics.get('solver')!r} with status {res.status!r} - selection is "
+        f"following the status label instead of measured feasibility")
+    trade = (w.abs().to_numpy() - adv_cap) > 1e-9      # prev is None, so the trade IS the position
+    assert not trade.any(), f"{int(trade.sum())} names breach the ADV participation cap"
