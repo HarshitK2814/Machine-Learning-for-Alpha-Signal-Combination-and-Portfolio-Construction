@@ -1,10 +1,16 @@
 # Reply to Absar — US C1 pilot certification, 27 September 2026
 
-> **Status: the contract change is a PENDING Contract Change Request, not merged.** Per section 4
-> of `Team_Coding_Work_Distribution.md`, a CCR edits only `contracts/` or `tests/contracts/`, bumps
-> `VERSION`, and **needs approval from all three members** — nobody holds extra approval rights. It
-> is open on branch `ccr/c1-unknown-industry`. Absar should **not** build the full production
-> history against v1.2.0 until Maham has also approved, or a later objection means rebuilding.
+> **Status: contract v1.2.0 is MERGED to `main`** (commit `9d88e7d`, in the merge `540ce07`), so it
+> is the live contract and the thing to build against.
+>
+> One honest note. Per section 4 of `Team_Coding_Work_Distribution.md` a Contract Change Request
+> edits only `contracts/` or `tests/contracts/`, bumps `VERSION`, and needs approval from all three
+> members — nobody holds extra approval rights. This went to `main` ahead of Absar's and Maham's
+> sign-off, deliberately, so that there is a definite target to build against rather than a wait.
+> **Ratification is still genuinely wanted:** it is two files, `src/alphacomb/contracts/schemas.py`
+> and `tests/contracts/test_schemas.py`. If either of you disagrees with the `ff49=0` encoding or
+> the month-end date rule, please say so before the full-history pull — a change afterwards costs a
+> rebuild.
 
 Answers verified by running the code against an injected `ff49=0` cohort, not by reading it. The
 probe put Unknown on ~5% of synthetic stock-months (matching the pilot's 4.5%) and traced it through
@@ -20,8 +26,8 @@ probe put Unknown on ~5% of synthetic stock-months (matching the pilot's 4.5%) a
 > through the actual code rather than reading it. Answers:
 >
 > **1. Does `contracts.validate` permit `ff49=0`?** Yes — it passed. But the schema was
-> `Column("ff49", "int")` with **no domain at all**, so `-1` and `9999` passed silently too. The CCR
-> proposes pinning the domain to `{0} ∪ 1..49` (contract **v1.2.0**). Important consequence for you:
+> `Column("ff49", "int")` with **no domain at all**, so `-1` and `9999` passed silently too. The domain is
+> now pinned to `{0} ∪ 1..49` (contract **v1.2.0**, merged). Important consequence for you:
 > **`3999` is now rejected**, so your 38 SICCD=3999 stock-months must arrive **recoded as 0**, not
 > passed through raw.
 >
@@ -105,7 +111,7 @@ probe put Unknown on ~5% of synthetic stock-months (matching the pilot's 4.5%) a
 
 | Change | Detail |
 |---|---|
-| Contract **v1.2.0** (pending CCR) | `ff49` domain `{0} ∪ 1..49`; `date` must be calendar month-end |
+| Contract **v1.2.0** (merged, ratification requested) | `ff49` domain `{0} ∪ 1..49`; `date` must be calendar month-end |
 | `tests/contracts/test_schemas.py` | New: `0` accepted, `-1/50/999/3999` rejected, non-month-end dates rejected, genuine codes 1/25/49 pass |
 | Suite | contracts 26 (+9). synthetic 5, risk 6, models 52, portfolio 30, tax 37 all green after the change |
 
