@@ -1,0 +1,6 @@
+KNS2020|Kozak|2020|Shrinking the cross-section
+CFHH2025|Cong|2025|Growing the efficient frontier on panel trees
+LWZ2022|Leippold|2022|Machine learning in the Chinese stock market
+JKMP2026|Jensen|2026|Machine Learning and the Implementable Efficient Frontier
+MENK2024|Menkveld|2024|Nonstandard Errors
+CHEN2021|Chen|2021|The Limits of p-Hacking: Some Thought Experiments

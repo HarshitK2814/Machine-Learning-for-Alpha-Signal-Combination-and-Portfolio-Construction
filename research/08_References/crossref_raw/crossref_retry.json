@@ -1,0 +1,126 @@
+{
+ "KNS2020": {
+  "query_title": "Shrinking the cross-section",
+  "query_author": "Kozak",
+  "year_expected": "2020",
+  "doi": "10.1016/j.jfineco.2019.06.008",
+  "title": "Shrinking the cross-section",
+  "journal": "Journal of Financial Economics",
+  "year": 2020,
+  "vol": "135",
+  "issue": "2",
+  "pages": "271-292",
+  "type": "journal-article",
+  "authors": [
+   "Serhiy Kozak",
+   "Stefan Nagel",
+   "Shrihari Santosh"
+  ],
+  "title_similarity": 1.0,
+  "author_match": true,
+  "status": "MATCH"
+ },
+ "CFHH2025": {
+  "query_title": "Growing the efficient frontier on panel trees",
+  "query_author": "Cong",
+  "year_expected": "2025",
+  "doi": "10.1016/j.jfineco.2025.104024",
+  "title": "Growing the efficient frontier on panel trees",
+  "journal": "Journal of Financial Economics",
+  "year": 2025,
+  "vol": "167",
+  "issue": null,
+  "pages": "104024",
+  "type": "journal-article",
+  "authors": [
+   "Lin William Cong",
+   "Guanhao Feng",
+   "Jingyu He",
+   "Xin He"
+  ],
+  "title_similarity": 1.0,
+  "author_match": true,
+  "status": "MATCH"
+ },
+ "LWZ2022": {
+  "query_title": "Machine learning in the Chinese stock market",
+  "query_author": "Leippold",
+  "year_expected": "2022",
+  "doi": "10.1016/j.jfineco.2021.08.017",
+  "title": "Machine learning in the Chinese stock market",
+  "journal": "Journal of Financial Economics",
+  "year": 2022,
+  "vol": "145",
+  "issue": "2",
+  "pages": "64-82",
+  "type": "journal-article",
+  "authors": [
+   "Markus Leippold",
+   "Qian Wang",
+   "Wenyu Zhou"
+  ],
+  "title_similarity": 1.0,
+  "author_match": true,
+  "status": "MATCH"
+ },
+ "JKMP2026": {
+  "query_title": "Machine Learning and the Implementable Efficient Frontier",
+  "query_author": "Jensen",
+  "year_expected": "2026",
+  "doi": "10.1093/rfs/hhag022",
+  "title": "Machine Learning and the Implementable Efficient Frontier",
+  "journal": "The Review of Financial Studies",
+  "year": 2026,
+  "vol": null,
+  "issue": null,
+  "pages": null,
+  "type": "journal-article",
+  "authors": [
+   "Theis Ingerslev Jensen",
+   "Bryan Kelly",
+   "Semyon Malamud",
+   "Lasse Heje Pedersen"
+  ],
+  "title_similarity": 1.0,
+  "author_match": true,
+  "status": "MATCH"
+ },
+ "MENK2024": {
+  "query_title": "Nonstandard Errors",
+  "query_author": "Menkveld",
+  "year_expected": "2024",
+  "doi": "10.2139/ssrn.3979358",
+  "title": "Non-Standard Errors",
+  "journal": "SSRN Electronic Journal",
+  "year": 2021,
+  "vol": null,
+  "issue": null,
+  "pages": null,
+  "type": "journal-article",
+  "authors": [
+   "Albert J. Menkveld"
+  ],
+  "title_similarity": 1.0,
+  "author_match": true,
+  "status": "WP_VERSION"
+ },
+ "CHEN2021": {
+  "query_title": "The Limits of p-Hacking: Some Thought Experiments",
+  "query_author": "Chen",
+  "year_expected": "2021",
+  "doi": "10.17016/feds.2019.016",
+  "title": "The Limits of p-Hacking: A Thought Experiment",
+  "journal": "Finance and Economics Discussion Series",
+  "year": 2019,
+  "vol": "2019.0",
+  "issue": "16",
+  "pages": null,
+  "type": "journal-article",
+  "authors": [
+   "Andrew Y Chen"
+  ],
+  "title_similarity": 0.933,
+  "author_match": true,
+  "status": "CHECK"
+ }
+}

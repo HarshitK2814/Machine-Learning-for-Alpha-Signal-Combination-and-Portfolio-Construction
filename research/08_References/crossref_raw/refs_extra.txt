@@ -1,0 +1,20 @@
+AGK2024|Ardia|2024|Efficient estimation of bid-ask spreads from open, high, low, and close prices
+CSS2012|Ceria|2012|Factor Alignment Problems and Quantitative Portfolio Management
+LS2008|Lee|2008|Do Risk Factors Eat Alphas?
+MPR2026|Muller|2026|In good and in bad times? The relation between anomaly returns and market states
+PS2003|Pastor|2003|Liquidity Risk and Expected Stock Returns
+BW2006|Baker|2006|Investor Sentiment and the Cross-Section of Stock Returns
+FP2014|Frazzini|2014|Betting against beta
+FF1993|Fama|1993|Common risk factors in the returns on stocks and bonds
+CAR1997|Carhart|1997|On Persistence in Mutual Fund Performance
+KP2015|Kelly|2015|The three-pass regression filter: A new approach to forecasting using many predictors
+CST2014|Chordia|2014|Have capital market anomalies attenuated in the recent era of high liquidity and trading activity?
+LT2020|Lochstoer|2020|What Drives Anomaly Returns?
+BLLP2025|Bryzgalova|2025|Missing Financial Data
+FHNW2025|Freyberger|2025|Missing Data in Asset Pricing Panels
+ATHL2005|Almgren|2005|Direct Estimation of Equity Market Impact
+HJTZ2015|Huang|2015|Investor Sentiment Aligned: A Powerful Predictor of Stock Returns
+SIM2023|Simon|2023|Deep Parametric Portfolio Policies
+BAMS2014|Bae|2014|Dynamic asset allocation for varied financial markets under regime switching framework
+FFR2023|Fieberg|2023|A Trend Factor for the Cross-Section of Cryptocurrency Returns
+LTZ2021|Lettau|2021|High-Dimensional Latent Factor Asset Pricing Models

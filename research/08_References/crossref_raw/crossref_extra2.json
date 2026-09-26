@@ -1,0 +1,269 @@
+{
+ "CST2002": {
+  "query_title": "Portfolio Constraints and the Fundamental Law of Active Management",
+  "query_author": "Clarke",
+  "year_expected": "2002",
+  "doi": "10.2469/faj.v58.n5.2468",
+  "title": "Portfolio Constraints and the Fundamental Law of Active Management",
+  "journal": "Financial Analysts Journal",
+  "year": 2002,
+  "vol": "58",
+  "issue": "5",
+  "pages": "48-66",
+  "type": "journal-article",
+  "authors": [
+   "Roger Clarke",
+   "Harindra de Silva",
+   "Steven Thorley"
+  ],
+  "title_similarity": 1.0,
+  "author_match": true,
+  "status": "MATCH"
+ },
+ "MICH1989": {
+  "query_title": "The Markowitz Optimization Enigma: Is Optimized Optimal?",
+  "query_author": "Michaud",
+  "year_expected": "1989",
+  "doi": "10.2469/cp.v1989.n4.6",
+  "title": "The Markowitz Optimization Enigma: Is Optimized Optimal?",
+  "journal": "ICFA Continuing Education Series",
+  "year": 1989,
+  "vol": "1989",
+  "issue": "4",
+  "pages": "43-54",
+  "type": "journal-article",
+  "authors": [
+   "Richard O. Michaud"
+  ],
+  "title_similarity": 1.0,
+  "author_match": true,
+  "status": "MATCH"
+ },
+ "MEM2003": {
+  "query_title": "Performance Hypothesis Testing with the Sharpe Ratio",
+  "query_author": "Memmel",
+  "year_expected": "2003",
+  "doi": "10.1016/j.jempfin.2008.03.002",
+  "title": "Robust performance hypothesis testing with the Sharpe ratio",
+  "journal": "Journal of Empirical Finance",
+  "year": 2008,
+  "vol": "15",
+  "issue": "5",
+  "pages": "850-859",
+  "type": "journal-article",
+  "authors": [
+   "Oliver Ledoit",
+   "Michael Wolf"
+  ],
+  "title_similarity": 0.937,
+  "author_match": false,
+  "status": "CHECK"
+ },
+ "BP1998": {
+  "query_title": "Estimating and Testing Linear Models with Multiple Structural Changes",
+  "query_author": "Bai",
+  "year_expected": "1998",
+  "doi": "10.2307/2998540",
+  "title": "Estimating and Testing Linear Models with Multiple Structural Changes",
+  "journal": "Econometrica",
+  "year": 1998,
+  "vol": "66",
+  "issue": "1",
+  "pages": "47",
+  "type": "journal-article",
+  "authors": [
+   "Jushan Bai",
+   "Pierre Perron"
+  ],
+  "title_similarity": 1.0,
+  "author_match": true,
+  "status": "MATCH"
+ },
+ "KLS2021": {
+  "query_title": "Kernel trick for the cross-section",
+  "query_author": "Kozak",
+  "year_expected": "2023",
+  "doi": "10.2139/ssrn.3307895",
+  "title": "Kernel Trick for the Cross Section",
+  "journal": "SSRN Electronic Journal",
+  "year": 2019,
+  "vol": null,
+  "issue": null,
+  "pages": null,
+  "type": "journal-article",
+  "authors": [
+   "Serhiy Kozak"
+  ],
+  "title_similarity": 0.985,
+  "author_match": true,
+  "status": "WP_VERSION"
+ },
+ "FGX2023": {
+  "query_title": "Deep learning for predicting asset returns",
+  "query_author": "Feng",
+  "year_expected": "2024",
+  "doi": "10.1057/palgrave.jam.2240142",
+  "title": "Alternative valuation techniques for predicting UK stock returns",
+  "journal": "Journal of Asset Management",
+  "year": 2004,
+  "vol": "5",
+  "issue": "4",
+  "pages": "230-250",
+  "type": "journal-article",
+  "authors": [
+   "Christian Dunis",
+   "Declan Reilly"
+  ],
+  "title_similarity": 0.585,
+  "author_match": false,
+  "status": "CHECK"
+ },
+ "CLARK2004": {
+  "query_title": "Missing data in asset pricing",
+  "query_author": "Chen",
+  "year_expected": "2025",
+  "doi": "10.3386/w30761",
+  "title": "Missing Data in Asset Pricing Panels",
+  "journal": "",
+  "year": 2022,
+  "vol": null,
+  "issue": null,
+  "pages": null,
+  "type": "report",
+  "authors": [
+   "Joachim Freyberger",
+   "Björn Höppner",
+   "Andreas Neuhierl",
+   "Michael Weber"
+  ],
+  "title_similarity": 0.892,
+  "author_match": false,
+  "status": "CHECK"
+ },
+ "HKGX2025": {
+  "query_title": "Large (and deep) factor models",
+  "query_author": "Kelly",
+  "year_expected": "2025",
+  "doi": "10.2139/ssrn.6225778",
+  "title": "Large and Deep Factor Models",
+  "journal": "",
+  "year": 2026,
+  "vol": null,
+  "issue": null,
+  "pages": null,
+  "type": "posted-content",
+  "authors": [
+   "Bryan T. Kelly",
+   "Boris Kuznetsov",
+   "Semyon Malamud",
+   "Teng Andrea Xu",
+   "Yuan Zhang"
+  ],
+  "title_similarity": 1.0,
+  "author_match": true,
+  "status": "WP_VERSION"
+ },
+ "CSS2012": {
+  "query_title": "Factor Alignment Problems and Quantitative Portfolio Management",
+  "query_author": "Ceria",
+  "year_expected": "2012",
+  "doi": "10.3905/jpm.2012.2012.1.021",
+  "title": "Factor Alignment Problems and Quantitative Portfolio Management",
+  "journal": "The Journal of Portfolio Management",
+  "year": 2011,
+  "vol": null,
+  "issue": null,
+  "pages": "111227035558003",
+  "type": "journal-article",
+  "authors": [
+   "Sebastián Ceria",
+   "Anureet Saxena",
+   "Robert A Stubbs"
+  ],
+  "title_similarity": 1.0,
+  "author_match": true,
+  "status": "MATCH"
+ },
+ "MPR2026": {
+  "query_title": "In good and in bad times? The relation between anomaly returns and market states",
+  "query_author": "Muller",
+  "year_expected": "2026",
+  "doi": "10.1016/j.jbankfin.2026.107746",
+  "title": "In good and in bad times? The relation between anomaly returns and market states",
+  "journal": "Journal of Banking &amp; Finance",
+  "year": 2026,
+  "vol": "190",
+  "issue": null,
+  "pages": "107746",
+  "type": "journal-article",
+  "authors": [
+   "Sebastian Müller",
+   "Fabian Preissler"
+  ],
+  "title_similarity": 1.0,
+  "author_match": false,
+  "status": "CHECK"
+ },
+ "PS2003": {
+  "query_title": "Liquidity Risk and Expected Stock Returns",
+  "query_author": "Pastor",
+  "year_expected": "2003",
+  "doi": "10.1086/374184",
+  "title": "Liquidity Risk and Expected Stock Returns",
+  "journal": "Journal of Political Economy",
+  "year": 2003,
+  "vol": "111",
+  "issue": "3",
+  "pages": "642-685",
+  "type": "journal-article",
+  "authors": [
+   "Ľuboš Pástor",
+   "Robert F. Stambaugh"
+  ],
+  "title_similarity": 1.0,
+  "author_match": false,
+  "status": "CHECK"
+ },
+ "SWZ2023": {
+  "query_title": "Deep Parametric Portfolio Policies",
+  "query_author": "Simon",
+  "year_expected": "2026",
+  "doi": "10.1287/mnsc.2025.00721",
+  "title": "Deep Parametric Portfolio Policies",
+  "journal": "Management Science",
+  "year": 2026,
+  "vol": null,
+  "issue": null,
+  "pages": null,
+  "type": "journal-article",
+  "authors": [
+   "Frederik Simon",
+   "Sebastian Weibels",
+   "Tom Zimmermann"
+  ],
+  "title_similarity": 1.0,
+  "author_match": true,
+  "status": "MATCH"
+ },
+ "CPZ2024": {
+  "query_title": "Deep Learning in Asset Pricing",
+  "query_author": "Chen",
+  "year_expected": "2024",
+  "doi": "10.1287/mnsc.2023.4695",
+  "title": "Deep Learning in Asset Pricing",
+  "journal": "Management Science",
+  "year": 2024,
+  "vol": "70",
+  "issue": "2",
+  "pages": "714-750",
+  "type": "journal-article",
+  "authors": [
+   "Luyang Chen",
+   "Markus Pelger",
+   "Jason Zhu"
+  ],
+  "title_similarity": 1.0,
+  "author_match": true,
+  "status": "MATCH"
+ }
+}

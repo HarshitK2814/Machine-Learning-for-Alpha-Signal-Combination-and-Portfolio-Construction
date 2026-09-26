@@ -1,0 +1,204 @@
+# Bibliography (formatted)
+
+200 entries. Format: APA-like. DOI shown where verified (see crossref_verification.csv).
+
+- **[SPUR2026]** [verify authors] (2026). Spurious Predictability in Financial Machine Learning. Working paper (arXiv 2604.15531).
+- **[AR2017]** Abdi, F., & Ranaldo, A. (2017). A Simple Estimation of Bid-Ask Spreads from Daily Close, High, and Low Prices. Review of Financial Studies 30(12):4437-4480. https://doi.org/10.1093/rfs/hhx084
+- **[VSC2026]** Afsharhajari, N., & Li, J.Y.-M. (2026). The Virtue of Sparsity in Complexity. Working paper (arXiv 2604.17166).
+- **[AAB2019]** Agrawal, A., Amos, B., Barratt, S., Boyd, S., Diamond, S., & Kolter, J.Z. (2019). Differentiable Convex Optimization Layers. Advances in Neural Information Processing Systems 32.
+- **[AC2001]** Almgren, R., & Chriss, N. (2001). Optimal Execution of Portfolio Transactions. Journal of Risk 3(2):5-39. https://doi.org/10.21314/jor.2001.041
+- **[ATHL2005]** Almgren, R., Thum, C., Hauptmann, E., & Li, H. (2005). Direct Estimation of Equity Market Impact. Risk 18(7):58-62.
+- **[AMI2002]** Amihud, Y. (2002). Illiquidity and Stock Returns: Cross-Section and Time-Series Effects. Journal of Financial Markets 5(1):31-56. https://doi.org/10.1016/s1386-4181(01)00024-6
+- **[AK2017]** Amos, B., & Kolter, J.Z. (2017). OptNet: Differentiable Optimization as a Layer in Neural Networks. Proceedings of ICML 2017 (PMLR 70).
+- **[AB2002]** Ang, A., & Bekaert, G. (2002). International Asset Allocation with Regime Shifts. Review of Financial Studies 15(4):1137-1187. https://doi.org/10.1093/rfs/15.4.1137
+- **[AHXZ2006]** Ang, A., Hodrick, R.J., Xing, Y., & Zhang, X. (2006). The Cross-Section of Volatility and Expected Returns. Journal of Finance 61(1):259-299. https://doi.org/10.1111/j.1540-6261.2006.00836.x
+- **[AT2012]** Ang, A., & Timmermann, A. (2012). Regime Changes and Financial Markets. Annual Review of Financial Economics 4:313-337. https://doi.org/10.1146/annurev-financial-110311-101808
+- **[AZ2020]** Apley, D.W., & Zhu, J. (2020). Visualizing the Effects of Predictor Variables in Black Box Supervised Learning Models. Journal of the Royal Statistical Society Series B 82(4):1059-1086. https://doi.org/10.1111/rssb.12377
+- **[AGK2024]** Ardia, D., Guidotti, E., & Kroencke, T.A. (2024). Efficient Estimation of Bid-Ask Spreads from Open, High, Low, and Close Prices. Journal of Financial Economics 161:103916. https://doi.org/10.1016/j.jfineco.2024.103916
+- **[AHM2019]** Arnott, R., Harvey, C.R., & Markowitz, H. (2019). A Backtesting Protocol in the Era of Machine Learning. Journal of Financial Data Science 1(1):64-74. https://doi.org/10.3905/jfds.2019.1.064
+- **[AMP2013]** Asness, C.S., Moskowitz, T.J., & Pedersen, L.H. (2013). Value and Momentum Everywhere. Journal of Finance 68(3):929-985. https://doi.org/10.1111/jofi.12021
+- **[ACM2023]** Avramov, D., Cheng, S., & Metzker, L. (2023). Machine Learning vs. Economic Restrictions: Evidence from Stock Return Predictability. Management Science 69(5):2587-2619. https://doi.org/10.1287/mnsc.2022.4449
+- **[AHV2023]** Azevedo, V., Hoegner, C., & Velikov, M. (2023). The Expected Returns on Machine-Learning Strategies. Working paper (SSRN 4702406); AFA programme. https://papers.ssrn.com/sol3/papers.cfm?abstract_id=4702406
+- **[BAMS2014]** Bae, G.I., Kim, W.C., & Mulvey, J.M. (2014). Dynamic Asset Allocation for Varied Financial Markets under Regime Switching Framework. European Journal of Operational Research 234(2):450-458. https://doi.org/10.1016/j.ejor.2013.03.032
+- **[BP1998]** Bai, J., & Perron, P. (1998). Estimating and Testing Linear Models with Multiple Structural Changes. Econometrica 66(1):47. https://doi.org/10.2307/2998540
+- **[BBLZ2017]** Bailey, D.H., Borwein, J., Lopez de Prado, M., & Zhu, Q.J. (2017). The Probability of Backtest Overfitting. Journal of Computational Finance 20(4):39-69. https://doi.org/10.21314/JCF.2016.322
+- **[BLDP2014]** Bailey, D.H., & Lopez de Prado, M. (2014). The Deflated Sharpe Ratio: Correcting for Selection Bias, Backtest Overfitting, and Non-Normality. Journal of Portfolio Management 40(5):94-107. https://doi.org/10.3905/jpm.2014.40.5.094
+- **[BW2006]** Baker, M., & Wurgler, J. (2006). Investor Sentiment and the Cross-Section of Stock Returns. Journal of Finance 61(4):1645-1680. https://doi.org/10.1111/j.1540-6261.2006.00885.x
+- **[BBCGT2023]** Bali, T.G., Beckmeyer, H., Moerke, M., & Weigert, F. (2023). Option Return Predictability with Machine Learning and Big Data. Review of Financial Studies 36(9):3548-3602. https://doi.org/10.1093/rfs/hhad017
+- **[BSC2015]** Barroso, P., & Santa-Clara, P. (2015). Momentum Has Its Moments. Journal of Financial Economics 116(1):111-120. https://doi.org/10.1016/j.jfineco.2014.11.010
+- **[BS2022]** Barroso, P., & Saxena, K. (2022). Lest We Forget: Learn from Out-of-Sample Forecast Errors When Optimizing Portfolios. Review of Financial Studies 35(3):1222-1278. https://doi.org/10.1093/rfs/hhab041
+- **[BH1995]** Benjamini, Y., & Hochberg, Y. (1995). Controlling the False Discovery Rate: A Practical and Powerful Approach to Multiple Testing. Journal of the Royal Statistical Society Series B 57(1):289-300. https://doi.org/10.1111/j.2517-6161.1995.tb02031.x
+- **[BBT2021]** Bianchi, D., Buchner, M., & Tamoni, A. (2021). Bond Risk Premiums with Machine Learning. Review of Financial Studies 34(2):1046-1089. https://doi.org/10.1093/rfs/hhaa062
+- **[BL1992]** Black, F., & Litterman, R. (1992). Global Portfolio Optimization. Financial Analysts Journal 48(5):28-43. https://doi.org/10.2469/faj.v48.n5.28
+- **[BLACKROCK2025]** BlackRock Systematic (2025). Augmented Investment Management: A systematic framework for designing alpha models. Industry white paper (BlackRock, Nov 2025; for professional investors). https://www.blackrock.com/gls-download/literature/whitepaper/augmented-investment-management.pdf
+- **[BCZ2022]** Blanchet, J., Chen, L., & Zhou, X.Y. (2022). Distributionally Robust Mean-Variance Portfolio Selection with Wasserstein Distances. Management Science 68(9):6382-6410. https://doi.org/10.1287/mnsc.2021.4155
+- **[BHHH2023]** Blitz, D., Hanauer, M.X., Hoogteijling, T., & Howard, C. (2023). The Term Structure of Machine Learning Alpha. Journal of Financial Data Science 5(4) 5(4):40-65. https://doi.org/10.3905/jfds.2023.1.135
+- **[BSCV2009]** Brandt, M.W., Santa-Clara, P., & Valkanov, R. (2009). Parametric Portfolio Policies: Exploiting Characteristics in the Cross-Section of Equity Returns. Review of Financial Studies 22(9):3411-3447. https://doi.org/10.1093/rfs/hhp003
+- **[BRE2001]** Breiman, L. (2001). Random Forests. Machine Learning 45(1):5-32. https://doi.org/10.1023/a:1010933404324
+- **[BLLP2025]** Bryzgalova, S., Lerner, S., Lettau, M., & Pelger, M. (2025). Missing Financial Data. Review of Financial Studies 38(3):803-882. https://doi.org/10.1093/rfs/hhae036
+- **[BPZ2025]** Bryzgalova, S., Pelger, M., & Zhu, J. (2025). Forest through the Trees: Building Cross-Sections of Stock Returns. Journal of Finance 80:2447-2506. https://doi.org/10.1111/jofi.13477
+- **[BK2023]** Butler, A., & Kwon, R.H. (2023). Integrating Prediction in Mean-Variance Portfolio Optimization. Quantitative Finance 23(3):429-452. https://doi.org/10.1080/14697688.2022.2162432
+- **[CFMZ2023]** Cakici, N., Fieberg, C., Metko, D., & Zaremba, A. (2023). Machine Learning Goes Global: Cross-Sectional Return Predictability in International Stock Markets. Journal of Economic Dynamics and Control 155:104725. https://doi.org/10.1016/j.jedc.2023.104725
+- **[CT2008]** Campbell, J.Y., & Thompson, S.B. (2008). Predicting Excess Stock Returns Out of Sample: Can Anything Beat the Historical Average?. Review of Financial Studies 21(4):1509-1531. https://doi.org/10.1093/rfs/hhm055
+- **[CHSWZ2025]** Capponi, A., Huang, C., Sidaoui, J.A., Wang, K., & Zou, J. (2025). The Nonstationarity-Complexity Tradeoff in Return Prediction. Working paper (arXiv 2512.23596, revised 2026). https://arxiv.org/abs/2512.23596
+- **[CAR1997]** Carhart, M.M. (1997). On Persistence in Mutual Fund Performance. Journal of Finance 52(1):57-82. https://doi.org/10.1111/j.1540-6261.1997.tb03808.x
+- **[COWY2020]** Cederburg, S., O'Doherty, M.S., Wang, F., & Yan, X.S. (2020). On the Performance of Volatility-Managed Portfolios. Journal of Financial Economics 138(1):95-117. https://doi.org/10.1016/j.jfineco.2020.04.015
+- **[CSS2012]** Ceria, S., Saxena, A., & Stubbs, R.A. (2012). Factor Alignment Problems and Quantitative Portfolio Management. Journal of Portfolio Management 38(2):29-43. https://doi.org/10.3905/jpm.2012.2012.1.021
+- **[CHEN2021]** Chen, A.Y. (2021). The Limits of p-Hacking: Some Thought Experiments. Journal of Finance 76(5):2447-2480.
+- **[CV2023]** Chen, A.Y., & Velikov, M. (2023). Zeroing In on the Expected Returns of Anomalies. Journal of Financial and Quantitative Analysis 58(3):968-1004. https://doi.org/10.1017/s0022109022000874
+- **[CW2026]** Chen, A.Y., & Welch, I. (2026). What Useful Alphas?. Working paper (arXiv 2607.06502).
+- **[CZ2022]** Chen, A.Y., & Zimmermann, T. (2022). Open Source Cross-Sectional Asset Pricing. Critical Finance Review 11(2):207-264. https://doi.org/10.1561/104.00000112
+- **[CPZ2024]** Chen, L., Pelger, M., & Zhu, J. (2024). Deep Learning in Asset Pricing. Management Science 70(2):714-750. https://doi.org/10.1287/mnsc.2023.4695
+- **[CHK2024]** Chen, M., Hanauer, M.X., & Kalsbach, T. (2024). Design Choices, Machine Learning, and the Cross-Section of Stock Returns. Working paper (SSRN 5031755). https://ssrn.com/abstract=5031755
+- **[CG2016]** Chen, T., & Guestrin, C. (2016). XGBoost: A Scalable Tree Boosting System. Proceedings of ACM SIGKDD 2016.
+- **[LLG2025]** Chen, Z., Kelly, B., & Malamud, S. (2025). Limits To (Machine) Learning. Working paper (arXiv 2512.12735).
+- **[CCY2019]** Chinco, A., Clark-Joseph, A.D., & Ye, M. (2019). Sparse Signals in the Cross-Section of Returns. Journal of Finance 74(1):449-492. https://doi.org/10.1111/jofi.12733
+- **[CST2014]** Chordia, T., Subrahmanyam, A., & Tong, Q. (2014). Have Capital Market Anomalies Attenuated in the Recent Era of High Liquidity and Trading Activity?. Journal of Accounting and Economics 58(1):41-58. https://doi.org/10.1016/j.jacceco.2014.06.001
+- **[CC2008]** Choueifaty, Y., & Coignard, Y. (2008). Toward Maximum Diversification. Journal of Portfolio Management 35(1):40-51. https://doi.org/10.3905/jpm.2008.35.1.40
+- **[CW2007]** Clark, T.E., & West, K.D. (2007). Approximately Normal Tests for Equal Predictive Accuracy in Nested Models. Journal of Econometrics 138(1):291-311. https://doi.org/10.1016/j.jeconom.2006.05.023
+- **[CST2002]** Clarke, R., de Silva, H., & Thorley, S. (2002). Portfolio Constraints and the Fundamental Law of Active Management. Financial Analysts Journal 58(5):48-66. https://doi.org/10.2469/faj.v58.n5.2468
+- **[COC2011]** Cochrane, J.H. (2011). Presidential Address: Discount Rates. Journal of Finance 66(4):1047-1108. https://doi.org/10.1111/j.1540-6261.2011.01671.x
+- **[CF2008]** Cohen, L., & Frazzini, A. (2008). Economic Links and Predictable Returns. Journal of Finance 63(4):1977-2011. https://doi.org/10.1111/j.1540-6261.2008.01379.x
+- **[CDS2020]** Collin-Dufresne, P., Daniel, K., & Saglam, M. (2020). Liquidity Regimes and Optimal Dynamic Asset Allocation. Journal of Financial Economics 136(2):379-406. https://doi.org/10.1016/j.jfineco.2019.09.011
+- **[CFHH2025]** Cong, L.W., Feng, G., He, J., & He, X. (2025). Growing the Efficient Frontier on Panel Trees. Journal of Financial Economics 167:104024. https://doi.org/10.1016/j.jfineco.2025.104024
+- **[CTWZ2021]** Cong, L.W., Tang, K., Wang, J., & Zhang, Y. (2021). AlphaPortfolio: Direct Construction through Deep Reinforcement Learning and Interpretable AI. Working paper (SSRN 3554486; NBER w35195).
+- **[CS2012]** Corwin, S.A., & Schultz, P. (2012). A Simple Way to Estimate Bid-Ask Spreads from Daily High and Low Prices. Journal of Finance 67(2):719-760. https://doi.org/10.1111/j.1540-6261.2012.01729.x
+- **[CI2023]** Costa, G., & Iyengar, G.N. (2023). Distributionally Robust End-to-End Portfolio Construction. Quantitative Finance 23(10):1465-1482. https://doi.org/10.1080/14697688.2023.2236148
+- **[DM2016]** Daniel, K., & Moskowitz, T.J. (2016). Momentum Crashes. Journal of Financial Economics 122(2):221-247. https://doi.org/10.1016/j.jfineco.2015.12.002
+- **[DY2010]** Delage, E., & Ye, Y. (2010). Distributionally Robust Optimization under Moment Uncertainty with Application to Data-Driven Problems. Operations Research 58(3):595-612. https://doi.org/10.1287/opre.1090.0741
+- **[DGU2009]** DeMiguel, V., Garlappi, L., & Uppal, R. (2009). Optimal Versus Naive Diversification: How Inefficient Is the 1/N Portfolio Strategy?. Review of Financial Studies 22(5):1915-1953. https://doi.org/10.1093/rfs/hhm075
+- **[DMNU2020]** DeMiguel, V., Martin-Utrera, A., Nogales, F.J., & Uppal, R. (2020). A Transaction-Cost Perspective on the Multitude of Firm Characteristics. Review of Financial Studies 33(5):2180-2222. https://doi.org/10.1093/rfs/hhz085
+- **[DMU2024]** DeMiguel, V., Martin-Utrera, A., & Uppal, R. (2024). A Multifactor Perspective on Volatility-Managed Portfolios. Journal of Finance 79:3859-3891. https://doi.org/10.1111/jofi.13395
+- **[DNMV2023]** Detzel, A., Novy-Marx, R., & Velikov, M. (2023). Model Comparison with Transaction Costs. Journal of Finance 78(3):1743-1775. https://doi.org/10.1111/jofi.13225
+- **[DKKM2023]** Didisheim, A., Ke, S., Kelly, B., & Malamud, S. (2023). Complexity in Factor Pricing Models. Working paper (NBER w31689; SSRN 4574634).
+- **[DM1995]** Diebold, F.X., & Mariano, R.S. (1995). Comparing Predictive Accuracy. Journal of Business & Economic Statistics 13(3):253-263. https://doi.org/10.1080/07350015.1995.10524599
+- **[DLRZ2022]** Dong, X., Li, Y., Rapach, D.E., & Zhou, G. (2022). Anomalies and the Expected Market Return. Journal of Finance 77(1):639-681. https://doi.org/10.1111/jofi.13099
+- **[DAK2017]** Donti, P.L., Amos, B., & Kolter, J.Z. (2017). Task-based End-to-end Model Learning in Stochastic Optimization. Advances in Neural Information Processing Systems 30.
+- **[EL2022]** Ehsani, S., & Linnainmaa, J.T. (2022). Factor Momentum and the Momentum Factor. Journal of Finance 77(3):1877-1919. https://doi.org/10.1111/jofi.13131
+- **[EG2022]** Elmachtoub, A.N., & Grigas, P. (2022). Smart 'Predict, then Optimize'. Management Science 68(1):9-26. https://doi.org/10.1287/mnsc.2020.3922
+- **[FF1993]** Fama, E.F., & French, K.R. (1993). Common Risk Factors in the Returns on Stocks and Bonds. Journal of Financial Economics 33(1):3-56. https://doi.org/10.1016/0304-405x(93)90023-5
+- **[FF2015]** Fama, E.F., & French, K.R. (2015). A Five-Factor Asset Pricing Model. Journal of Financial Economics 116(1):1-22. https://doi.org/10.1016/j.jfineco.2014.10.010
+- **[FM1973]** Fama, E.F., & MacBeth, J.D. (1973). Risk, Return, and Equilibrium: Empirical Tests. Journal of Political Economy 81(3):607-636. https://doi.org/10.1086/260061
+- **[FMYY2025]** Fan, Q., Medeiros, M.C., Yang, H., & Yang, S. (2025). Cost-aware Portfolios in a Large Universe of Assets. Working paper (arXiv 2412.11575, revised Aug 2025).
+- **[FGX2020]** Feng, G., Giglio, S., & Xiu, D. (2020). Taming the Factor Zoo: A Test of New Factors. Journal of Finance 75(3):1327-1370. https://doi.org/10.1111/jofi.12883
+- **[FAL2017]** Finn, C., Abbeel, P., & Levine, S. (2017). Model-Agnostic Meta-Learning for Fast Adaptation of Deep Networks. Proceedings of ICML 2017 (PMLR 70).
+- **[FK2018]** Fischer, T., & Krauss, C. (2018). Deep Learning with Long Short-Term Memory Networks for Financial Market Predictions. European Journal of Operational Research 270(2):654-669. https://doi.org/10.1016/j.ejor.2017.11.054
+- **[FIM2018]** Frazzini, A., Israel, R., & Moskowitz, T.J. (2018). Trading Costs. Working paper (SSRN 3229719). https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3229719
+- **[FP2014]** Frazzini, A., & Pedersen, L.H. (2014). Betting Against Beta. Journal of Financial Economics 111(1):1-25. https://doi.org/10.1016/j.jfineco.2013.10.005
+- **[FHNW2025]** Freyberger, J., Hoppner, B., Neuhierl, A., & Weber, M. (2025). Missing Data in Asset Pricing Panels. Review of Financial Studies 38(3):760-802. https://doi.org/10.1093/rfs/hhae003
+- **[FNW2020]** Freyberger, J., Neuhierl, A., & Weber, M. (2020). Dissecting Characteristics Nonparametrically. Review of Financial Studies 33(5):2326-2377. https://doi.org/10.1093/rfs/hhz123
+- **[FRI2001]** Friedman, J.H. (2001). Greedy Function Approximation: A Gradient Boosting Machine. Annals of Statistics 29(5):1189-1232. https://doi.org/10.1214/aos/1013203451
+- **[GG2016]** Gal, Y., & Ghahramani, Z. (2016). Dropout as a Bayesian Approximation: Representing Model Uncertainty in Deep Learning. Proceedings of ICML 2016 (PMLR 48).
+- **[GP2013]** Garleanu, N., & Pedersen, L.H. (2013). Dynamic Trading with Predictable Returns and Transaction Costs. Journal of Finance 68(6):2309-2340. https://doi.org/10.1111/jofi.12080
+- **[GKX2022]** Giglio, S., Kelly, B., & Xiu, D. (2022). Factor Models, Machine Learning, and Asset Pricing. Annual Review of Financial Economics 14:337-368. https://doi.org/10.1146/annurev-financial-101521-104735
+- **[GLX2021]** Giglio, S., Liao, Y., & Xiu, D. (2021). Thousands of Alpha Tests. Review of Financial Studies 34(7):3456-3496. https://doi.org/10.1093/rfs/hhaa111
+- **[GI2003]** Goldfarb, D., & Iyengar, G. (2003). Robust Portfolio Selection Problems. Mathematics of Operations Research 28(1):1-38. https://doi.org/10.1287/moor.28.1.1.14260
+- **[GHZ2017]** Green, J., Hand, J.R.M., & Zhang, X.F. (2017). The Characteristics that Provide Independent Information about Average U.S. Monthly Stock Returns. Review of Financial Studies 30(12):4389-4436. https://doi.org/10.1093/rfs/hhx019
+- **[GRIN1989]** Grinold, R.C. (1989). The Fundamental Law of Active Management. Journal of Portfolio Management 15(3):30-37. https://doi.org/10.3905/jpm.1989.409211
+- **[GK2000]** Grinold, R.C., & Kahn, R.N. (2000). Active Portfolio Management (2nd ed.). McGraw-Hill (book).
+- **[GKX2020]** Gu, S., Kelly, B., & Xiu, D. (2020). Empirical Asset Pricing via Machine Learning. Review of Financial Studies 33(5):2223-2273. https://doi.org/10.1093/rfs/hhaa009
+- **[GKX2021]** Gu, S., Kelly, B., & Xiu, D. (2021). Autoencoder Asset Pricing Models. Journal of Econometrics 222(1):429-450. https://doi.org/10.1016/j.jeconom.2020.07.009
+- **[GT2007]** Guidolin, M., & Timmermann, A. (2007). Asset Allocation under Multivariate Regime Switching. Journal of Economic Dynamics and Control 31(11):3503-3544. https://doi.org/10.1016/j.jedc.2006.12.004
+- **[HKS2020]** Haddad, V., Kozak, S., & Santosh, S. (2020). Factor Timing. Review of Financial Studies 33(5):1980-2018. https://doi.org/10.1093/rfs/hhaa017
+- **[HAM1989]** Hamilton, J.D. (1989). A New Approach to the Economic Analysis of Nonstationary Time Series and the Business Cycle. Econometrica 57(2):357-384. https://doi.org/10.2307/1912559
+- **[HK2023]** Hanauer, M.X., & Kalsbach, T. (2023). Machine Learning and the Cross-Section of Emerging Market Stock Returns. Emerging Markets Review 55:101022. https://doi.org/10.1016/j.ememar.2023.101022
+- **[HAN2005]** Hansen, P.R. (2005). A Test for Superior Predictive Ability. Journal of Business & Economic Statistics 23(4):365-380. https://doi.org/10.1198/073500105000000063
+- **[HLN2011]** Hansen, P.R., Lunde, A., & Nason, J.M. (2011). The Model Confidence Set. Econometrica 79(2):453-497. https://doi.org/10.3982/ecta5771
+- **[HAR2017]** Harvey, C.R. (2017). Presidential Address: The Scientific Outlook in Financial Economics. Journal of Finance 72(4):1399-1440. https://doi.org/10.1111/jofi.12530
+- **[HL2015]** Harvey, C.R., & Liu, Y. (2015). Backtesting. Journal of Portfolio Management 42(1):13-28. https://doi.org/10.3905/jpm.2015.42.1.013
+- **[HLZ2016]** Harvey, C.R., Liu, Y., & Zhu, H. (2016). ... and the Cross-Section of Expected Returns. Review of Financial Studies 29(1):5-68. https://doi.org/10.1093/rfs/hhv059
+- **[HAS2009]** Hasbrouck, J. (2009). Trading Costs and Returns for U.S. Equities: Estimating Effective Costs from Daily Data. Journal of Finance 64(3):1445-1477. https://doi.org/10.1111/j.1540-6261.2009.01469.x
+- **[HTF2009]** Hastie, T., Tibshirani, R., & Friedman, J. (2009). The Elements of Statistical Learning (2nd ed.). Springer (book).
+- **[HS1997]** Hochreiter, S., & Schmidhuber, J. (1997). Long Short-Term Memory. Neural Computation 9(8):1735-1780. https://doi.org/10.1162/neco.1997.9.8.1735
+- **[HXZ2015]** Hou, K., Xue, C., & Zhang, L. (2015). Digesting Anomalies: An Investment Approach. Review of Financial Studies 28(3):650-705. https://doi.org/10.1093/rfs/hhu068
+- **[HXZ2020]** Hou, K., Xue, C., & Zhang, L. (2020). Replicating Anomalies. Review of Financial Studies 33(5):2019-2133. https://doi.org/10.1093/rfs/hhy131
+- **[HJTZ2015]** Huang, D., Jiang, F., Tu, J., & Zhou, G. (2015). Investor Sentiment Aligned: A Powerful Predictor of Stock Returns. Review of Financial Studies 28(3):791-837. https://doi.org/10.1093/rfs/hhu080
+- **[JJNH1991]** Jacobs, R.A., Jordan, M.I., Nowlan, S.J., & Hinton, G.E. (1991). Adaptive Mixtures of Local Experts. Neural Computation 3(1):79-87. https://doi.org/10.1162/neco.1991.3.1.79
+- **[JM2003]** Jagannathan, R., & Ma, T. (2003). Risk Reduction in Large Portfolios: Why Imposing the Wrong Constraints Helps. Journal of Finance 58(4):1651-1683. https://doi.org/10.1111/1540-6261.00580
+- **[JKMP2026]** Jensen, T.I., Kelly, B., Malamud, S., & Pedersen, L.H. (2026). Machine Learning and the Implementable Efficient Frontier. Review of Financial Studies (published online 2026). https://doi.org/10.1093/rfs/hhag022
+- **[JKP2023]** Jensen, T.I., Kelly, B., & Pedersen, L.H. (2023). Is There a Replication Crisis in Finance?. Journal of Finance 78(5):2465-2518. https://doi.org/10.1111/jofi.13249
+- **[JKX2023]** Jiang, J., Kelly, B., & Xiu, D. (2023). (Re-)Imag(in)ing Price Trends. Journal of Finance 78(6):3193-3249. https://doi.org/10.1111/jofi.13268
+- **[JK1981]** Jobson, J.D., & Korkie, B.M. (1981). Performance Hypothesis Testing with the Sharpe and Treynor Measures. Journal of Finance 36(4):889-908. https://doi.org/10.1111/j.1540-6261.1981.tb04891.x
+- **[KNNV2024]** Kagkadis, A., Nolte, I., Nolte, S., & Vasilas, N. (2024). Factor Timing with Portfolio Characteristics. Review of Asset Pricing Studies 14(1):84-118. https://doi.org/10.1093/rapstu/raad010
+- **[KZ2007]** Kan, R., & Zhou, G. (2007). Optimal Portfolio Choice with Parameter Uncertainty. Journal of Financial and Quantitative Analysis 42(3):621-656. https://doi.org/10.1017/s0022109000004129
+- **[KMN2023]** Kaniel, R., Lin, Z., Pelger, M., & Van Nieuwerburgh, S. (2023). Machine-Learning the Skill of Mutual Fund Managers. Journal of Financial Economics 150(1):94-138. https://doi.org/10.1016/j.jfineco.2023.07.004
+- **[CPPS2024]** Kato, M. (2024). Conformal Predictive Portfolio Selection. Working paper (arXiv 2410.16333, revised 2025).
+- **[KE2017]** Ke, G., et al. (2017). LightGBM: A Highly Efficient Gradient Boosting Decision Tree. Advances in Neural Information Processing Systems 30.
+- **[AIPT2025]** Kelly, B., et al. (2025). APT or AIPT? The Surprising Dominance of Large Factor Models. Working paper (EDHEC-hosted PDF, Oct 2025) [verify authors and venue].
+- **[KKMX2025]** Kelly, B., Kuznetsov, B., Malamud, S., & Xu, T.A. (2025). Artificial Intelligence Asset Pricing Models. Working paper (NBER w33351).
+- **[KMP2023]** Kelly, B., Malamud, S., & Pedersen, L.H. (2023). Principal Portfolios. Journal of Finance 78(1):347-387. https://doi.org/10.1111/jofi.13199
+- **[KMZ2024]** Kelly, B., Malamud, S., & Zhou, K. (2024). The Virtue of Complexity in Return Prediction. Journal of Finance 79(1):459-503. https://doi.org/10.1111/jofi.13298
+- **[KMP2021]** Kelly, B., Moskowitz, T.J., & Pruitt, S. (2021). Understanding Momentum and Reversal. Journal of Financial Economics 140(3):726-743. https://doi.org/10.1016/j.jfineco.2020.06.024
+- **[KP2015]** Kelly, B., & Pruitt, S. (2015). The Three-Pass Regression Filter: A New Approach to Forecasting Using Many Predictors. Journal of Econometrics 186(2):294-316. https://doi.org/10.1016/j.jeconom.2015.02.011
+- **[KPS2019]** Kelly, B., Pruitt, S., & Su, Y. (2019). Characteristics Are Covariances: A Unified Model of Risk and Return. Journal of Financial Economics 134(3):501-524. https://doi.org/10.1016/j.jfineco.2019.05.001
+- **[KX2023]** Kelly, B., & Xiu, D. (2023). Financial Machine Learning. Foundations and Trends in Finance 13(3-4):205-363. https://doi.org/10.1561/500000064
+- **[KO2012]** Kirby, C., & Ostdiek, B. (2012). It's All in the Timing: Simple Active Portfolio Strategies that Outperform Naive Diversification. Journal of Financial and Quantitative Analysis 47(2):437-467. https://doi.org/10.1017/s0022109012000117
+- **[KS2004]** Korajczyk, R.A., & Sadka, R. (2004). Are Momentum Profits Robust to Trading Costs?. Journal of Finance 59(3):1039-1082. https://doi.org/10.1111/j.1540-6261.2004.00656.x
+- **[KNS2018]** Kozak, S., Nagel, S., & Santosh, S. (2018). Interpreting Factor Models. Journal of Finance 73(3):1183-1223. https://doi.org/10.1111/jofi.12612
+- **[KNS2020]** Kozak, S., Nagel, S., & Santosh, S. (2020). Shrinking the Cross-Section. Journal of Financial Economics 135(2):271-292. https://doi.org/10.1016/j.jfineco.2019.06.008
+- **[KDH2017]** Krauss, C., Do, X.A., & Huck, N. (2017). Deep Neural Networks, Gradient-Boosted Trees, Random Forests: Statistical Arbitrage on the S&P 500. European Journal of Operational Research 259(2):689-702. https://doi.org/10.1016/j.ejor.2016.10.031
+- **[KPT2012]** Kritzman, M., Page, S., & Turkington, D. (2012). Regime Shifts: Implications for Dynamic Strategies. Financial Analysts Journal 68(3):22-39. https://doi.org/10.2469/faj.v68.n3.3
+- **[KYO2016]** Kyle, A.S., & Obizhaeva, A.A. (2016). Market Microstructure Invariance: Empirical Hypotheses. Econometrica 84(4):1345-1404. https://doi.org/10.3982/ecta10486
+- **[SERT2025]** Lai, S. (2025). Asset Pricing in Pre-trained Transformer. Working paper (arXiv 2505.01575).
+- **[LPB2017]** Lakshminarayanan, B., Pritzel, A., & Blundell, C. (2017). Simple and Scalable Predictive Uncertainty Estimation Using Deep Ensembles. Advances in Neural Information Processing Systems 30.
+- **[LAL2025]** Lalwani, V., Meshram, V., & Jindal, V. (2025). Empirical Asset Pricing via Machine Learning: The Role of Research Design Choices. European Financial Management 32(3):816-833. https://doi.org/10.1111/eufm.70033
+- **[LW2004]** Ledoit, O., & Wolf, M. (2004). Honey, I Shrunk the Sample Covariance Matrix. Journal of Portfolio Management 30(4):110-119. https://doi.org/10.3905/jpm.2004.110
+- **[LW2008]** Ledoit, O., & Wolf, M. (2008). Robust Performance Hypothesis Testing with the Sharpe Ratio. Journal of Empirical Finance 15(5):850-859. https://doi.org/10.1016/j.jempfin.2008.03.002
+- **[LW2017]** Ledoit, O., & Wolf, M. (2017). Nonlinear Shrinkage of the Covariance Matrix for Portfolio Selection: Markowitz Meets Goldilocks. Review of Financial Studies 30(12):4349-4388. https://doi.org/10.1093/rfs/hhx052
+- **[LS2008]** Lee, J.-H., & Stefek, D. (2008). Do Risk Factors Eat Alphas?. Journal of Portfolio Management 34(4):12-25. https://doi.org/10.3905/jpm.2008.709976
+- **[LWZ2022]** Leippold, M., Wang, Q., & Zhou, W. (2022). Machine Learning in the Chinese Stock Market. Journal of Financial Economics 145(2):64-82. https://doi.org/10.1016/j.jfineco.2021.08.017
+- **[LSZ2004]** Lesmond, D.A., Schill, M.J., & Zhou, C. (2004). The Illusory Nature of Momentum Profits. Journal of Financial Economics 71(2):349-380. https://doi.org/10.1016/s0304-405x(03)00206-x
+- **[LP2020]** Lettau, M., & Pelger, M. (2020). Factors That Fit the Time Series and Cross-Section of Stock Returns. Review of Financial Studies 33(5):2274-2325. https://doi.org/10.1093/rfs/hhaa020
+- **[LLMSS2021]** Leung, E., Lohre, H., Mischlich, D., Shea, Y., & Stroh, M. (2021). The Promises and Pitfalls of Machine Learning for Predicting Stock Returns. Journal of Financial Data Science 3(2):21-50. https://doi.org/10.3905/jfds.2021.1.062
+- **[LEW2015]** Lewellen, J. (2015). The Cross-section of Expected Stock Returns. Critical Finance Review 4(1):1-44. https://doi.org/10.1561/104.00000024
+- **[LMNS2025]** Liao, Y., Ma, X., Neuhierl, A., & Schilling, L. (2025). The Uncertainty of Machine Learning Predictions in Asset Pricing. Working paper (arXiv 2503.00549). https://arxiv.org/abs/2503.00549
+- **[LMR2017]** Light, N., Maslov, D., & Rytchkov, O. (2017). Aggregation of Information About the Cross Section of Stock Returns: A Latent Variable Approach. Review of Financial Studies 30(4):1339-1381. https://doi.org/10.1093/rfs/hhw102
+- **[LZR2019]** Lim, B., Zohren, S., & Roberts, S. (2019). Enhancing Time-Series Momentum Strategies Using Deep Neural Networks. Journal of Financial Data Science 1(4):19-38. https://doi.org/10.3905/jfds.2019.1.015
+- **[LO2002]** Lo, A.W. (2002). The Statistics of Sharpe Ratios. Financial Analysts Journal 58(4):36-52. https://doi.org/10.2469/faj.v58.n4.2453
+- **[LT2020]** Lochstoer, L.A., & Tetlock, P.C. (2020). What Drives Anomaly Returns?. Journal of Finance 75(3):1417-1455. https://doi.org/10.1111/jofi.12876
+- **[LDP2016]** Lopez de Prado, M. (2016). Building Diversified Portfolios that Outperform Out of Sample. Journal of Portfolio Management 42(4):59-69. https://doi.org/10.3905/jpm.2016.42.4.059
+- **[LDP2018]** Lopez de Prado, M. (2018). Advances in Financial Machine Learning. Wiley (book).
+- **[LLT2023]** Lopez-Lira, A., & Tang, Y. (2023). Can ChatGPT Forecast Stock Price Movements? Return Predictability and Large Language Models. Working paper (arXiv 2304.07619; SSRN 4412788); reported forthcoming in JFE [verify].
+- **[LL2017]** Lundberg, S.M., & Lee, S.-I. (2017). A Unified Approach to Interpreting Model Predictions. Advances in Neural Information Processing Systems 30.
+- **[MRT2010]** Maillard, S., Roncalli, T., & Teiletche, J. (2010). The Properties of Equally Weighted Risk Contribution Portfolios. Journal of Portfolio Management 36(4):60-70. https://doi.org/10.3905/jpm.2010.36.4.060
+- **[MARK1952]** Markowitz, H. (1952). Portfolio Selection. Journal of Finance 7(1):77-91. https://doi.org/10.1111/j.1540-6261.1952.tb01525.x
+- **[MP2016]** McLean, R.D., & Pontiff, J. (2016). Does Academic Research Destroy Stock Return Predictability?. Journal of Finance 71(1):5-32. https://doi.org/10.1111/jofi.12365
+- **[MENK2024]** Menkveld, A.J., et al. (2024). Nonstandard Errors. Journal of Finance 79(3):2339-2390.
+- **[MICH1989]** Michaud, R.O. (1989). The Markowitz Optimization Enigma: Is 'Optimized' Optimal?. Financial Analysts Journal 1989(4):43-54. https://doi.org/10.2469/cp.v1989.n4.6
+- **[MS2001]** Moody, J., & Saffell, M. (2001). Learning to Trade via Direct Reinforcement. IEEE Transactions on Neural Networks 12(4):875-889. https://doi.org/10.1109/72.935097
+- **[MM2017]** Moreira, A., & Muir, T. (2017). Volatility-Managed Portfolios. Journal of Finance 72(4):1611-1644. https://doi.org/10.1111/jofi.12513
+- **[MPR2026]** Muller, S., & Preissler, F. (2026). In Good and in Bad Times? The Relation between Anomaly Returns and Market States. Journal of Banking & Finance 190:107746. https://doi.org/10.1016/j.jbankfin.2026.107746
+- **[NAG2021]** Nagel, S. (2021). Machine Learning in Asset Pricing. Princeton University Press (book).
+- **[NRRZ2024]** Neuhierl, A., Randl, O., Reschenhofer, C., & Zechner, J. (2024). Timing the Factor Zoo. Working paper (SSRN 4376898); AFA/AEA conference programmes. https://papers.ssrn.com/sol3/papers.cfm?abstract_id=4376898
+- **[NW1987]** Newey, W.K., & West, K.D. (1987). A Simple, Positive Semi-Definite, Heteroskedasticity and Autocorrelation Consistent Covariance Matrix. Econometrica 55(3):703-708. https://doi.org/10.2307/1913610
+- **[NMV2016]** Novy-Marx, R., & Velikov, M. (2016). A Taxonomy of Anomalies and Their Trading Costs. Review of Financial Studies 29(1):104-147. https://doi.org/10.1093/rfs/hhv063
+- **[NMV2019]** Novy-Marx, R., & Velikov, M. (2019). Comparing Cost-Mitigation Techniques. Financial Analysts Journal 75(1):85-102. https://doi.org/10.1080/0015198x.2018.1547057
+- **[NML2018]** Nystrup, P., Madsen, H., & Lindstrom, E. (2018). Dynamic Portfolio Optimization across Hidden Market Regimes. Quantitative Finance 18(1):83-95. https://doi.org/10.1080/14697688.2017.1342857
+- **[OP2022]** Obaid, K., & Pukthuanthong, K. (2022). A Picture Is Worth a Thousand Words: Measuring Investor Sentiment by Combining Machine Learning and Photos from News. Journal of Financial Economics 144(1):273-297. https://doi.org/10.1016/j.jfineco.2021.06.002
+- **[PS2003]** Pastor, L., & Stambaugh, R.F. (2003). Liquidity Risk and Expected Stock Returns. Journal of Political Economy 111(3):642-685. https://doi.org/10.1086/374184
+- **[PW2020]** Patton, A.J., & Weller, B.M. (2020). What You See Is Not What You Get: The Costs of Trading Market Anomalies. Journal of Financial Economics 137(2):515-549. https://doi.org/10.1016/j.jfineco.2020.02.012
+- **[PR1994]** Politis, D.N., & Romano, J.P. (1994). The Stationary Bootstrap. Journal of the American Statistical Association 89(428):1303-1313. https://doi.org/10.1080/01621459.1994.10476870
+- **[RR2007]** Rahimi, A., & Recht, B. (2007). Random Features for Large-Scale Kernel Machines. Advances in Neural Information Processing Systems 20.
+- **[RSZ2010]** Rapach, D.E., Strauss, J.K., & Zhou, G. (2010). Out-of-Sample Equity Premium Prediction: Combination Forecasts and Links to the Real Economy. Review of Financial Studies 23(2):821-862. https://doi.org/10.1093/rfs/hhp063
+- **[RJ2019]** Rasekhschaffe, K.C., & Jones, R.C. (2019). Machine Learning for Stock Selection. Financial Analysts Journal 75(3):70-88. https://doi.org/10.1080/0015198X.2019.1596678
+- **[RU2000]** Rockafellar, R.T., & Uryasev, S. (2000). Optimization of Conditional Value-at-Risk. Journal of Risk 2(3):21-41. https://doi.org/10.21314/jor.2000.038
+- **[RW2005]** Romano, J.P., & Wolf, M. (2005). Stepwise Multiple Testing as Formalized Data Snooping. Econometrica 73(4):1237-1282. https://doi.org/10.1111/j.1468-0262.2005.00615.x
+- **[SYM2025]** Shu, Y., Yu, C., & Mulvey, J.M. (2025). Dynamic Asset Allocation with Asset-Specific Regime Forecasts. Annals of Operations Research 346(1):285-318. https://doi.org/10.1007/s10479-024-06266-0
+- **[SHU1997]** Shumway, T. (1997). The Delisting Bias in CRSP Data. Journal of Finance 52(1):327-340. https://doi.org/10.1111/j.1540-6261.1997.tb03818.x
+- **[SWZ2023]** Simon, F., Weibels, S., & Zimmermann, T. (2026). Deep Parametric Portfolio Policies. Management Science (2026; Crossref record) - earlier CFR Working Paper 23-01 / SSRN 4150292. https://doi.org/10.1287/mnsc.2025.00721
+- **[SYY2012]** Stambaugh, R.F., Yu, J., & Yuan, Y. (2012). The Short of It: Investor Sentiment and Anomalies. Journal of Financial Economics 104(2):288-302. https://doi.org/10.1016/j.jfineco.2011.12.001
+- **[SY2017]** Stambaugh, R.F., & Yuan, Y. (2017). Mispricing Factors. Review of Financial Studies 30(4):1270-1315. https://doi.org/10.1093/rfs/hhw107
+- **[TIB1996]** Tibshirani, R. (1996). Regression Shrinkage and Selection via the Lasso. Journal of the Royal Statistical Society Series B 58(1):267-288. https://doi.org/10.1111/j.2517-6161.1996.tb02080.x
+- **[TH2021]** Tobek, O., & Hronec, M. (2021). Does It Pay to Follow Anomalies Research? Machine Learning Approach with International Evidence. Journal of Financial Markets 56:100588. https://doi.org/10.1016/j.finmar.2020.100588
+- **[ULM2024]** Uysal, A.S., Li, X., & Mulvey, J.M. (2024). End-to-End Risk Budgeting Portfolio Optimization with Neural Networks. Annals of Operations Research 339(1-2):397-426. https://doi.org/10.1007/s10479-023-05539-4
+- **[VBHL2023]** van Binsbergen, J.H., Han, X., & Lopez-Lira, A. (2023). Man versus Machine Learning: The Term Structure of Earnings Expectations and Conditional Biases. Review of Financial Studies 36(6):2361-2396. https://doi.org/10.1093/rfs/hhac085
+- **[VAS2017]** Vaswani, A., et al. (2017). Attention Is All You Need. Advances in Neural Information Processing Systems 30.
+- **[SPO2026]** Wang, Y., & Hasuike, T. (2026). Decision-Induced Ranking Explains Prediction Inflation and Excessive Turnover in SPO-Based Portfolio Optimization. Working paper (arXiv 2605.01176).
+- **[WL2025]** Wang, Y., & Lera, S.C. (2025). Meta-Learning for Return Prediction in Shifting Market Regimes. Journal of Financial Markets 79:101042. https://doi.org/10.1016/j.finmar.2025.101042
+- **[WG2008]** Welch, I., & Goyal, A. (2008). A Comprehensive Look at the Empirical Performance of Equity Premium Prediction. Review of Financial Studies 21(4):1455-1508. https://doi.org/10.1093/rfs/hhm014
+- **[WHI2000]** White, H. (2000). A Reality Check for Data Snooping. Econometrica 68(5):1097-1126. https://doi.org/10.1111/1468-0262.00152
+- **[WGRZ2022]** Wood, K., Giegerich, S., Roberts, S., & Zohren, S. (2022). Trading with the Momentum Transformer: An Intelligent and Interpretable Architecture. arXiv 2112.08534 [verify journal version].
+- **[FRLUX2025]** Zhang, J. (2025). FR-LUX: Friction-Aware, Regime-Conditioned Policy Optimization for Implementable Portfolio Management. Working paper (arXiv 2510.02986).
+- **[ZZR2020]** Zhang, Z., Zohren, S., & Roberts, S. (2020). Deep Learning for Portfolio Optimization. Journal of Financial Data Science 2(4):8-20. https://doi.org/10.3905/jfds.2020.1.042
+- **[DA2023]** Zhao, L., Kong, S., & Shen, Y. (2023). DoubleAdapt: A Meta-learning Approach to Incremental Learning for Stock Trend Forecasting. Proceedings of ACM SIGKDD 2023. https://doi.org/10.1145/3580305.3599315
+- **[ZH2005]** Zou, H., & Hastie, T. (2005). Regularization and Variable Selection via the Elastic Net. Journal of the Royal Statistical Society Series B 67(2):301-320. https://doi.org/10.1111/j.1467-9868.2005.00503.x

@@ -1,0 +1,512 @@
+[
+ {
+  "query": "Journal of Finance",
+  "name": "The Journal of Finance",
+  "issn": "0022-1082",
+  "publisher": "Wiley",
+  "works": 16132,
+  "cites": 1961030,
+  "two_yr_mean": 13.193103448275862,
+  "h": 664
+ },
+ {
+  "query": "Journal of Finance",
+  "name": "Journal of Banking & Finance",
+  "issn": "0378-4266",
+  "publisher": "Elsevier BV",
+  "works": 7560,
+  "cites": 515661,
+  "two_yr_mean": 4.4473161033797215,
+  "h": 309
+ },
+ {
+  "query": "Review of Financial Studies",
+  "name": "Review of Financial Studies",
+  "issn": "0893-9454",
+  "publisher": "Oxford University Press",
+  "works": 3312,
+  "cites": 624630,
+  "two_yr_mean": 11.809352517985612,
+  "h": 397
+ },
+ {
+  "query": "Review of Financial Studies",
+  "name": "Review of Financial Information Studies",
+  "issn": "2234-7739",
+  "publisher": null,
+  "works": 25,
+  "cites": 11,
+  "two_yr_mean": 0.0,
+  "h": 2
+ },
+ {
+  "query": "Journal of Financial Economics",
+  "name": "Journal of Financial Economics",
+  "issn": "0304-405X",
+  "publisher": "Elsevier BV",
+  "works": 4896,
+  "cites": 1342442,
+  "two_yr_mean": 12.368,
+  "h": 557
+ },
+ {
+  "query": "Journal of Financial Economics",
+  "name": "International Journal of Economics and Financial Issues",
+  "issn": "2146-4138",
+  "publisher": "EconJournals",
+  "works": 1272,
+  "cites": 7304,
+  "two_yr_mean": 1.7380530973451327,
+  "h": 27
+ },
+ {
+  "query": "Journal of Financial and Quantitative Analysis",
+  "name": "Journal of Financial and Quantitative Analysis",
+  "issn": "0022-1090",
+  "publisher": "Cambridge University Press",
+  "works": 4096,
+  "cites": 269837,
+  "two_yr_mean": 3.394160583941606,
+  "h": 255
+ },
+ {
+  "query": "Management Science",
+  "name": "Management Science",
+  "issn": "0025-1909",
+  "publisher": "Institute for Operations Research and the Management Sciences",
+  "works": 13836,
+  "cites": 1333756,
+  "two_yr_mean": 6.227307398932113,
+  "h": 480
+ },
+ {
+  "query": "Management Science",
+  "name": "Pest Management Science",
+  "issn": "1526-498X",
+  "publisher": "Wiley",
+  "works": 9747,
+  "cites": 282399,
+  "two_yr_mean": 3.38893653516295,
+  "h": 188
+ },
+ {
+  "query": "Operations Research",
+  "name": "Operations Research",
+  "issn": "0030-364X",
+  "publisher": "Institute for Operations Research and the Management Sciences",
+  "works": 8512,
+  "cites": 534411,
+  "two_yr_mean": 3.477434679334917,
+  "h": 304
+ },
+ {
+  "query": "Operations Research",
+  "name": "Computers & Operations Research",
+  "issn": "0305-0548",
+  "publisher": "Elsevier BV",
+  "works": 8366,
+  "cites": 369062,
+  "two_yr_mean": 4.913606911447085,
+  "h": 224
+ },
+ {
+  "query": "Review of Finance",
+  "name": "International Review of Economics & Finance",
+  "issn": "1059-0560",
+  "publisher": "Elsevier BV",
+  "works": 6076,
+  "cites": 114103,
+  "two_yr_mean": 7.727239218577221,
+  "h": 127
+ },
+ {
+  "query": "Review of Finance",
+  "name": "International Review of Finance",
+  "issn": "1369-412X",
+  "publisher": "Wiley",
+  "works": 835,
+  "cites": 13584,
+  "two_yr_mean": 1.577922077922078,
+  "h": 51
+ },
+ {
+  "query": "Review of Asset Pricing Studies",
+  "name": "The Review of Asset Pricing Studies",
+  "issn": "2045-9920",
+  "publisher": "Oxford University Press",
+  "works": 271,
+  "cites": 10914,
+  "two_yr_mean": 4.3,
+  "h": 49
+ },
+ {
+  "query": "Quantitative Finance",
+  "name": "Quantitative Finance",
+  "issn": "1469-7688",
+  "publisher": "Taylor & Francis",
+  "works": 3192,
+  "cites": 74313,
+  "two_yr_mean": 2.459731543624161,
+  "h": 113
+ },
+ {
+  "query": "Quantitative Finance",
+  "name": "Review of Quantitative Finance and Accounting",
+  "issn": "0924-865X",
+  "publisher": "Springer Science+Business Media",
+  "works": 2123,
+  "cites": 41239,
+  "two_yr_mean": 2.93312101910828,
+  "h": 80
+ },
+ {
+  "query": "Journal of Computational Finance",
+  "name": "The Journal of Computational Finance",
+  "issn": "1460-1559",
+  "publisher": null,
+  "works": 756,
+  "cites": 14264,
+  "two_yr_mean": 0.6785714285714286,
+  "h": 57
+ },
+ {
+  "query": "Mathematical Finance",
+  "name": "Mathematical Finance",
+  "issn": "0960-1627",
+  "publisher": "Wiley",
+  "works": 1427,
+  "cites": 72190,
+  "two_yr_mean": 1.603448275862069,
+  "h": 129
+ },
+ {
+  "query": "Mathematical Finance",
+  "name": "Applied Mathematical Finance",
+  "issn": "1350-486X",
+  "publisher": "Taylor & Francis",
+  "works": 575,
+  "cites": 14136,
+  "two_yr_mean": 1.0666666666666667,
+  "h": 58
+ },
+ {
+  "query": "Journal of Banking and Finance",
+  "name": "Journal of Banking & Finance",
+  "issn": "0378-4266",
+  "publisher": "Elsevier BV",
+  "works": 7560,
+  "cites": 515661,
+  "two_yr_mean": 4.4473161033797215,
+  "h": 309
+ },
+ {
+  "query": "Journal of Banking and Finance",
+  "name": "International Journal of Banking and Finance",
+  "issn": "1675-722X",
+  "publisher": null,
+  "works": 251,
+  "cites": 1434,
+  "two_yr_mean": 0.4473684210526316,
+  "h": 16
+ },
+ {
+  "query": "Journal of Financial Markets",
+  "name": "Journal of Financial Markets",
+  "issn": "1386-4181",
+  "publisher": "Elsevier BV",
+  "works": 918,
+  "cites": 53517,
+  "two_yr_mean": 2.0854700854700856,
+  "h": 104
+ },
+ {
+  "query": "Journal of Financial Markets",
+  "name": "Journal of International Financial Markets Institutions and Money",
+  "issn": "1042-4431",
+  "publisher": "Elsevier BV",
+  "works": 2190,
+  "cites": 70738,
+  "two_yr_mean": 6.970414201183432,
+  "h": 113
+ },
+ {
+  "query": "Journal of Empirical Finance",
+  "name": "Journal of Empirical Finance",
+  "issn": "0927-5398",
+  "publisher": "Elsevier BV",
+  "works": 1866,
+  "cites": 84106,
+  "two_yr_mean": 2.8194444444444446,
+  "h": 133
+ },
+ {
+  "query": "Journal of Empirical Finance",
+  "name": "International Journal of Empirical Finance",
+  "issn": null,
+  "publisher": null,
+  "works": 7,
+  "cites": 17,
+  "two_yr_mean": 0.0,
+  "h": 2
+ },
+ {
+  "query": "International Journal of Forecasting",
+  "name": "International Journal of Forecasting",
+  "issn": "0169-2070",
+  "publisher": "Elsevier BV",
+  "works": 3737,
+  "cites": 256407,
+  "two_yr_mean": 3.79253112033195,
+  "h": 188
+ },
+ {
+  "query": "International Journal of Forecasting",
+  "name": "International Journal of Business Forecasting and Marketing Intelligence",
+  "issn": "1744-6635",
+  "publisher": "Inderscience Publishers",
+  "works": 466,
+  "cites": 1109,
+  "two_yr_mean": 0.2698412698412698,
+  "h": 16
+ },
+ {
+  "query": "European Journal of Operational Research",
+  "name": "European Journal of Operational Research",
+  "issn": "0377-2217",
+  "publisher": "Elsevier BV",
+  "works": 24814,
+  "cites": 1442096,
+  "two_yr_mean": 5.85669191919192,
+  "h": 407
+ },
+ {
+  "query": "Journal of Portfolio Management",
+  "name": "The Journal of Portfolio Management",
+  "issn": "0095-4918",
+  "publisher": "Euromoney Institutional Investor",
+  "works": 3648,
+  "cites": 84231,
+  "two_yr_mean": 0.7972602739726027,
+  "h": 116
+ },
+ {
+  "query": "Journal of Portfolio Management",
+  "name": "Journal of Real Estate Portfolio Management",
+  "issn": "1083-5547",
+  "publisher": "Taylor & Francis",
+  "works": 601,
+  "cites": 8593,
+  "two_yr_mean": 1.0434782608695652,
+  "h": 42
+ },
+ {
+  "query": "Journal of Financial Econometrics",
+  "name": "Journal of Financial Econometrics",
+  "issn": "1479-8409",
+  "publisher": "Oxford University Press",
+  "works": 701,
+  "cites": 31010,
+  "two_yr_mean": 1.2236842105263157,
+  "h": 77
+ },
+ {
+  "query": "Journal of Financial Econometrics",
+  "name": "International Journal of Econometrics and Financial Management",
+  "issn": "2374-2011",
+  "publisher": null,
+  "works": 21,
+  "cites": 93,
+  "two_yr_mean": 0.3333333333333333,
+  "h": 4
+ },
+ {
+  "query": "Journal of Econometrics",
+  "name": "Journal of Econometrics",
+  "issn": "0304-4076",
+  "publisher": "Elsevier BV",
+  "works": 6493,
+  "cites": 699681,
+  "two_yr_mean": 2.9495798319327733,
+  "h": 333
+ },
+ {
+  "query": "Journal of Econometrics",
+  "name": "Journal of Applied Econometrics",
+  "issn": "0883-7252",
+  "publisher": "Wiley",
+  "works": 2647,
+  "cites": 189524,
+  "two_yr_mean": 3.5442477876106193,
+  "h": 182
+ },
+ {
+  "query": "Journal of Financial Data Science",
+  "name": "The Journal of Financial Data Science",
+  "issn": "2640-3943",
+  "publisher": null,
+  "works": 303,
+  "cites": 2025,
+  "two_yr_mean": 0.6796116504854369,
+  "h": 21
+ },
+ {
+  "query": "Critical Finance Review",
+  "name": "Critical Finance Review",
+  "issn": "2164-5744",
+  "publisher": "Now Publishers",
+  "works": 191,
+  "cites": 5616,
+  "two_yr_mean": 3.74,
+  "h": 32
+ },
+ {
+  "query": "Financial Analysts Journal",
+  "name": "Financial Analysts Journal",
+  "issn": "0015-198X",
+  "publisher": "Taylor & Francis",
+  "works": 5578,
+  "cites": 133174,
+  "two_yr_mean": 2.74025974025974,
+  "h": 168
+ },
+ {
+  "query": "Financial Analysts Journal",
+  "name": "\u0098The \u009cICFAI Journal of Corporate Governance",
+  "issn": "0972-6853",
+  "publisher": null,
+  "works": 62,
+  "cites": 458,
+  "two_yr_mean": 0.03225806451612903,
+  "h": 11
+ },
+ {
+  "query": "Journal of Business & Economic Statistics",
+  "name": "Journal of Business and Economic Statistics",
+  "issn": "0735-0015",
+  "publisher": "Taylor & Francis",
+  "works": 3800,
+  "cites": 265053,
+  "two_yr_mean": 1.8614232209737829,
+  "h": 234
+ },
+ {
+  "query": "Journal of Business & Economic Statistics",
+  "name": "International Journal of Economic Finance and Business Statistics",
+  "issn": "3025-9959",
+  "publisher": null,
+  "works": 88,
+  "cites": 19,
+  "two_yr_mean": 0.20987654320987653,
+  "h": 2
+ },
+ {
+  "query": "Annals of Operations Research",
+  "name": "Annals of Operations Research",
+  "issn": "0254-5330",
+  "publisher": "Springer Science+Business Media",
+  "works": 9846,
+  "cites": 285313,
+  "two_yr_mean": 3.8948670377241807,
+  "h": 186
+ },
+ {
+  "query": "Journal of Economic Dynamics and Control",
+  "name": "Journal of Economic Dynamics and Control",
+  "issn": "0165-1889",
+  "publisher": "Elsevier BV",
+  "works": 4749,
+  "cites": 185605,
+  "two_yr_mean": 2.0,
+  "h": 168
+ },
+ {
+  "query": "Expert Systems with Applications",
+  "name": "Expert Systems with Applications",
+  "issn": "0957-4174",
+  "publisher": "Elsevier BV",
+  "works": 32301,
+  "cites": 1256684,
+  "two_yr_mean": 7.50889576484239,
+  "h": 349
+ },
+ {
+  "query": "Expert Systems with Applications",
+  "name": "Expert Systems with Applications X",
+  "issn": "2590-1885",
+  "publisher": "Elsevier BV",
+  "works": 31,
+  "cites": 1084,
+  "two_yr_mean": 0.0,
+  "h": 12
+ },
+ {
+  "query": "INFORMS Journal on Computing",
+  "name": "INFORMS journal on computing",
+  "issn": "0899-1499",
+  "publisher": "Institute for Operations Research and the Management Sciences",
+  "works": 2717,
+  "cites": 91684,
+  "two_yr_mean": 1.6608,
+  "h": 129
+ },
+ {
+  "query": "SIAM Journal on Financial Mathematics",
+  "name": "SIAM Journal on Financial Mathematics",
+  "issn": "1945-497X",
+  "publisher": "Society for Industrial and Applied Mathematics",
+  "works": 670,
+  "cites": 11159,
+  "two_yr_mean": 1.728,
+  "h": 53
+ },
+ {
+  "query": "Finance and Stochastics",
+  "name": "Finance and Stochastics",
+  "issn": "0949-2984",
+  "publisher": "Springer Science+Business Media",
+  "works": 829,
+  "cites": 42904,
+  "two_yr_mean": 1.84,
+  "h": 107
+ },
+ {
+  "query": "Journal of Machine Learning Research",
+  "name": "Journal of Machine Learning Research",
+  "issn": "1532-4435",
+  "publisher": "The MIT Press",
+  "works": 1418,
+  "cites": 166394,
+  "two_yr_mean": 0.0,
+  "h": 131
+ },
+ {
+  "query": "Journal of Machine Learning Research",
+  "name": "Journal of Geophysical Research Machine Learning and Computation",
+  "issn": "2993-5210",
+  "publisher": "Wiley",
+  "works": 459,
+  "cites": 1010,
+  "two_yr_mean": 2.2004357298474946,
+  "h": 13
+ },
+ {
+  "query": "Journal of Risk",
+  "name": "Journal of Risk & Insurance",
+  "issn": "0022-4367",
+  "publisher": "Wiley",
+  "works": 3845,
+  "cites": 80256,
+  "two_yr_mean": 1.9788732394366197,
+  "h": 124
+ },
+ {
+  "query": "Journal of Risk",
+  "name": "Journal of Risk and Uncertainty",
+  "issn": "0895-5646",
+  "publisher": "Springer Science+Business Media",
+  "works": 1039,
+  "cites": 88580,
+  "two_yr_mean": 2.023529411764706,
+  "h": 127
+ }
+]

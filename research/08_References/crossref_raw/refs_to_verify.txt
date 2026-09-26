@@ -1,0 +1,153 @@
+GKX2020|Gu|2020|Empirical Asset Pricing via Machine Learning
+GKX2021|Gu|2021|Autoencoder asset pricing models
+KPS2019|Kelly|2019|Characteristics are covariances: A unified model of risk and return
+CPZ2024|Chen|2024|Deep Learning in Asset Pricing
+FNW2020|Freyberger|2020|Dissecting Characteristics Nonparametrically
+KNS2020|Kozak|2020|Shrinking the cross-section
+KNS2018|Kozak|2018|Interpreting Factor Models
+ACM2023|Avramov|2023|Machine Learning vs. Economic Restrictions: Evidence from Stock Return Predictability
+LWZ2022|Leippold|2022|Machine learning in the Chinese stock market
+KMZ2024|Kelly|2024|The Virtue of Complexity in Return Prediction
+JKMP2026|Jensen|2026|Machine Learning and the Implementable Efficient Frontier
+BPZ2025|Bryzgalova|2025|Forest through the Trees: Building Cross-Sections of Stock Returns
+CFHH2025|Cong|2025|Growing the efficient frontier on panel trees
+KMP2023|Kelly|2023|Principal Portfolios
+JKX2023|Jiang|2023|(Re-)Imag(in)ing Price Trends
+KX2023|Kelly|2023|Financial Machine Learning
+CFMZ2023|Cakici|2023|Machine learning goes global: Cross-sectional return predictability in international stock markets
+TH2021|Tobek|2021|Does it pay to follow anomalies research? Machine learning approach with international evidence
+BHHH2023|Blitz|2023|The Term Structure of Machine Learning Alpha
+LLMSS2021|Leung|2021|The Promises and Pitfalls of Machine Learning for Predicting Stock Returns
+RJ2019|Rasekhschaffe|2019|Machine Learning for Stock Selection
+HK2023|Hanauer|2023|Machine learning and the cross-section of emerging market stock returns
+BBT2021|Bianchi|2021|Bond Risk Premiums with Machine Learning
+LP2020|Lettau|2020|Factors That Fit the Time Series and Cross-Section of Stock Returns
+FGX2020|Feng|2020|Taming the Factor Zoo: A Test of New Factors
+GLX2021|Giglio|2021|Thousands of Alpha Tests
+GKX2022|Giglio|2022|Factor Models, Machine Learning, and Asset Pricing
+CCY2019|Chinco|2019|Sparse Signals in the Cross-Section of Returns
+LMR2017|Light|2017|Aggregation of Information About the Cross Section of Stock Returns: A Latent Variable Approach
+GHZ2017|Green|2017|The Characteristics that Provide Independent Information about Average U.S. Monthly Stock Returns
+LEW2015|Lewellen|2015|The Cross-section of Expected Stock Returns
+VBHL2023|van Binsbergen|2023|Man versus Machine Learning: The Term Structure of Earnings Expectations and Conditional Biases
+KMP2021|Kelly|2021|Understanding momentum and reversal
+WL2025|Wang|2025|Meta-learning for return prediction in shifting market regimes
+DA2023|Zhao|2023|DoubleAdapt: A Meta-learning Approach to Incremental Learning for Stock Trend Forecasting
+HLZ2016|Harvey|2016|and the Cross-Section of Expected Returns
+HXZ2020|Hou|2020|Replicating Anomalies
+JKP2023|Jensen|2023|Is There a Replication Crisis in Finance?
+CZ2022|Chen|2022|Open Source Cross-Sectional Asset Pricing
+MP2016|McLean|2016|Does Academic Research Destroy Stock Return Predictability?
+CV2023|Chen|2023|Zeroing In on the Expected Returns of Anomalies
+HAR2017|Harvey|2017|Presidential Address: The Scientific Outlook in Financial Economics
+COC2011|Cochrane|2011|Presidential Address: Discount Rates
+MENK2024|Menkveld|2024|Nonstandard Errors
+CHEN2021|Chen|2021|The Limits of p-Hacking: Some Thought Experiments
+HXZ2015|Hou|2015|Digesting Anomalies: An Investment Approach
+FF2015|Fama|2015|A five-factor asset pricing model
+SY2017|Stambaugh|2017|Mispricing Factors
+AMP2013|Asness|2013|Value and Momentum Everywhere
+HKS2020|Haddad|2020|Factor Timing
+KNNV2024|Kagkadis|2024|Factor Timing with Portfolio Characteristics
+EL2022|Ehsani|2022|Factor Momentum and the Momentum Factor
+DLRZ2022|Dong|2022|Anomalies and the Expected Market Return
+MM2017|Moreira|2017|Volatility-Managed Portfolios
+COWY2020|Cederburg|2020|On the performance of volatility-managed portfolios
+DMU2024|DeMiguel|2024|A Multifactor Perspective on Volatility-Managed Portfolios
+DM2016|Daniel|2016|Momentum crashes
+BSC2015|Barroso|2015|Momentum has its moments
+SYY2012|Stambaugh|2012|The short of it: Investor sentiment and anomalies
+AB2002|Ang|2002|International Asset Allocation With Regime Shifts
+AT2012|Ang|2012|Regime Changes and Financial Markets
+HAM1989|Hamilton|1989|A New Approach to the Economic Analysis of Nonstationary Time Series and the Business Cycle
+GT2007|Guidolin|2007|Asset allocation under multivariate regime switching
+NML2018|Nystrup|2018|Dynamic portfolio optimization across hidden market regimes
+KPT2012|Kritzman|2012|Regime Shifts: Implications for Dynamic Strategies
+SYM2025|Shu|2025|Dynamic asset allocation with asset-specific regime forecasts
+CDS2020|Collin-Dufresne|2020|Liquidity regimes and optimal dynamic asset allocation
+RSZ2010|Rapach|2010|Out-of-Sample Equity Premium Prediction: Combination Forecasts and Links to the Real Economy
+WG2008|Welch|2008|A Comprehensive Look at The Empirical Performance of Equity Premium Prediction
+CT2008|Campbell|2008|Predicting Excess Stock Returns Out of Sample: Can Anything Beat the Historical Average?
+MARK1952|Markowitz|1952|Portfolio Selection
+DGU2009|DeMiguel|2009|Optimal Versus Naive Diversification: How Inefficient is the 1/N Portfolio Strategy?
+BSCV2009|Brandt|2009|Parametric Portfolio Policies: Exploiting Characteristics in the Cross-Section of Equity Returns
+DMNU2020|DeMiguel|2020|A Transaction-Cost Perspective on the Multitude of Firm Characteristics
+GP2013|Garleanu|2013|Dynamic Trading with Predictable Returns and Transaction Costs
+LW2017|Ledoit|2017|Nonlinear Shrinkage of the Covariance Matrix for Portfolio Selection: Markowitz Meets Goldilocks
+LW2004|Ledoit|2004|Honey, I Shrunk the Sample Covariance Matrix
+LDP2016|Lopez de Prado|2016|Building Diversified Portfolios that Outperform Out of Sample
+BL1992|Black|1992|Global Portfolio Optimization
+MRT2010|Maillard|2010|The Properties of Equally Weighted Risk Contribution Portfolios
+CC2008|Choueifaty|2008|Toward Maximum Diversification
+RU2000|Rockafellar|2000|Optimization of conditional value-at-risk
+GI2003|Goldfarb|2003|Robust Portfolio Selection Problems
+DY2010|Delage|2010|Distributionally Robust Optimization Under Moment Uncertainty with Application to Data-Driven Problems
+BCZ2022|Blanchet|2022|Distributionally Robust Mean-Variance Portfolio Selection with Wasserstein Distances
+KO2012|Kirby|2012|It's All in the Timing: Simple Active Portfolio Strategies that Outperform Naive Diversification
+BS2022|Barroso|2022|Lest We Forget: Learn from Out-of-Sample Forecast Errors When Optimizing Portfolios
+JM2003|Jagannathan|2003|Risk Reduction in Large Portfolios: Why Imposing the Wrong Constraints Helps
+KZ2007|Kan|2007|Optimal Portfolio Choice with Parameter Uncertainty
+EG2022|Elmachtoub|2022|Smart Predict, then Optimize
+DAK2017|Donti|2017|Task-based End-to-end Model Learning in Stochastic Optimization
+AK2017|Amos|2017|OptNet: Differentiable Optimization as a Layer in Neural Networks
+AAB2019|Agrawal|2019|Differentiable Convex Optimization Layers
+BK2023|Butler|2023|Integrating prediction in mean-variance portfolio optimization
+CI2023|Costa|2023|Distributionally robust end-to-end portfolio construction
+ULM2024|Uysal|2024|End-to-end risk budgeting portfolio optimization with neural networks
+ZZR2020|Zhang|2020|Deep Learning for Portfolio Optimization
+LZR2019|Lim|2019|Enhancing Time-Series Momentum Strategies Using Deep Neural Networks
+WGRZ2022|Wood|2022|Trading with the Momentum Transformer: An Intelligent and Interpretable Architecture
+MS2001|Moody|2001|Learning to trade via direct reinforcement
+FK2018|Fischer|2018|Deep learning with long short-term memory networks for financial market predictions
+KDH2017|Krauss|2017|Deep neural networks, gradient-boosted trees, random forests: Statistical arbitrage on the S&P 500
+NMV2016|Novy-Marx|2016|A Taxonomy of Anomalies and Their Trading Costs
+DNMV2023|Detzel|2023|Model Comparison with Transaction Costs
+PW2020|Patton|2020|What you see is not what you get: The costs of trading market anomalies
+KS2004|Korajczyk|2004|Are Momentum Profits Robust to Trading Costs?
+LSZ2004|Lesmond|2004|The illusory nature of momentum profits
+HAS2009|Hasbrouck|2009|Trading Costs and Returns for U.S. Equities: Estimating Effective Costs from Daily Data
+CS2012|Corwin|2012|A Simple Way to Estimate Bid-Ask Spreads from Daily High and Low Prices
+AR2017|Abdi|2017|A Simple Estimation of Bid-Ask Spreads from Daily Close, High, and Low Prices
+AMI2002|Amihud|2002|Illiquidity and stock returns: cross-section and time-series effects
+KYO2016|Kyle|2016|Market Microstructure Invariance: Empirical Hypotheses
+AC2001|Almgren|2001|Optimal execution of portfolio transactions
+NMV2019|Novy-Marx|2019|Comparing Cost-Mitigation Techniques
+SHU1997|Shumway|1997|The Delisting Bias in CRSP Data
+NW1987|Newey|1987|A Simple, Positive Semi-Definite, Heteroskedasticity and Autocorrelation Consistent Covariance Matrix
+LO2002|Lo|2002|The Statistics of Sharpe Ratios
+LW2008|Ledoit|2008|Robust performance hypothesis testing with the Sharpe ratio
+JK1981|Jobson|1981|Performance Hypothesis Testing with the Sharpe and Treynor Measures
+WHI2000|White|2000|A Reality Check for Data Snooping
+HAN2005|Hansen|2005|A Test for Superior Predictive Ability
+RW2005|Romano|2005|Stepwise Multiple Testing as Formalized Data Snooping
+HLN2011|Hansen|2011|The Model Confidence Set
+DM1995|Diebold|1995|Comparing Predictive Accuracy
+CW2007|Clark|2007|Approximately normal tests for equal predictive accuracy in nested models
+PR1994|Politis|1994|The Stationary Bootstrap
+BLDP2014|Bailey|2014|The Deflated Sharpe Ratio: Correcting for Selection Bias, Backtest Overfitting, and Non-Normality
+BBLZ2017|Bailey|2017|The probability of backtest overfitting
+HL2015|Harvey|2015|Backtesting
+AHM2019|Arnott|2019|A Backtesting Protocol in the Era of Machine Learning
+FM1973|Fama|1973|Risk, Return, and Equilibrium: Empirical Tests
+BH1995|Benjamini|1995|Controlling the False Discovery Rate: A Practical and Powerful Approach to Multiple Testing
+LL2017|Lundberg|2017|A Unified Approach to Interpreting Model Predictions
+AZ2020|Apley|2020|Visualizing the effects of predictor variables in black box supervised learning models
+FRI2001|Friedman|2001|Greedy function approximation: A gradient boosting machine
+BRE2001|Breiman|2001|Random Forests
+CG2016|Chen|2016|XGBoost: A Scalable Tree Boosting System
+VAS2017|Vaswani|2017|Attention Is All You Need
+HS1997|Hochreiter|1997|Long Short-Term Memory
+LPB2017|Lakshminarayanan|2017|Simple and Scalable Predictive Uncertainty Estimation using Deep Ensembles
+GG2016|Gal|2016|Dropout as a Bayesian Approximation: Representing Model Uncertainty in Deep Learning
+JJNH1991|Jacobs|1991|Adaptive Mixtures of Local Experts
+FAL2017|Finn|2017|Model-Agnostic Meta-Learning for Fast Adaptation of Deep Networks
+GRIN1989|Grinold|1989|The fundamental law of active management
+AHXZ2006|Ang|2006|The Cross-Section of Volatility and Expected Returns
+CF2008|Cohen|2008|Economic Links and Predictable Returns
+LAL2025|Lalwani|2025|Empirical Asset Pricing via Machine Learning: The Role of Research Design Choices
+ZH2005|Zou|2005|Regularization and variable selection via the elastic net
+TIB1996|Tibshirani|1996|Regression Shrinkage and Selection via the Lasso
+KMN2023|Kaniel|2023|Machine-learning the skill of mutual fund managers
+BBCGT2023|Bali|2023|Option Return Predictability with Machine Learning and Big Data
+OP2022|Obaid|2022|A picture is worth a thousand words: Measuring investor sentiment by combining machine learning and photos from news
+KE2017|Ke|2017|LightGBM: A Highly Efficient Gradient Boosting Decision Tree

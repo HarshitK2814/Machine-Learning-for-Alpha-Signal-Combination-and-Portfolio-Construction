@@ -1,0 +1,68 @@
+# Proposed baseline configuration (extracted from Experimental_Framework.md). Not yet executed.
+universe:
+  source: CRSP
+  share_codes: [10, 11]
+  exchanges: [NYSE, AMEX, NASDAQ]
+  main_filter: {min_price: 5, exclude_below_nyse_size_pct: 20}
+  robustness_universes: [all_stocks, nyse_top500]
+frequency: {signals: monthly, rebalancing: monthly, risk_and_costs: daily}
+periods:
+  initial_train: [1972-01, 1989-12]
+  initial_validation: [1990-01, 1994-12]
+  walk_forward_test: [1995-01, 2020-12]
+  lockbox: [2021-01, 2025-12]
+  refit: annual_january
+  train_window: expanding   # robustness: rolling_240m
+  validation_window: 60m_rolling
+  embargo_months: horizon_h
+signals:
+  library: JKP_characteristics   # cross-check: OpenAP
+  themes: 13
+  normalisation: cross_sectional_rank_[-0.5,0.5]
+  missing: zero_plus_theme_indicators
+  publication_gating: robustness_only
+states: [MKTVOL, BEAR, ILLIQ, SENT, CREDIT, TERM, INFL, DRATE, FMOM_theme, DISP]
+targets: {prediction_horizons: [1, 3, 6, 12], choose_in_validation: true}
+factorial:
+  form: [linear, nonlinear]
+  conditioning: [static, state]
+  objective: [prediction, economic]
+  uncertainty: [none, ensemble_shrinkage]
+models:
+  ridge: {lambda_grid: logspace(-4, 4, 17)}
+  lightgbm: {num_leaves: [15, 31, 63], learning_rate: [0.01, 0.05], min_data_in_leaf: [500, 2000],
+             feature_fraction: [0.5, 0.8], bagging_fraction: 0.8, lambda_l2: [0, 10],
+             max_trees: 2000, early_stopping: validation}
+  nn3: {layers: [32, 16, 8], activation: relu, batch_norm: true, optimizer: adam, lr: 0.001,
+        l1: [1e-5, 1e-4, 1e-3], early_stopping_patience: 5, ensemble_seeds: 10}
+  moe: {experts: 3, gate_inputs: states_only}
+  economic_policy: {net: nn3, bptt_months: 12, gamma: calibrate_to_10pct_vol, huber_delta: 1e-4}
+  uncertainty: {members: 10, kappa_grid: [0, 0.5, 1, 2, 4]}
+portfolio:
+  objective: mean_variance_minus_tc
+  constraints: {dollar_neutral: true, gross_max: 2.0, beta_abs_max: 0.05,
+                industry_ff49_abs_max: 0.02, weight_abs_max: 0.01, adv_participation_max: 0.05}
+  long_only_variant: {tracking_error_max: 0.04}
+  solver: [MOSEK, CLARABEL]
+risk_model:
+  type: structural
+  factors: [market_beta, jkp_13_themes, ff49_industries]
+  factor_cov: {ewma_halflife_days: 126, newey_west: true}
+  specific: {ewma_halflife_days: 126, bayesian_shrink: size_deciles}
+  robustness: [pca_20, ledoit_wolf_top500]
+costs:
+  spread: {primary: taq_effective_spread, fallback: [edge_ohlc, abdi_ranaldo]}
+  impact: {form: "k * sigma_daily * |Q|^1.5 / ADV^0.5", k: 1.0, sensitivity: [0.5, 2.0, 3.0]}
+  commission_bps: 1
+  borrow: {general_collateral_bps_pa: 25, hard_to_borrow_pa: 0.05, htb_proxy: bottom_decile_inst_ownership}
+  aum_usd_2020: [1.0e8, 1.0e9, 1.0e10]
+  aum_scaling: total_crsp_market_cap
+execution: {lag_days: 1, price: close}
+inference:
+  nw_lags: 12
+  lw2008_blocks: [4, 6, 12]
+  spa: {bootstrap: stationary, mean_block: 6, reps: 10000}
+  mcs_alpha: 0.10
+  pbo_cscv_blocks: 16
+  bootstrap_reps: 5000
+logging: {tracker: mlflow, log_every_trial: true}

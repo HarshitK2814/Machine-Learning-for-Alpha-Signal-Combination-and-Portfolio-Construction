@@ -1,0 +1,369 @@
+{
+ "AGK2024": {
+  "query_title": "Efficient estimation of bid-ask spreads from open, high, low, and close prices",
+  "query_author": "Ardia",
+  "year_expected": "2024",
+  "doi": "10.1016/j.jfineco.2024.103916",
+  "title": "Efficient estimation of bid–ask spreads from open, high, low, and close prices",
+  "journal": "Journal of Financial Economics",
+  "year": 2024,
+  "vol": "161",
+  "issue": null,
+  "pages": "103916",
+  "type": "journal-article",
+  "authors": [
+   "David Ardia",
+   "Emanuele Guidotti",
+   "Tim A. Kroencke"
+  ],
+  "title_similarity": 1.0,
+  "author_match": true,
+  "status": "MATCH"
+ },
+ "CSS2012": {
+  "query_title": "Factor Alignment Problems and Quantitative Portfolio Management",
+  "status": "ERROR",
+  "error": "HTTP Error 429: Too Many Requests"
+ },
+ "LS2008": {
+  "query_title": "Do Risk Factors Eat Alphas?",
+  "query_author": "Lee",
+  "year_expected": "2008",
+  "doi": "10.3905/jpm.2008.709976",
+  "title": "Do Risk Factors Eat Alphas?",
+  "journal": "The Journal of Portfolio Management",
+  "year": 2008,
+  "vol": "34",
+  "issue": "4",
+  "pages": "12-25",
+  "type": "journal-article",
+  "authors": [
+   "Jyh-Huei Lee",
+   "Dan Stefek"
+  ],
+  "title_similarity": 1.0,
+  "author_match": true,
+  "status": "MATCH"
+ },
+ "MPR2026": {
+  "query_title": "In good and in bad times? The relation between anomaly returns and market states",
+  "status": "ERROR",
+  "error": "HTTP Error 429: Too Many Requests"
+ },
+ "PS2003": {
+  "query_title": "Liquidity Risk and Expected Stock Returns",
+  "status": "ERROR",
+  "error": "HTTP Error 429: Too Many Requests"
+ },
+ "BW2006": {
+  "query_title": "Investor Sentiment and the Cross-Section of Stock Returns",
+  "query_author": "Baker",
+  "year_expected": "2006",
+  "doi": "10.1111/j.1540-6261.2006.00885.x",
+  "title": "Investor Sentiment and the Cross‐Section of Stock Returns",
+  "journal": "The Journal of Finance",
+  "year": 2006,
+  "vol": "61",
+  "issue": "4",
+  "pages": "1645-1680",
+  "type": "journal-article",
+  "authors": [
+   "MALCOLM BAKER",
+   "JEFFREY WURGLER"
+  ],
+  "title_similarity": 1.0,
+  "author_match": true,
+  "status": "MATCH"
+ },
+ "FP2014": {
+  "query_title": "Betting against beta",
+  "query_author": "Frazzini",
+  "year_expected": "2014",
+  "doi": "10.1016/j.jfineco.2013.10.005",
+  "title": "Betting against beta",
+  "journal": "Journal of Financial Economics",
+  "year": 2014,
+  "vol": "111",
+  "issue": "1",
+  "pages": "1-25",
+  "type": "journal-article",
+  "authors": [
+   "Andrea Frazzini",
+   "Lasse Heje Pedersen"
+  ],
+  "title_similarity": 1.0,
+  "author_match": true,
+  "status": "MATCH"
+ },
+ "FF1993": {
+  "query_title": "Common risk factors in the returns on stocks and bonds",
+  "query_author": "Fama",
+  "year_expected": "1993",
+  "doi": "10.1016/0304-405x(93)90023-5",
+  "title": "Common risk factors in the returns on stocks and bonds",
+  "journal": "Journal of Financial Economics",
+  "year": 1993,
+  "vol": "33",
+  "issue": "1",
+  "pages": "3-56",
+  "type": "journal-article",
+  "authors": [
+   "Eugene F. Fama",
+   "Kenneth R. French"
+  ],
+  "title_similarity": 1.0,
+  "author_match": true,
+  "status": "MATCH"
+ },
+ "CAR1997": {
+  "query_title": "On Persistence in Mutual Fund Performance",
+  "query_author": "Carhart",
+  "year_expected": "1997",
+  "doi": "10.1111/j.1540-6261.1997.tb03808.x",
+  "title": "On Persistence in Mutual Fund Performance",
+  "journal": "The Journal of Finance",
+  "year": 1997,
+  "vol": "52",
+  "issue": "1",
+  "pages": "57-82",
+  "type": "journal-article",
+  "authors": [
+   "Mark M. Carhart"
+  ],
+  "title_similarity": 1.0,
+  "author_match": true,
+  "status": "MATCH"
+ },
+ "KP2015": {
+  "query_title": "The three-pass regression filter: A new approach to forecasting using many predictors",
+  "query_author": "Kelly",
+  "year_expected": "2015",
+  "doi": "10.1016/j.jeconom.2015.02.011",
+  "title": "The three-pass regression filter: A new approach to forecasting using many predictors",
+  "journal": "Journal of Econometrics",
+  "year": 2015,
+  "vol": "186",
+  "issue": "2",
+  "pages": "294-316",
+  "type": "journal-article",
+  "authors": [
+   "Bryan Kelly",
+   "Seth Pruitt"
+  ],
+  "title_similarity": 1.0,
+  "author_match": true,
+  "status": "MATCH"
+ },
+ "CST2014": {
+  "query_title": "Have capital market anomalies attenuated in the recent era of high liquidity and trading activity?",
+  "query_author": "Chordia",
+  "year_expected": "2014",
+  "doi": "10.1016/j.jacceco.2014.06.001",
+  "title": "Have capital market anomalies attenuated in the recent era of high liquidity and trading activity?",
+  "journal": "Journal of Accounting and Economics",
+  "year": 2014,
+  "vol": "58",
+  "issue": "1",
+  "pages": "41-58",
+  "type": "journal-article",
+  "authors": [
+   "Tarun Chordia",
+   "Avanidhar Subrahmanyam",
+   "Qing Tong"
+  ],
+  "title_similarity": 1.0,
+  "author_match": true,
+  "status": "MATCH"
+ },
+ "LT2020": {
+  "query_title": "What Drives Anomaly Returns?",
+  "query_author": "Lochstoer",
+  "year_expected": "2020",
+  "doi": "10.1111/jofi.12876",
+  "title": "What Drives Anomaly Returns?",
+  "journal": "The Journal of Finance",
+  "year": 2020,
+  "vol": "75",
+  "issue": "3",
+  "pages": "1417-1455",
+  "type": "journal-article",
+  "authors": [
+   "LARS A. LOCHSTOER",
+   "PAUL C. TETLOCK"
+  ],
+  "title_similarity": 1.0,
+  "author_match": true,
+  "status": "MATCH"
+ },
+ "BLLP2025": {
+  "query_title": "Missing Financial Data",
+  "query_author": "Bryzgalova",
+  "year_expected": "2025",
+  "doi": "10.1093/rfs/hhae036",
+  "title": "Missing Financial Data",
+  "journal": "The Review of Financial Studies",
+  "year": 2024,
+  "vol": "38",
+  "issue": "3",
+  "pages": "803-882",
+  "type": "journal-article",
+  "authors": [
+   "Svetlana Bryzgalova",
+   "Sven Lerner",
+   "Martin Lettau",
+   "Markus Pelger"
+  ],
+  "title_similarity": 1.0,
+  "author_match": true,
+  "status": "MATCH"
+ },
+ "FHNW2025": {
+  "query_title": "Missing Data in Asset Pricing Panels",
+  "query_author": "Freyberger",
+  "year_expected": "2025",
+  "doi": "10.1093/rfs/hhae003",
+  "title": "Missing Data in Asset Pricing Panels",
+  "journal": "The Review of Financial Studies",
+  "year": 2024,
+  "vol": "38",
+  "issue": "3",
+  "pages": "760-802",
+  "type": "journal-article",
+  "authors": [
+   "Joachim Freyberger",
+   "Bjoern Hoeppner",
+   "Andreas Neuhierl",
+   "Michael Weber"
+  ],
+  "title_similarity": 1.0,
+  "author_match": true,
+  "status": "MATCH"
+ },
+ "ATHL2005": {
+  "query_title": "Direct Estimation of Equity Market Impact",
+  "query_author": "Almgren",
+  "year_expected": "2005",
+  "doi": "10.1142/s2382626616500027",
+  "title": "Option Hedging with Smooth Market Impact",
+  "journal": "Market Microstructure and Liquidity",
+  "year": 2016,
+  "vol": "02",
+  "issue": "01",
+  "pages": "1650002",
+  "type": "journal-article",
+  "authors": [
+   "Robert Almgren",
+   "Tianhui Michael Li"
+  ],
+  "title_similarity": 0.543,
+  "author_match": true,
+  "status": "CHECK"
+ },
+ "HJTZ2015": {
+  "query_title": "Investor Sentiment Aligned: A Powerful Predictor of Stock Returns",
+  "query_author": "Huang",
+  "year_expected": "2015",
+  "doi": "10.1093/rfs/hhu080",
+  "title": "Investor Sentiment Aligned: A Powerful Predictor of Stock Returns",
+  "journal": "Review of Financial Studies",
+  "year": 2014,
+  "vol": "28",
+  "issue": "3",
+  "pages": "791-837",
+  "type": "journal-article",
+  "authors": [
+   "Dashan Huang",
+   "Fuwei Jiang",
+   "Jun Tu",
+   "Guofu Zhou"
+  ],
+  "title_similarity": 1.0,
+  "author_match": true,
+  "status": "MATCH"
+ },
+ "SIM2023": {
+  "query_title": "Deep Parametric Portfolio Policies",
+  "query_author": "Simon",
+  "year_expected": "2023",
+  "doi": "10.1287/mnsc.2025.00721",
+  "title": "Deep Parametric Portfolio Policies",
+  "journal": "Management Science",
+  "year": 2026,
+  "vol": null,
+  "issue": null,
+  "pages": null,
+  "type": "journal-article",
+  "authors": [
+   "Frederik Simon",
+   "Sebastian Weibels",
+   "Tom Zimmermann"
+  ],
+  "title_similarity": 1.0,
+  "author_match": true,
+  "status": "CHECK"
+ },
+ "BAMS2014": {
+  "query_title": "Dynamic asset allocation for varied financial markets under regime switching framework",
+  "query_author": "Bae",
+  "year_expected": "2014",
+  "doi": "10.1016/j.ejor.2013.03.032",
+  "title": "Dynamic asset allocation for varied financial markets under regime switching framework",
+  "journal": "European Journal of Operational Research",
+  "year": 2014,
+  "vol": "234",
+  "issue": "2",
+  "pages": "450-458",
+  "type": "journal-article",
+  "authors": [
+   "Geum Il Bae",
+   "Woo Chang Kim",
+   "John M. Mulvey"
+  ],
+  "title_similarity": 1.0,
+  "author_match": true,
+  "status": "MATCH"
+ },
+ "FFR2023": {
+  "query_title": "A Trend Factor for the Cross-Section of Cryptocurrency Returns",
+  "query_author": "Fieberg",
+  "year_expected": "2023",
+  "doi": "10.1017/s0022109024000747",
+  "title": "A Trend Factor for the Cross Section of Cryptocurrency Returns",
+  "journal": "Journal of Financial and Quantitative Analysis",
+  "year": 2025,
+  "vol": "60",
+  "issue": "7",
+  "pages": "3116-3153",
+  "type": "journal-article",
+  "authors": [
+   "Christian Fieberg",
+   "Gerrit Liedtke",
+   "Thorsten Poddig",
+   "Thomas Walker",
+   "Adam Zaremba"
+  ],
+  "title_similarity": 0.992,
+  "author_match": true,
+  "status": "CHECK"
+ },
+ "LTZ2021": {
+  "query_title": "High-Dimensional Latent Factor Asset Pricing Models",
+  "query_author": "Lettau",
+  "year_expected": "2021",
+  "doi": "10.1016/j.jeconom.2019.08.012",
+  "title": "Estimating latent asset-pricing factors",
+  "journal": "Journal of Econometrics",
+  "year": 2020,
+  "vol": "218",
+  "issue": "1",
+  "pages": "1-31",
+  "type": "journal-article",
+  "authors": [
+   "Martin Lettau",
+   "Markus Pelger"
+  ],
+  "title_similarity": 0.591,
+  "author_match": true,
+  "status": "CHECK"
+ }
+}

@@ -1,0 +1,13 @@
+CST2002|Clarke|2002|Portfolio Constraints and the Fundamental Law of Active Management
+MICH1989|Michaud|1989|The Markowitz Optimization Enigma: Is Optimized Optimal?
+MEM2003|Memmel|2003|Performance Hypothesis Testing with the Sharpe Ratio
+BP1998|Bai|1998|Estimating and Testing Linear Models with Multiple Structural Changes
+KLS2021|Kozak|2023|Kernel trick for the cross-section
+FGX2023|Feng|2024|Deep learning for predicting asset returns
+CLARK2004|Chen|2025|Missing data in asset pricing
+HKGX2025|Kelly|2025|Large (and deep) factor models
+CSS2012|Ceria|2012|Factor Alignment Problems and Quantitative Portfolio Management
+MPR2026|Muller|2026|In good and in bad times? The relation between anomaly returns and market states
+PS2003|Pastor|2003|Liquidity Risk and Expected Stock Returns
+SWZ2023|Simon|2026|Deep Parametric Portfolio Policies
+CPZ2024|Chen|2024|Deep Learning in Asset Pricing
