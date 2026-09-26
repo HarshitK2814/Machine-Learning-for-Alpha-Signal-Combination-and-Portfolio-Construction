@@ -15,6 +15,8 @@ Maham can build against real files rather than descriptions.
 | - | Manifests | `outputs/manifest_models.csv`, `outputs/manifest_portfolios.csv` | run metadata | Maps run IDs to cells, cost multipliers and AUM |
 | - | Cell contrast coding | `alphacomb.contracts.interfaces.CellSpec.contrasts()` | +/-1 coding and interactions | Feeds the factorial decomposition (E29) directly; already verified orthogonal |
 | - | Interpretation outputs | `alphacomb.interpret` functions | economic importance, implied theme weights, state-dependence regressions, limits-to-arbitrage tilts | E60-E62 inputs |
+| C12+ | **After-tax return ledger** | `outputs/summary_after_tax.csv`, and C12 tables with extra columns | adds `after_tax_ret, tax_ret, realised_st, realised_lt, wash_disallowed, carryforward, nav` | Produced by `pipelines/06_after_tax_eval.py`. **Additive** - the columns are optional in contract v1.1.0, so Maham's existing statistics code keeps working unchanged. Every Sharpe is computed on the NAV series that actually paid the tax |
+| - | **Adaptive combination panel** | `outputs/adaptive_weights.csv`, `outputs/summary_adaptive.csv`, `outputs/adaptive_report.json` | per-month weight on each member model, plus the regret bound and drift events | Produced by `pipelines/07_adaptive_combine.py`. The summary already contains the benchmarks the adaptive row must be compared against (equal-weight blend, best member in hindsight) - please report all of them together |
 
 **How to run a baseline through the same machinery**
 

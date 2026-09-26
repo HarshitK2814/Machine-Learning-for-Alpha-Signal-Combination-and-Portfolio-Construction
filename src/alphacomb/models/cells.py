@@ -45,6 +45,11 @@ class CellRunConfig:
     economic_max_train_months: int = 240
     validation_months_for_kappa: int = 12
     gamma: float = 25.0
+    # After-tax objective: a TaxRegime switches the economic cells from net-of-cost utility to
+    # net-of-cost-and-tax utility. None reproduces the existing behaviour exactly.
+    tax_regime: object = None
+    tax_harvest_haircut: float = 1.0
+    strategy_suffix: str = ""
     # design v2: rungs of the functional-form ladder used inside the nonlinear arm
     # options: "gbdt_nn" (A1), "complexity_dense" (A2), "complexity_sparse" (A3), "attention" (A4)
     form_ladder: tuple[str, ...] = ("gbdt_nn",)
@@ -200,7 +205,9 @@ def run_economic_cell(spec: CellSpec, df: pd.DataFrame, features, calendar: list
 
         best, best_val, best_params = None, -np.inf, None
         for policy, params in economic.candidates(models_cfg, spec.is_nonlinear, gamma=cfg.gamma, seed=cfg.seed,
-                                                  n_members=members, fast=cfg.fast):
+                                                  n_members=members, fast=cfg.fast,
+                                                  tax_regime=cfg.tax_regime,
+                                                  harvest_haircut=cfg.tax_harvest_haircut):
             policy.fit(train_months, val_months)
             log_trial(run_id, strategy, spec.code, params, cfg.seed, split.train_end, policy.val_utility_)
             if policy.val_utility_ > best_val:
@@ -222,8 +229,8 @@ def run_cell(spec: CellSpec | str, bundle: DataBundle, risk: RiskCache, cfg: Cel
     cfg = cfg or CellRunConfig()
     base_cfg = base_cfg or load_config("base")
     models_cfg = models_cfg or read_yaml(paths.REPO_ROOT / "configs" / "models.yaml")
-    run_id = run_id or new_run_id(f"cell_{spec.code}")
-    strategy = f"cell_{spec.code}"
+    run_id = run_id or new_run_id(f"cell_{spec.code}{cfg.strategy_suffix}")
+    strategy = f"cell_{spec.code}{cfg.strategy_suffix}"
 
     df, features = build_design(bundle, spec, horizon=cfg.horizon,
                                interaction_states=models_cfg["conditional_linear"]["interaction_states"])

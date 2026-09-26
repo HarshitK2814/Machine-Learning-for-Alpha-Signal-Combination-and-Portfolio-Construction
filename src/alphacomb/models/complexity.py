@@ -13,6 +13,15 @@ Implements levels A2 and A3 of design v2 (see ``docs/DESIGN_V2_FRONTIER.md``).
 Both arms share the random feature map, so the dense/sparse comparison is clean: only the penalty
 changes. The ridge parameter and the L1 strength are chosen on validation like every other
 hyperparameter, and every fitted configuration is logged as a trial.
+
+**Two calibration bugs found on 20 September 2026, both of which inverted the result.** The
+defaults were ``gamma=1.0`` and a ridge grid of ``(1e-8, 1e-4, 1e-2)``. On our 170-signal design
+that bandwidth is about 350x too large - the kernel degenerates to a delta function - and the ridge
+grid is five to nine orders of magnitude too small, so every rung sat in the noise-fitting regime.
+Measured validation IC then *fell* with parameterisation (0.0232 at P=200 to 0.0003 at P=4000),
+which is the virtue of complexity running backwards. With the median-heuristic bandwidth and a
+ridge grid reaching 1e3-1e4 it rises instead (0.0498 to 0.0525). Any complexity result produced
+before that fix is void. ``tests/models/test_complexity_calibration.py`` pins it.
 """
 from __future__ import annotations
 
@@ -30,9 +39,17 @@ class RandomFourierFeatures:
     dense and sparse arms and across hyperparameter values.
     """
 
-    def __init__(self, n_features: int, gamma: float = 1.0, seed: int = 0):
+    def __init__(self, n_features: int, gamma: float | None = None, seed: int = 0):
+        """``gamma=None`` uses the median heuristic ``1/(2d)``, set at fit time.
+
+        The old default of 1.0 was wrong by roughly the input dimension. For an RBF kernel
+        exp(-gamma ||x-y||^2) on d standardised features the typical squared distance is about 2d,
+        so on our 170-signal design gamma should be near 0.003. At gamma=1 the kernel is
+        effectively a delta function, every random feature is noise, and no amount of
+        parameterisation helps.
+        """
         self.n_features = int(n_features)
-        self.gamma = float(gamma)
+        self.gamma = None if gamma is None else float(gamma)
         self.seed = int(seed)
         self.W_: np.ndarray | None = None
         self.b_: np.ndarray | None = None
@@ -45,6 +62,8 @@ class RandomFourierFeatures:
         self.sd_ = np.nanstd(X, axis=0)
         self.sd_[self.sd_ < 1e-8] = 1.0
         d = X.shape[1]
+        if self.gamma is None:
+            self.gamma = 1.0 / (2.0 * d)          # median heuristic for standardised inputs
         self.W_ = rng.normal(0.0, np.sqrt(2.0 * self.gamma), size=(d, self.n_features))
         self.b_ = rng.uniform(0, 2 * np.pi, size=self.n_features)
         return self
@@ -71,14 +90,15 @@ class ComplexityCell:
         arm (basis-pursuit style selection).
     """
 
-    def __init__(self, complexity: float = 1.0, penalty: str = "ridge", alpha: float = 1e-6,
-                 gamma: float = 1.0, max_features: int = 6000, n_members: int = 1, seed: int = 0):
+    def __init__(self, complexity: float = 1.0, penalty: str = "ridge", alpha: float = 1e3,
+                 gamma: float | None = None, max_features: int = 6000, n_members: int = 1,
+                 seed: int = 0):
         if penalty not in {"ridge", "l1"}:
             raise ValueError("penalty must be 'ridge' or 'l1'")
         self.complexity = float(complexity)
         self.penalty = penalty
         self.alpha = float(alpha)
-        self.gamma = float(gamma)
+        self.gamma = None if gamma is None else float(gamma)
         self.max_features = int(max_features)
         self.n_members = int(n_members)
         self.seed = int(seed)
@@ -133,8 +153,8 @@ class ComplexityCell:
         return float(self.n_selected_) / max(len(self.models_[0].coef_), 1) * self.complexity
 
 
-def candidates(complexity_grid=(0.25, 1.0, 4.0), ridge_alphas=(1e-8, 1e-4, 1e-2),
-               l1_alphas=(1e-5, 1e-4), gamma: float = 1.0, n_members: int = 1, seed: int = 0,
+def candidates(complexity_grid=(0.25, 1.0, 4.0), ridge_alphas=(1.0, 1e2, 1e3, 1e4),
+               l1_alphas=(1e-5, 1e-4), gamma: float | None = None, n_members: int = 1, seed: int = 0,
                fast: bool = False, arms=("dense", "sparse")):
     """(model, params) pairs for the complexity ladder.
 
@@ -142,7 +162,7 @@ def candidates(complexity_grid=(0.25, 1.0, 4.0), ridge_alphas=(1e-8, 1e-4, 1e-2)
     a difference between them is attributable to the penalty rather than to the feature draw.
     """
     if fast:
-        complexity_grid, ridge_alphas, l1_alphas = (0.5, 2.0), (1e-6,), (1e-4,)
+        complexity_grid, ridge_alphas, l1_alphas = (0.5, 2.0), (1e2, 1e3), (1e-4,)
     for c in complexity_grid:
         if "dense" in arms:
             for a in ridge_alphas:

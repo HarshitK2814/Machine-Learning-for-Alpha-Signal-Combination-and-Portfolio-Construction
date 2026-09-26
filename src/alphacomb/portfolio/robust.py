@@ -23,7 +23,8 @@ import pandas as pd
 
 from ..risk.structural import RiskModel
 from .cost_terms import cost_inputs_for, cvx_borrow_cost, cvx_trade_cost
-from .optimizer import OptimizationResult, OptimizerConfig, _risk_factor, available_solvers
+from .optimizer import (OptimizationResult, OptimizerConfig, _risk_factor, book_constraints,
+                        BREACH_TOL, bound_breach, realised_violations, solve_escalating)
 
 log = logging.getLogger(__name__)
 
@@ -82,26 +83,23 @@ def construct_robust(date, alpha: pd.Series, w_prev: pd.Series | None, risk: Ris
     if wasserstein_eps > 0:
         robust_term = robust_term + wasserstein_eps * cp.norm2(w)
 
-    objective = cp.Maximize(a @ w - 0.5 * cfg.gamma * risk_term - cost_term - borrow_term - robust_term)
-    cons = [cp.norm1(w) <= cfg.gross_max, cp.abs(w) <= pos_cap, cp.abs(dw) <= adv_cap,
-            cp.abs(beta @ w) <= cfg.beta_abs_max]
-    if cfg.dollar_neutral and not cfg.long_only:
-        cons.append(cp.sum(w) == 0)
-    if cfg.long_only:
-        cons += [w >= 0, cp.sum(w) == 1]
-    for col in [c for c in risk.B.columns if c.startswith("ind_")]:
-        cons.append(cp.abs(risk.B[col].to_numpy(dtype=float) @ w) <= cfg.industry_abs_max)
+    def breach_of(value):
+        return bound_breach(value, prev, adv_cap, pos_cap, cfg, risk)
 
-    problem = cp.Problem(objective, cons)
-    status = "failed"
-    for solver in available_solvers(cfg.solver_order):
-        try:
-            problem.solve(solver=getattr(cp, solver), verbose=False)
-            if w.value is not None and problem.status in {"optimal", "optimal_inaccurate"}:
-                status = problem.status
-                break
-        except Exception as exc:  # pragma: no cover
-            log.debug("robust solver %s failed on %s: %s", solver, date, exc)
+    def attempt(soft: bool):
+        cons, penalty, caps = book_constraints(w, prev, adv_cap, pos_cap, cfg, risk, soft=soft)
+        problem = cp.Problem(
+            cp.Maximize(a @ w - 0.5 * cfg.gamma * risk_term - cost_term - borrow_term
+                        - robust_term - penalty), cons)
+        st, sv = solve_escalating(problem, w, cfg, date, breach_fn=breach_of)
+        return problem, st, sv, caps
+    # Same two stages as `construct`, from the same shared builder.
+    problem, status, used_solver, caps = attempt(soft=False)
+    breach = bound_breach(w.value, prev, adv_cap, pos_cap, cfg, risk) if status != "failed" else float("inf")
+    if status == "failed" or breach > BREACH_TOL:
+        log.info("hard constraint set unsatisfiable on %s (status=%s, relative breach=%.3g); "
+                 "retrying with breachable bounds", pd.Timestamp(date).date(), status, breach)
+        problem, status, used_solver, caps = attempt(soft=True)
     if status == "failed" or w.value is None:
         return OptimizationResult(pd.Series(prev, index=permnos), "failed_hold", diagnostics={"n_assets": n})
 
@@ -112,7 +110,8 @@ def construct_robust(date, alpha: pd.Series, w_prev: pd.Series | None, risk: Ris
         weights=weights, status=status, objective=float(problem.value),
         predicted_vol=risk.volatility(weights), turnover=float(np.abs(trade).sum() / 2),
         diagnostics={"n_assets": n, "kappa_robust": kappa_robust, "wasserstein_eps": wasserstein_eps,
-                     "gross": float(np.abs(weights).sum())},
+                     "gross": float(np.abs(weights).sum()), "solver": used_solver,
+                     "pos_cap_relaxed": caps["pos_cap_relaxed"], **realised_violations(caps)},
     )
 
 

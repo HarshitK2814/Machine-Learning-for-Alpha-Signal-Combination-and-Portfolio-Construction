@@ -167,6 +167,48 @@ def log_trial(run_id: str, strategy: str, cell: str, params: dict, seed: int, tr
         pd.DataFrame([row], columns=_TRIAL_COLUMNS).to_csv(fh, header=header, index=False)
 
 
+def append_manifest(frame: pd.DataFrame, path: str | Path) -> Path:
+    """Append run metadata to a manifest, surviving the schema changing over time.
+
+    The obvious implementation - ``to_csv(mode="a", header=not path.exists())`` - is a trap. The
+    header is written once, on the first run, and never revisited. The day anyone adds a column the
+    new rows have more fields than the header promises, and the file silently becomes unparseable:
+    ``ParserError: Expected 8 fields in line 4, saw 10``. It broke exactly that way here, weeks
+    after the column was added, in a different pipeline from the one that added it.
+
+    So: read what is there (tolerantly - the file may already be damaged), union the columns, and
+    rewrite the whole thing with one correct header. Manifests are small; correctness is cheap.
+    """
+    path = Path(path)
+    existing = pd.DataFrame()
+    if path.exists():
+        try:
+            existing = pd.read_csv(path)
+        except pd.errors.ParserError:
+            # Already damaged by a previous append. Recover the rows that still parse, keyed on
+            # the widest header we can find, rather than discarding the file.
+            existing = _recover_csv(path)
+    merged = pd.concat([existing, frame], ignore_index=True) if len(existing) else frame
+    merged.to_csv(path, index=False)
+    return path
+
+
+def _recover_csv(path: Path) -> pd.DataFrame:
+    """Best-effort recovery of a manifest damaged by header/row width drift."""
+    import csv
+
+    with open(path, newline="", encoding="utf-8") as fh:
+        rows = list(csv.reader(fh))
+    if not rows:
+        return pd.DataFrame()
+    header = rows[0]
+    width = max(len(r) for r in rows)
+    if len(header) < width:                       # pad the stale header with positional names
+        header = header + [f"col_{i}" for i in range(len(header), width)]
+    body = [r + [None] * (width - len(r)) for r in rows[1:] if any(r)]
+    return pd.DataFrame(body, columns=header)
+
+
 def read_trials() -> pd.DataFrame:
     path = paths.trials_path()
     if not path.exists():

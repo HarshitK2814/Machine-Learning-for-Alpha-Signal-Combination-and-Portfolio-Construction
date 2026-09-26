@@ -209,3 +209,176 @@ def test_run_cell_with_frontier_ladder_and_conformal(small_panel, tmp_path, monk
     diag = pd.read_csv(result["diagnostics"])
     assert (diag["uncertainty_method"] == "conformal").all()
     assert diag["conformal_coverage"].notna().any()
+
+
+# --------------------------------------------------------------------------------------------
+# Regression tests for the 22 September frontier audit. Each of these failures was invisible to
+# the tests that existed: they asserted the component RAN, not that its output was usable.
+# --------------------------------------------------------------------------------------------
+
+def test_attention_scores_every_stock_even_past_the_subsample_cap():
+    """A capped predict leaves dropped stocks as NaN - two thirds of a real CRSP cross-section.
+
+    The cap exists to bound the O(n^2) attention cost during training. Applying it at prediction
+    time is silent data loss: the universe here is deliberately larger than the cap, which the
+    synthetic panel (~666 names) never is.
+    """
+    rng = np.random.default_rng(0)
+    n_per_month, cap = 60, 25
+    frames = []
+    for m, date in enumerate(pd.date_range("2015-01-31", periods=4, freq="ME")):
+        x = rng.normal(size=(n_per_month, 3))
+        frames.append(pd.DataFrame({
+            "date": date, "permno": np.arange(n_per_month) + 1,
+            "f0": x[:, 0], "f1": x[:, 1], "f2": x[:, 2],
+            "y": x[:, 0] * 0.05 + rng.normal(scale=0.01, size=n_per_month)}))
+    panel = pd.concat(frames, ignore_index=True)
+    feats = ["f0", "f1", "f2"]
+    model = AttentionCell(d_model=8, n_heads=2, ff_hidden=8, max_epochs=2, max_stocks=cap, seed=0)
+    model.fit(panel[panel["date"] < "2015-03-01"], panel[panel["date"] >= "2015-03-01"], feats, "y")
+
+    scored = model.predict(panel, feats)
+    assert scored["score"].notna().all(), (
+        f"{scored['score'].isna().sum()} of {len(scored)} stocks were left unscored; "
+        f"the prediction path is subsampling to max_stocks={cap}")
+
+
+def test_attention_trains_on_a_unit_scale_target():
+    """Raw monthly returns (sd ~0.13) against an O(1) head makes the first epochs fight the scale.
+
+    The fitted scale must be stored and reapplied, so the returned score stays on the return scale
+    that every other cell emits.
+    """
+    rng = np.random.default_rng(1)
+    frames = []
+    for date in pd.date_range("2015-01-31", periods=4, freq="ME"):
+        x = rng.normal(size=(40, 2))
+        frames.append(pd.DataFrame({"date": date, "permno": np.arange(40) + 1,
+                                    "f0": x[:, 0], "f1": x[:, 1],
+                                    "y": 0.13 * x[:, 0]}))
+    panel = pd.concat(frames, ignore_index=True)
+    feats = ["f0", "f1"]
+    model = AttentionCell(d_model=8, n_heads=2, ff_hidden=8, max_epochs=2, seed=0)
+    model.fit(panel[panel["date"] < "2015-03-01"], panel[panel["date"] >= "2015-03-01"], feats, "y")
+    assert model.y_scale_ == pytest.approx(panel[panel["date"] < "2015-03-01"]["y"].std(), rel=1e-6)
+    # the caller's frame must not have been mutated by the rescaling
+    assert panel["y"].std() == pytest.approx(0.13 * 1.0, rel=0.2)
+
+
+def test_every_bound_is_feasible_on_an_arbitrarily_drifted_book(small_panel):
+    """The feasible set must be non-empty however far the book has drifted, on BOTH paths.
+
+    Two distinct bugs met here. `construct_robust` was a parallel copy that never received the
+    21 September feasibility fix - no test caught it because every test passes `w_prev=None`, the
+    one case where the constraints cannot conflict. And the fix itself was incomplete: it relaxed
+    the position, gross and net bounds to each one's individually-reachable floor, which are not
+    jointly attainable, so the infeasibility simply moved into the unrelaxed beta constraint. Both
+    are why this asserts feasibility at several drift levels rather than at one.
+
+    `w = prev` is feasible by construction now, so `infeasible` is unreachable by definition; a
+    failure here means a bound stopped being anchored at prev.
+    """
+    risk = StructuralRiskModel(small_panel).prepare().load(DATE)
+    rng = np.random.default_rng(5)
+    alpha = grinold_alpha(pd.Series(rng.normal(size=len(risk.B)), index=risk.B.index), risk, ic=0.05)
+    cfg = OptimizerConfig(**{**OptimizerConfig.from_files().__dict__, "gamma": 40.0})
+    for mult in (1.0, 4.0, 10.0):
+        drifted = pd.Series(cfg.weight_abs_max * mult, index=alpha.index)
+        for name, res in [
+            ("construct", construct(DATE, alpha, drifted, risk, small_panel.cost_inputs, cfg)),
+            ("construct_robust", construct_robust(DATE, alpha, drifted, risk,
+                                                  small_panel.cost_inputs, None, 0.0, 0.0, cfg)),
+        ]:
+            assert res.status in {"optimal", "optimal_inaccurate"}, (
+                f"{name} returned {res.status!r} at drift {mult}x weight_abs_max; a bound is no "
+                f"longer relaxed to its value at prev, so the feasible set is empty")
+            assert not res.weights.empty
+
+
+def test_no_bound_is_loosened_on_an_undrifted_book(small_panel):
+    """The feasibility machinery must be a no-op when the book is inside its caps.
+
+    This is the property the second failed repair broke: anchoring every bound at `prev` made
+    `net_slack` equal `|sum prev|`, so dollar-neutrality quietly stopped binding after any drift.
+    Buying feasibility by weakening a property the paper claims is not a repair, so it is asserted.
+    """
+    risk = StructuralRiskModel(small_panel).prepare().load(DATE)
+    rng = np.random.default_rng(11)
+    alpha = grinold_alpha(pd.Series(rng.normal(size=len(risk.B)), index=risk.B.index), risk, ic=0.05)
+    cfg = OptimizerConfig(**{**OptimizerConfig.from_files().__dict__, "gamma": 40.0})
+    res = construct(DATE, alpha, None, risk, small_panel.cost_inputs, cfg)
+    assert res.status in {"optimal", "optimal_inaccurate"}
+    assert res.diagnostics["n_violated"] == 0, (
+        f"bounds were breached on a fresh book: {res.diagnostics['violated']}")
+    # the bounds the paper quotes must hold exactly, not approximately
+    assert abs(float(res.weights.sum())) < 1e-6, "dollar-neutrality stopped binding"
+    assert float(res.weights.abs().sum()) <= cfg.gross_max + 1e-6
+    beta = risk.B["beta"].to_numpy(dtype=float)
+    assert abs(float(beta @ res.weights.to_numpy())) <= cfg.beta_abs_max + 1e-6
+
+
+def test_a_breached_bound_is_reported_not_hidden(small_panel):
+    """When a bound genuinely cannot be met, the violation must reach the diagnostics.
+
+    The whole point of the soft formulation is that a breach is visible in the manifest instead of
+    appearing as a failed solve or as silently relaxed limits.
+    """
+    risk = StructuralRiskModel(small_panel).prepare().load(DATE)
+    rng = np.random.default_rng(12)
+    alpha = grinold_alpha(pd.Series(rng.normal(size=len(risk.B)), index=risk.B.index), risk, ic=0.05)
+    cfg = OptimizerConfig(**{**OptimizerConfig.from_files().__dict__, "gamma": 40.0})
+    drifted = pd.Series(cfg.weight_abs_max * 10.0, index=alpha.index)   # far outside every bound
+    res = construct(DATE, alpha, drifted, risk, small_panel.cost_inputs, cfg)
+    assert res.status in {"optimal", "optimal_inaccurate"}
+    assert res.diagnostics["n_violated"] > 0, (
+        "a book at 10x the position cap must breach the gross budget and report it")
+    assert res.diagnostics["max_violation"] > 0.0
+
+
+def test_a_returned_book_never_breaches_its_bounds_unreported(small_panel):
+    """The returned weights and the reported violations must agree, at every drift level.
+
+    This catches the worst failure found in the 22 September audit, which the repair itself
+    introduced. On a drifted book the hard constraint set is empty, but SCS does not always say
+    `infeasible` - it returns `optimal_inaccurate` with a solution breaching the gross budget by
+    two orders of magnitude. Because the status was not `failed`, the soft fallback never fired and
+    the result was a book at gross 769 against a budget of 2 with nothing recorded anywhere.
+
+    So the invariant is not "the solver was happy". It is: whatever comes back, any bound it
+    breaches is in the diagnostics. A solution is measured, never taken on the strength of a label.
+    """
+    from alphacomb.portfolio.optimizer import BREACH_TOL, bound_breach
+
+    risk = StructuralRiskModel(small_panel).prepare().load(DATE)
+    rng = np.random.default_rng(13)
+    alpha = grinold_alpha(pd.Series(rng.normal(size=len(risk.B)), index=risk.B.index), risk, ic=0.05)
+    cfg = OptimizerConfig(**{**OptimizerConfig.from_files().__dict__, "gamma": 40.0})
+    ci = small_panel.cost_inputs
+
+    for mult in (0.0, 1.0, 4.0, 10.0):
+        prev = None if mult == 0 else pd.Series(cfg.weight_abs_max * mult, index=alpha.index)
+        res = construct(DATE, alpha, prev, risk, ci, cfg)
+        assert res.status in {"optimal", "optimal_inaccurate"}, f"failed at drift {mult}"
+        prev_arr = (prev.reindex(res.weights.index).fillna(0.0).to_numpy()
+                    if prev is not None else np.zeros(len(res.weights)))
+        adv_cap, pos_cap = _caps_for(res.weights.index, ci, cfg, prev_arr)
+        actual = bound_breach(res.weights.to_numpy(), prev_arr, adv_cap, pos_cap, cfg,
+                              risk.align(res.weights.index))
+        if actual > BREACH_TOL:
+            assert res.diagnostics.get("n_violated", 0) > 0, (
+                f"drift {mult}x: the returned book breaches its bounds by {actual:.4g} "
+                f"(relative) with nothing in diagnostics - an unreported constraint violation")
+
+
+def _caps_for(permnos, cost_inputs, cfg, prev):
+    """The position and trade caps `construct` builds internally, for independent verification.
+
+    Includes the per-name widening `book_constraints` applies, so the check compares against the
+    bounds actually imposed rather than a tighter set the optimiser was never asked to meet.
+    """
+    from alphacomb.portfolio.cost_terms import cost_inputs_for
+
+    ci = cost_inputs_for(DATE, cost_inputs, permnos)
+    adv_cap = np.clip(ci["adv_usd"].to_numpy() * cfg.adv_participation_max / cfg.aum_usd, 1e-6, None)
+    pos_cap = np.minimum(cfg.weight_abs_max, np.maximum(adv_cap, 1e-5))
+    return adv_cap, np.maximum(pos_cap, np.abs(prev) - adv_cap)

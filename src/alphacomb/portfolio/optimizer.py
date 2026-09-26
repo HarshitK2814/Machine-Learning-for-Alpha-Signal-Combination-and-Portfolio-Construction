@@ -22,8 +22,14 @@ from ..contracts.io import read_yaml
 from ..contracts import paths
 from ..risk.structural import RiskModel
 from .cost_terms import cost_inputs_for, cvx_borrow_cost, cvx_trade_cost
+from .tax_terms import TaxState, apply_wash_block, cvx_tax_cost
 
 log = logging.getLogger(__name__)
+
+# Dimensionless: a solution is treated as satisfying a bound if it is within this fraction of it.
+# Loose enough to absorb conic residue on a 1e-6 trade cap, tight enough that a real breach - the
+# gross-769-against-2 case that motivated the check - is four orders of magnitude clear of it.
+BREACH_TOL = 1e-4
 
 
 @dataclass
@@ -44,6 +50,13 @@ class OptimizerConfig:
     long_only: bool = False
     tracking_error_max: float = 0.04
     fallback_hold_on_failure: bool = True
+    tax_aware: bool = False          # put the tax consequence of a trade in the objective
+    tax_harvest_haircut: float = 1.0  # how usable a realised loss is; sensitivity parameter
+    wash_block: bool = False         # forbid repurchasing a name inside the s1091 window
+    # Price of breaching a drift-sensitive bound (gross, dollar-neutrality, factor exposures).
+    # Large relative to the objective, whose terms are O(1e-3), so a bound is respected exactly
+    # whenever the trade caps permit; it only bends when the alternative is an infeasible solve.
+    violation_penalty: float = 1.0e4
 
     @staticmethod
     def from_files(cfg: dict | None = None, portfolio_cfg: dict | None = None) -> "OptimizerConfig":
@@ -100,9 +113,197 @@ def _risk_factor(risk: RiskModel) -> tuple[np.ndarray, np.ndarray]:
     return L, risk.D.to_numpy(dtype=float)
 
 
+def solve_escalating(problem, w, cfg: OptimizerConfig, date, breach_fn=None) -> tuple[str, str]:
+    """Try solvers in preference order and keep the answer that is actually *feasible*.
+
+    This rule was wrong until 22 September, and wrong in a way that reached published results. The
+    original version preferred the first solver reporting ``optimal`` over one reporting
+    ``optimal_inaccurate``, justified by the two objectives agreeing to five significant figures.
+    The objectives do agree. The solutions do not:
+
+        CLARABEL   optimal_inaccurate    0 of 827 names over their position cap
+        SCS        optimal             139 of 827 names over, worst 3.54x the cap
+
+    So the preference selected SCS's infeasible book over CLARABEL's feasible one, on every month.
+    The comparison had been made on the objective value alone; nobody measured the constraints. The
+    caps being walked through are the ADV participation limits, so the effect is to take positions
+    that could not be traded at the modelled impact cost, concentrated in the least liquid names.
+
+    With ``breach_fn`` supplied, a candidate is scored by how far it violates the bounds and the
+    status is used only to break ties. A feasible ``optimal_inaccurate`` beats an infeasible
+    ``optimal`` every time. Without it the old status-only behaviour is kept, for callers that have
+    no constraint set to measure against.
+    """
+    import cvxpy as cp
+
+    best = None            # (breach, status_rank, w_value, solver, status)
+    for solver in available_solvers(cfg.solver_order):
+        try:
+            problem.solve(solver=getattr(cp, solver), verbose=False)
+            if w.value is None or problem.status not in {"optimal", "optimal_inaccurate"}:
+                continue
+            value = np.asarray(w.value).ravel().copy()
+            breach = float(breach_fn(value)) if breach_fn is not None else 0.0
+            rank = 0 if problem.status == "optimal" else 1
+            cand = (breach if breach > BREACH_TOL else 0.0, rank, value, solver, problem.status)
+            if best is None or cand[:2] < best[:2]:
+                best = cand
+            if cand[0] == 0.0 and rank == 0:
+                break                      # feasible and cleanly optimal; nothing can beat it
+        except Exception as exc:  # pragma: no cover - solver availability varies
+            log.debug("solver %s failed on %s: %s", solver, date, exc)
+    if best is None:
+        return "failed", ""
+    w.value = best[2]
+    return best[4], best[3]
+
+
+def bound_breach(w_val: np.ndarray, prev: np.ndarray, adv_cap: np.ndarray, pos_cap: np.ndarray,
+                 cfg: OptimizerConfig, risk: RiskModel) -> float:
+    """Largest breach of the configured bounds by a candidate solution, **relative to each bound**.
+
+    Needed because **a solver status cannot be trusted on this problem**. On a drifted book, where
+    the hard constraint set is genuinely empty, SCS does not always report `infeasible`: it returns
+    `optimal_inaccurate` together with a solution that breaches the gross budget by two orders of
+    magnitude. Accepting that status produced a book at gross 769 against a budget of 2 with nothing
+    recorded anywhere - the same silent-failure shape as the bug this exercise is about, only now
+    manufactured by the repair. The answer is to measure the solution rather than believe the label.
+
+    The measure is **relative** because the bounds span six orders of magnitude: `adv_cap` floors at
+    1e-6 while `gross_max` is 2. An absolute tolerance tight enough to catch a real gross breach
+    treats ordinary conic residue on a 1e-6 trade cap as a violation, which sent every undrifted
+    month down the soft path and cost it a clean `optimal`. Each breach is therefore divided by its
+    own bound, and the caller compares against a single dimensionless tolerance.
+    """
+    if w_val is None:
+        return float("inf")
+    w = np.asarray(w_val, dtype=float).ravel()
+    scale = max(cfg.gross_max, 1e-12)
+    worst = [float(np.max((np.abs(w) - pos_cap) / np.maximum(pos_cap, 1e-12))),
+             float(np.max((np.abs(w - prev) - adv_cap) / np.maximum(adv_cap, 1e-12))),
+             (float(np.abs(w).sum()) - cfg.gross_max) / scale,
+             (abs(float(risk.B["beta"].to_numpy(dtype=float) @ w)) - cfg.beta_abs_max)
+             / max(cfg.beta_abs_max, 1e-12)]
+    if cfg.dollar_neutral and not cfg.long_only:
+        worst.append(abs(float(w.sum())) / scale)          # equality: any net exposure is a breach
+    if cfg.long_only:
+        worst += [abs(float(w.sum()) - 1.0), float(np.max(-w)) / scale]
+    for col in [c for c in risk.B.columns if c.startswith("ind_")]:
+        worst.append((abs(float(risk.B[col].to_numpy(dtype=float) @ w)) - cfg.industry_abs_max)
+                     / max(cfg.industry_abs_max, 1e-12))
+    return max(0.0, max(worst))
+
+
+def book_constraints(w, prev: np.ndarray, adv_cap: np.ndarray, pos_cap: np.ndarray,
+                     cfg: OptimizerConfig, risk: RiskModel,
+                     soft: bool = False) -> tuple[list, object, dict]:
+    """Position, budget, neutrality and exposure constraints. Never infeasible, never loosened.
+
+    Extracted so there is exactly **one** implementation: ``construct`` and
+    ``robust.construct_robust`` used to build these separately, and the 21 September feasibility fix
+    reached only the first. No test caught the divergence because every test of the robust path
+    passes ``w_prev=None`` - a fresh book, the one case in which a drifted position cannot make the
+    constraints conflict.
+
+    **The failure being prevented.** A book that has drifted outside its caps cannot always be
+    traded back inside them in one month, because ``|w - prev| <= adv_cap`` pins ``w`` near ``prev``.
+    The constraint set is then empty, the solve fails, the caller holds stale weights, ``prev``
+    drifts further, and the next month is worse - a self-reinforcing failure that silently turns a
+    strategy into a stale buy-and-hold. It bites hardest in small illiquid names, where ``adv_cap``
+    is smallest, so it penalises exactly the cells that trade them and reads as "nonlinearity adds
+    no net value".
+
+    **Two repairs that did not work**, both recorded because each looked correct and passed tests:
+
+    1. Relaxing each bound to the least value *that bound alone* can reach from ``prev`` (the
+       21 September fix). The minimisers differ - shrinking ``||w||_1`` and neutralising ``beta'w``
+       call for different trades - so the floors are not jointly attainable and the intersection is
+       still empty. Relaxing three of five bounds that way merely moved the infeasibility into beta.
+    2. Anchoring every bound at its value at ``prev``. That does guarantee feasibility, since
+       ``w = prev`` satisfies everything at once, but it **silently loosens the book**: ``net_slack``
+       becomes ``|sum prev|`` rather than zero, so dollar-neutrality stops binding after any drift.
+       Buying feasibility by weakening a property the paper claims is not a repair.
+
+    **What is correct** is to make the drift-sensitive bounds *soft*. The hard set is the trade caps
+    plus per-name position caps widened only where that pair is individually empty, which is a
+    non-empty box by construction. The gross budget, dollar-neutrality and every factor exposure
+    carry a non-negative slack priced at ``cfg.violation_penalty`` in the objective. The solver
+    therefore satisfies each bound **exactly** whenever the box permits - the normal case, where this
+    is identical to the hard formulation - and when it genuinely cannot, it violates by the least
+    possible amount and reports it, instead of failing and freezing the book. That is also what a
+    desk does: an over-limit position is worked down as fast as participation allows, and the breach
+    is reported rather than pretended away.
+
+    ``soft=False`` builds the bounds as hard constraints with no slack variables, which is
+    numerically identical to the pre-existing formulation. Callers should try that first and only
+    fall back to ``soft=True`` when it proves infeasible: slack variables priced at 1e4 against
+    objective terms of order 1e-3 measurably worsen the conditioning, and on this problem's scaling
+    that is the difference between a clean ``optimal`` and ``optimal_inaccurate``. Paying that cost
+    on every month to protect against a case that arises in almost none of them is the wrong trade,
+    and it would also perturb results computed before any of this existed.
+
+    Returns ``(constraints, penalty_expression, caps)``. The caller must subtract the penalty from
+    its objective; ``caps`` records the realised violations so a breach appears in the manifest.
+    """
+    import cvxpy as cp
+
+    # Hard, and non-empty by construction: each w_i may range over
+    # [max(-pos_cap, prev - adv_cap), min(pos_cap, prev + adv_cap)], which is non-empty once
+    # pos_cap >= |prev| - adv_cap.
+    pos_cap = np.maximum(pos_cap, np.abs(prev) - adv_cap)
+    cons = [cp.abs(w) <= pos_cap, cp.abs(w - prev) <= adv_cap]
+
+    penalty, violations = 0.0, {}
+
+    def bound_it(expr, bound: float, name: str, equality: bool = False):
+        """|expr| <= bound, violable at a price when `soft`, otherwise exactly as configured."""
+        nonlocal penalty
+        if not soft:
+            cons.append(expr == bound if equality else cp.abs(expr) <= bound)
+            return
+        slack = cp.Variable(nonneg=True)
+        cons.append(cp.abs(expr - bound if equality else expr) <= (0.0 if equality else bound) + slack)
+        penalty = penalty + cfg.violation_penalty * slack
+        violations[name] = slack
+
+    bound_it(cp.norm1(w), cfg.gross_max, "gross")
+    if cfg.dollar_neutral and not cfg.long_only:
+        bound_it(cp.sum(w), 0.0, "net", equality=True)
+    if cfg.long_only:
+        cons.append(w >= 0)
+        bound_it(cp.sum(w), 1.0, "net_long_only", equality=True)
+    bound_it(risk.B["beta"].to_numpy(dtype=float) @ w, cfg.beta_abs_max, "beta")
+    for col in [c for c in risk.B.columns if c.startswith("ind_")]:
+        bound_it(risk.B[col].to_numpy(dtype=float) @ w, cfg.industry_abs_max, f"ind:{col}")
+
+    return cons, penalty, {"violations": violations,
+                           "pos_cap_relaxed": bool(float(pos_cap.max()) > cfg.weight_abs_max + 1e-12)}
+
+
+def realised_violations(caps: dict, tol: float = 1e-6) -> dict:
+    """Read the slack values back after a solve, keeping only the bounds genuinely breached.
+
+    ``tol`` exists because a conic solver leaves numerical residue of order 1e-7 in a non-negative
+    slack even when the bound is not binding at all. Reporting that as a breach would put fifteen
+    spurious violations in the manifest for every month.
+    """
+    out = {}
+    for name, var in caps.get("violations", {}).items():
+        v = float(var.value) if var.value is not None else 0.0
+        if v > tol:
+            out[name] = v
+    return {"n_violated": len(out), "max_violation": max(out.values()) if out else 0.0,
+            "violated": out}
+
+
 def construct(date, alpha: pd.Series, w_prev: pd.Series | None, risk: RiskModel,
-              cost_inputs: pd.DataFrame, cfg: OptimizerConfig | None = None) -> OptimizationResult:
-    """Solve the cost-aware mean-variance problem for one month (contract C11)."""
+              cost_inputs: pd.DataFrame, cfg: OptimizerConfig | None = None,
+              tax_state: TaxState | None = None) -> OptimizationResult:
+    """Solve the cost-aware mean-variance problem for one month (contract C11).
+
+    ``tax_state`` is optional and comes from the same tax-lot ledger that scores the result, so the
+    optimiser cannot be optimising against a tax model the accountant would not recognise.
+    """
     import cvxpy as cp
 
     cfg = cfg or OptimizerConfig.from_files()
@@ -125,8 +326,6 @@ def construct(date, alpha: pd.Series, w_prev: pd.Series | None, risk: RiskModel,
     L, d = _risk_factor(risk)
     B = risk.B.to_numpy(dtype=float)
     beta = risk.B["beta"].to_numpy(dtype=float)
-    industry_cols = [c for c in risk.B.columns if c.startswith("ind_")]
-
     adv_cap = np.clip(adv * cfg.adv_participation_max / cfg.aum_usd, 1e-6, None)
     pos_cap = np.minimum(cfg.weight_abs_max, np.maximum(adv_cap, 1e-5))
 
@@ -135,27 +334,36 @@ def construct(date, alpha: pd.Series, w_prev: pd.Series | None, risk: RiskModel,
     risk_term = cp.sum_squares(L.T @ (B.T @ w)) + cp.sum(cp.multiply(d, cp.square(w)))
     cost_term = cvx_trade_cost(dw, spread, sigma_d, adv, cfg.aum_usd, k, cfg.commission_bps)
     borrow_term = cvx_borrow_cost(w, borrow)
-    objective = cp.Maximize(a @ w - 0.5 * cfg.gamma * risk_term - cost_term - borrow_term)
+    tax_term, tax_cons = 0.0, []
+    if cfg.tax_aware and tax_state is not None and not tax_state.empty:
+        g_vec, rate_vec, blocked = tax_state.aligned(permnos)
+        tax_term, tax_cons = cvx_tax_cost(w, prev, g_vec, rate_vec,
+                                          allow_harvest=tax_state.allow_harvest,
+                                          harvest_haircut=cfg.tax_harvest_haircut)
+        if cfg.wash_block:
+            tax_cons += apply_wash_block(w, prev, blocked)
 
-    cons = [cp.norm1(w) <= cfg.gross_max, cp.abs(w) <= pos_cap, cp.abs(dw) <= adv_cap]
-    if cfg.dollar_neutral and not cfg.long_only:
-        cons.append(cp.sum(w) == 0)
-    if cfg.long_only:
-        cons += [w >= 0, cp.sum(w) == 1]
-    cons.append(cp.abs(beta @ w) <= cfg.beta_abs_max)
-    for col in industry_cols:
-        cons.append(cp.abs(risk.B[col].to_numpy(dtype=float) @ w) <= cfg.industry_abs_max)
+    def breach_of(value):
+        return bound_breach(value, prev, adv_cap, pos_cap, cfg, risk)
 
-    problem = cp.Problem(objective, cons)
-    status = "failed"
-    for solver in available_solvers(cfg.solver_order):
-        try:
-            problem.solve(solver=getattr(cp, solver), verbose=False)
-            if w.value is not None and problem.status in {"optimal", "optimal_inaccurate"}:
-                status = problem.status
-                break
-        except Exception as exc:  # pragma: no cover - solver availability varies
-            log.debug("solver %s failed on %s: %s", solver, date, exc)
+    def attempt(soft: bool):
+        cons, penalty, caps = book_constraints(w, prev, adv_cap, pos_cap, cfg, risk, soft=soft)
+        problem = cp.Problem(
+            cp.Maximize(a @ w - 0.5 * cfg.gamma * risk_term - cost_term - borrow_term
+                        - tax_term - penalty),
+            cons + tax_cons)
+        st, sv = solve_escalating(problem, w, cfg, date, breach_fn=breach_of)
+        return problem, st, sv, caps
+
+    # Two stages, so the ordinary month pays nothing for the drifted month's insurance. The hard
+    # formulation is what every result before this existed was computed with; the soft one exists
+    # only to stop a drifted book from freezing, and its slack variables cost real conditioning.
+    problem, status, used_solver, caps = attempt(soft=False)
+    breach = bound_breach(w.value, prev, adv_cap, pos_cap, cfg, risk) if status != "failed" else float("inf")
+    if status == "failed" or breach > BREACH_TOL:
+        log.info("hard constraint set unsatisfiable on %s (status=%s, relative breach=%.3g); "
+                 "retrying with breachable bounds", pd.Timestamp(date).date(), status, breach)
+        problem, status, used_solver, caps = attempt(soft=True)
     if status == "failed" or w.value is None:
         held = pd.Series(prev, index=permnos)
         log.warning("optimiser failed on %s; holding previous weights", pd.Timestamp(date).date())
@@ -171,7 +379,13 @@ def construct(date, alpha: pd.Series, w_prev: pd.Series | None, risk: RiskModel,
         predicted_vol=risk.volatility(weights),
         expected_cost=float(cost_term.value) if hasattr(cost_term, "value") else float("nan"),
         turnover=float(np.abs(trade).sum() / 2),
-        diagnostics={"n_assets": n, "gross": float(np.abs(weights).sum()), "net": float(weights.sum())},
+        diagnostics={"n_assets": n, "gross": float(np.abs(weights).sum()), "net": float(weights.sum()),
+                     "tax_term": float(tax_term.value) if hasattr(tax_term, "value") else 0.0,
+                     "solver": used_solver,
+                     # recorded so a breached bound is visible in the manifest rather than
+                     # silently changing what the constraint means
+                     "pos_cap_relaxed": caps["pos_cap_relaxed"],
+                     **realised_violations(caps)},
     )
 
 
@@ -200,6 +414,8 @@ def project(date, w_prop: pd.Series, risk: RiskModel, cost_inputs: pd.DataFrame,
     w = cp.Variable(n)
     cons = [cp.norm1(w) <= cfg.gross_max, cp.abs(w) <= pos_cap, cp.abs(beta @ w) <= cfg.beta_abs_max]
     if cfg.dollar_neutral and not cfg.long_only:
+        # project() has no previous book - a proposal is not a position - so there is no drift to
+        # accommodate and dollar neutrality stays a hard equality.
         cons.append(cp.sum(w) == 0)
     if cfg.long_only:
         cons += [w >= 0, cp.sum(w) == 1]
