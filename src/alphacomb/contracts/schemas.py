@@ -14,7 +14,8 @@ from dataclasses import dataclass, field
 import numpy as np
 import pandas as pd
 
-VERSION = "1.1.0"   # 1.1.0: optional targets.div_next (additive, no breaking change)
+VERSION = "1.2.0"   # 1.2.0: ff49 domain {0} | 1..49 with 0 = Unknown Industry; month-end date check
+                    # 1.1.0: optional targets.div_next (additive, no breaking change)
 
 
 class SchemaError(ValueError):
@@ -29,6 +30,7 @@ class Column:
     minimum: float | None = None
     maximum: float | None = None
     nullable: bool = False
+    allowed: frozenset | None = None   # exact permitted value set, for coded categoricals
 
 
 @dataclass(frozen=True)
@@ -64,7 +66,16 @@ SCHEMAS: dict[str, Schema] = {
             Column("me", "float", minimum=0.0),
             Column("price", "float", minimum=0.0),
             Column("exchcd", "int"),
-            Column("ff49", "int"),
+            # 0 = Unknown Industry: the security is retained in the universe but has no
+            # defensible contemporaneous FF49. Absar's US C1 pilot (26 Sep 2026) found 3,763 of
+            # 83,596 investible stock-months in this state - 3,725 with CRSP SICCD=0 and 38 with
+            # SICCD=3999, which sits outside the FF49 definition. Backfilling a later SIC would be
+            # look-ahead (the SIC often arrives years afterwards) and dropping the rows would be a
+            # non-random size/exchange selection effect, since the cohort is disproportionately
+            # small Nasdaq names. The domain is pinned because the old `Column("ff49", "int")`
+            # accepted -1 and 9999 silently, and a typo'd industry code would have become a new
+            # risk factor and a new neutrality constraint without anything objecting.
+            Column("ff49", "int", allowed=frozenset(range(0, 50))),
             Column("nyse_size_pct", "float", minimum=0.0, maximum=100.0),
         ),
     ),
@@ -223,6 +234,25 @@ def validate(df: pd.DataFrame, name: str, *, allow_empty: bool = False) -> pd.Da
                 raise SchemaError(f"{name} ({s.contract}): '{col.name}' below minimum {col.minimum}")
             if col.maximum is not None and float(np.nanmax(finite)) > col.maximum + 1e-9:
                 raise SchemaError(f"{name} ({s.contract}): '{col.name}' above maximum {col.maximum}")
+        if col.allowed is not None and len(finite):
+            unexpected = sorted(set(finite.unique().tolist()) - set(col.allowed))
+            if unexpected:
+                raise SchemaError(
+                    f"{name} ({s.contract}): '{col.name}' has values outside its permitted domain: "
+                    f"{unexpected[:10]}")
+        if col.kind == "date" and len(finite):
+            # Every contract merges on `date`, so one table dated to the last TRADING day and
+            # another to the calendar month end would make every cross-contract join silently
+            # empty - both are valid dates, so nothing else would object. CRSP month-end dates are
+            # last-trading-day, so this has to be normalised on the producing side.
+            ts = pd.DatetimeIndex(finite.unique())
+            off = ts[ts != ts + pd.offsets.MonthEnd(0)]
+            if len(off):
+                raise SchemaError(
+                    f"{name} ({s.contract}): '{col.name}' must be calendar month-end; "
+                    f"{len(off)} distinct value(s) are not, e.g. {[str(d.date()) for d in off[:3]]}. "
+                    f"Normalise with `+ pd.offsets.MonthEnd(0)` and keep any true trading date in a "
+                    f"separate column.")
 
     for prefix, kind in s.prefixes:
         matches = [c for c in df.columns if c.startswith(prefix)]
