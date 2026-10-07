@@ -1,0 +1,34 @@
+{
+  "status": "FROZEN_PRE_RESULTS_SAMPLE_AMENDMENT",
+  "amendment_date": "2026-10-07",
+  "primary_after_tax_evaluation_window": {
+    "start": "2009-01-01",
+    "end": "2019-12-31"
+  },
+  "clean_mechanism_subwindow": {
+    "start": "2014-01-01",
+    "end": "2018-03-31",
+    "tax_state": "INHERITS_PRIMARY_WINDOW_STATE_FROM_2009-01-01"
+  },
+  "tax_ledger_inception": "2009-01-01",
+  "opening_tax_lots": "NONE_COLD_START_AT_FIRST_EVALUATION_REBALANCE",
+  "pre_2009_acquisition_lots_permitted": false,
+  "dated_c12_accounting": "year_end",
+  "tax_year_end_months": {
+    "DEU": 12,
+    "JPN": 12,
+    "IND": 3
+  },
+  "allowance_allocations": {
+    "DEU:ABGELTUNGSTEUER": 0.0
+  },
+  "section_112a_threshold_treatment": "STATUTORY_EXCESS_ONLY_THRESHOLD_NOT_GENERAL_ALLOWANCE",
+  "point_in_time_fx": {
+    "decision": "3A",
+    "cache": "data/intl_c6/cache/C6_WRDS_DAILY_FX_TO_USD.csv.gz",
+    "rule": "IMMEDIATELY_PRECEDING_AVAILABLE_BUSINESS_DAY_NEVER_FUTURE"
+  },
+  "real_results_inspected_before_amendment": false,
+  "production_promoted": false,
+  "github_written": false
+}

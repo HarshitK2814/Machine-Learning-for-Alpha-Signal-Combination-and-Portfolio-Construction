@@ -22,7 +22,8 @@ import numpy as np
 import pandas as pd
 
 from ..risk.structural import RiskModel
-from .cost_terms import cost_inputs_for, cvx_borrow_cost, cvx_trade_cost
+from .cost_terms import (cost_inputs_for, cvx_borrow_cost, cvx_trade_cost,
+                         eligible_cost_input_permnos, ineligible_held_permnos)
 from .optimizer import (OptimizationResult, OptimizerConfig, _risk_factor, book_constraints,
                         BREACH_TOL, bound_breach, realised_violations, solve_escalating)
 
@@ -42,7 +43,16 @@ def construct_robust(date, alpha: pd.Series, w_prev: pd.Series | None, risk: Ris
     import cvxpy as cp
 
     cfg = cfg or OptimizerConfig.from_files()
+    held_without_costs = ineligible_held_permnos(date, cost_inputs, w_prev)
+    if len(held_without_costs):
+        held = w_prev.copy() if w_prev is not None else pd.Series(dtype=float)
+        return OptimizationResult(
+            held,
+            "failed_hold_missing_cost",
+            diagnostics={"ineligible_held_permnos": held_without_costs.tolist()},
+        )
     permnos = alpha.dropna().index
+    permnos = eligible_cost_input_permnos(date, cost_inputs, permnos)
     risk = risk.align(permnos)
     n = len(permnos)
     if n < 10:
@@ -50,7 +60,7 @@ def construct_robust(date, alpha: pd.Series, w_prev: pd.Series | None, risk: Ris
 
     a = alpha.reindex(permnos).to_numpy(dtype=float)
     prev = (w_prev.reindex(permnos).fillna(0.0).to_numpy(dtype=float) if w_prev is not None else np.zeros(n))
-    ci = cost_inputs_for(date, cost_inputs, permnos)
+    ci = cost_inputs_for(date, cost_inputs, permnos, borrow_fee_proxy=cfg.borrow_fee_proxy())
     spread = ci["spread"].to_numpy() * cfg.cost_multiplier
     sigma_d = ci["sigma_d"].to_numpy()
     adv = ci["adv_usd"].to_numpy()

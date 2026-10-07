@@ -194,8 +194,10 @@ def run_economic_cell(spec: CellSpec, df: pd.DataFrame, features, calendar: list
         train, val, test = split_frames(df, split)
         if train.empty or val.empty or test.empty:
             continue
+        from ..portfolio.cost_terms import borrow_fee_proxy_from_cost_config
         kwargs = dict(risk=risk, aum=float(costs_cfg["aum_usd_2020"]), impact_k=float(costs_cfg["impact_k"]),
-                      commission_bps=float(costs_cfg["commission_bps"]))
+                      commission_bps=float(costs_cfg["commission_bps"]),
+                      borrow_fee_proxy=borrow_fee_proxy_from_cost_config(costs_cfg))
         train_months = economic.prepare_months(train, features.all, max_months=cfg.economic_max_train_months, **kwargs)
         val_months = economic.prepare_months(val, features.all, **kwargs)
         test_months = economic.prepare_months(test, features.all, **kwargs)
