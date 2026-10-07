@@ -91,6 +91,22 @@ one thing that keeps the strict verdict red, and no merge can change it.**
 | Prohibited 25 bp fallback | Absent from `src/` and `configs/`. The sole `0.0025` is in `synthetic/generate.py`, generating synthetic borrow fees — legitimate |
 | `main` modified directly | No |
 
+### PR #2 test suite, run independently
+
+```
+collected = 290   (matches Absar's count exactly)
+289 pass
+1 fail: tests/c14/test_c14_dated_production_integration.py::test_frozen_sample_materializes_complete_engine
+exit=0 once that one test is deselected
+```
+
+The single failure is `FileNotFoundError` on
+`data/intl_c6/cache/C6_WRDS_DAILY_FX_TO_USD.csv.gz` — a missing input, not a defect, and
+the same failure the local integration branch shows. Absar sees 290/290 because the file
+is on his machine; it is on neither Drive nor the PR, since `data/` is gitignored. **This
+is the only gap between his result and ours**, and it also blocks
+`validate_c14_evaluation_sample.py`.
+
 ### On merging
 
 The merge was **not** performed. Everything up to it is done and the recommendation is to
