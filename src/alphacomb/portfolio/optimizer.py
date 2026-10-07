@@ -21,7 +21,9 @@ from ..contracts import load_config
 from ..contracts.io import read_yaml
 from ..contracts import paths
 from ..risk.structural import RiskModel
-from .cost_terms import cost_inputs_for, cvx_borrow_cost, cvx_trade_cost
+from .cost_terms import (BorrowFeeProxy, borrow_fee_proxy_from_cost_config, cost_inputs_for,
+                         cvx_borrow_cost, cvx_trade_cost, eligible_cost_input_permnos,
+                         ineligible_held_permnos)
 from .tax_terms import TaxState, apply_wash_block, cvx_tax_cost
 
 log = logging.getLogger(__name__)
@@ -53,6 +55,8 @@ class OptimizerConfig:
     tax_aware: bool = False          # put the tax consequence of a trade in the objective
     tax_harvest_haircut: float = 1.0  # how usable a realised loss is; sensitivity parameter
     wash_block: bool = False         # forbid repurchasing a name inside the s1091 window
+    borrow_fee_proxy_name: str | None = None
+    borrow_fee_proxy_annual: float | None = None
     # Price of breaching a drift-sensitive bound (gross, dollar-neutrality, factor exposures).
     # Large relative to the objective, whose terms are O(1e-3), so a bound is respected exactly
     # whenever the trade caps permit; it only bends when the alternative is an infeasible solve.
@@ -63,6 +67,7 @@ class OptimizerConfig:
         cfg = cfg or load_config("base")
         pcfg = portfolio_cfg or read_yaml(paths.REPO_ROOT / "configs" / "portfolio.yaml")
         p, c = cfg["portfolio"], cfg["costs"]
+        borrow_proxy = borrow_fee_proxy_from_cost_config(c)
         return OptimizerConfig(
             gross_max=float(p["gross_max"]), dollar_neutral=bool(p["dollar_neutral"]),
             beta_abs_max=float(p["beta_abs_max"]), industry_abs_max=float(p["industry_abs_max"]),
@@ -73,7 +78,14 @@ class OptimizerConfig:
             max_seconds=float(pcfg.get("solver", {}).get("max_seconds", 30)),
             long_only=bool(pcfg.get("long_only_variant", {}).get("enabled", False)),
             tracking_error_max=float(pcfg.get("long_only_variant", {}).get("tracking_error_max", 0.04)),
+            borrow_fee_proxy_name=borrow_proxy.name if borrow_proxy else None,
+            borrow_fee_proxy_annual=borrow_proxy.annual_rate if borrow_proxy else None,
         )
+
+    def borrow_fee_proxy(self) -> BorrowFeeProxy | None:
+        if self.borrow_fee_proxy_name is None or self.borrow_fee_proxy_annual is None:
+            return None
+        return BorrowFeeProxy(self.borrow_fee_proxy_name, self.borrow_fee_proxy_annual)
 
 
 @dataclass
@@ -139,7 +151,27 @@ def solve_escalating(problem, w, cfg: OptimizerConfig, date, breach_fn=None) -> 
     best = None            # (breach, status_rank, w_value, solver, status)
     for solver in available_solvers(cfg.solver_order):
         try:
-            problem.solve(solver=getattr(cp, solver), verbose=False)
+            # The tax-aware objective can distinguish two books whose aggregate
+            # sales differ by only a few parts in 1e6.  Default conic tolerances
+            # are too loose at that scale and previously allowed numerical
+            # residue to reverse the intended tax-deferral ordering.  Tighten
+            # tolerances without changing the optimisation problem itself.
+            solver_options = {
+                "CLARABEL": {
+                    "tol_gap_abs": 1e-10,
+                    "tol_gap_rel": 1e-10,
+                    "tol_feas": 1e-10,
+                    "max_iter": 500,
+                },
+                "SCS": {"eps": 1e-7, "max_iters": 100_000},
+                "ECOS": {
+                    "abstol": 1e-10,
+                    "reltol": 1e-10,
+                    "feastol": 1e-10,
+                    "max_iters": 1_000,
+                },
+            }.get(solver, {})
+            problem.solve(solver=getattr(cp, solver), verbose=False, **solver_options)
             if w.value is None or problem.status not in {"optimal", "optimal_inaccurate"}:
                 continue
             value = np.asarray(w.value).ravel().copy()
@@ -307,7 +339,20 @@ def construct(date, alpha: pd.Series, w_prev: pd.Series | None, risk: RiskModel,
     import cvxpy as cp
 
     cfg = cfg or OptimizerConfig.from_files()
+    held_without_costs = ineligible_held_permnos(date, cost_inputs, w_prev)
+    if len(held_without_costs):
+        # A missing spread/sigma/ADV row makes a security non-tradeable.  If it
+        # is already held, dropping it from the optimisation universe would be
+        # an unpriced liquidation.  Hold the entire prior book and surface a
+        # failed status instead.
+        held = w_prev.copy() if w_prev is not None else pd.Series(dtype=float)
+        return OptimizationResult(
+            held,
+            "failed_hold_missing_cost",
+            diagnostics={"ineligible_held_permnos": held_without_costs.tolist()},
+        )
     permnos = alpha.dropna().index
+    permnos = eligible_cost_input_permnos(date, cost_inputs, permnos)
     risk = risk.align(permnos)
     n = len(permnos)
     if n < 10:
@@ -316,7 +361,7 @@ def construct(date, alpha: pd.Series, w_prev: pd.Series | None, risk: RiskModel,
     a = alpha.reindex(permnos).to_numpy(dtype=float)
     prev = (w_prev.reindex(permnos).fillna(0.0).to_numpy(dtype=float)
             if w_prev is not None else np.zeros(n))
-    ci = cost_inputs_for(date, cost_inputs, permnos)
+    ci = cost_inputs_for(date, cost_inputs, permnos, borrow_fee_proxy=cfg.borrow_fee_proxy())
     spread = ci["spread"].to_numpy() * cfg.cost_multiplier
     sigma_d = ci["sigma_d"].to_numpy()
     adv = ci["adv_usd"].to_numpy()
@@ -400,13 +445,14 @@ def project(date, w_prop: pd.Series, risk: RiskModel, cost_inputs: pd.DataFrame,
 
     cfg = cfg or OptimizerConfig.from_files()
     permnos = w_prop.dropna().index
+    permnos = eligible_cost_input_permnos(date, cost_inputs, permnos)
     risk = risk.align(permnos)
     n = len(permnos)
     if n < 10:
         return OptimizationResult(pd.Series(dtype=float), "too_few_assets")
 
     target = w_prop.reindex(permnos).to_numpy(dtype=float)
-    ci = cost_inputs_for(date, cost_inputs, permnos)
+    ci = cost_inputs_for(date, cost_inputs, permnos, borrow_fee_proxy=cfg.borrow_fee_proxy())
     adv_cap = np.clip(ci["adv_usd"].to_numpy() * cfg.adv_participation_max / cfg.aum_usd, 1e-6, None)
     pos_cap = np.minimum(cfg.weight_abs_max, np.maximum(adv_cap, 1e-5))
     beta = risk.B["beta"].to_numpy(dtype=float)

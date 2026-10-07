@@ -20,7 +20,7 @@ from dataclasses import dataclass
 import numpy as np
 import pandas as pd
 
-from ..portfolio.cost_terms import impact_coefficient
+from ..portfolio.cost_terms import BorrowFeeProxy, MissingCostInput, impact_coefficient
 from ..risk.cache import RiskCache
 
 
@@ -39,7 +39,8 @@ class MonthBatch:
 
 
 def prepare_months(df: pd.DataFrame, features: list[str], risk: RiskCache, aum: float, impact_k: float,
-                   commission_bps: float, max_months: int | None = None) -> list[MonthBatch]:
+                   commission_bps: float, max_months: int | None = None,
+                   borrow_fee_proxy: BorrowFeeProxy | None = None) -> list[MonthBatch]:
     """Build the per-month tensors the policy trains on (most recent ``max_months`` months)."""
     out: list[MonthBatch] = []
     dates = sorted(df["date"].unique())
@@ -47,6 +48,10 @@ def prepare_months(df: pd.DataFrame, features: list[str], risk: RiskCache, aum: 
         dates = dates[-max_months:]
     for date in dates:
         d = df[(df["date"] == date) & df["ret_next"].notna()]
+        market_ok = d[["spread", "sigma_d", "adv_usd"]].notna().all(axis=1)
+        market_ok &= np.isfinite(d[["spread", "sigma_d", "adv_usd"]]).all(axis=1)
+        market_ok &= d["spread"].ge(0) & d["sigma_d"].ge(0) & d["adv_usd"].gt(0)
+        d = d.loc[market_ok].copy()
         if len(d) < 30:
             continue
         mr = risk.monthly(date)
@@ -58,13 +63,22 @@ def prepare_months(df: pd.DataFrame, features: list[str], risk: RiskCache, aum: 
         pos = pos[keep]
         spread = d["spread"].to_numpy(dtype=float)
         lin = 0.5 * spread + commission_bps / 10_000.0
+        borrow = d["borrow_fee"].astype(float).copy()
+        missing_borrow = borrow.isna()
+        if missing_borrow.any():
+            if borrow_fee_proxy is None:
+                raise MissingCostInput(
+                    f"{pd.Timestamp(date).date()}: economic policy has missing borrow fees "
+                    "without an explicit MODELLED proxy"
+                )
+            borrow.loc[missing_borrow] = borrow_fee_proxy.annual_rate
         out.append(MonthBatch(
             date=pd.Timestamp(date), permnos=d["permno"].to_numpy(),
             X=np.nan_to_num(d[features].to_numpy(dtype="float32"), nan=0.0),
             r=d["ret_next"].to_numpy(dtype="float32"),
             spread=lin.astype("float32"),
             impact=impact_coefficient(d["sigma_d"].to_numpy(), d["adv_usd"].to_numpy(), aum, impact_k).astype("float32"),
-            borrow=(d["borrow_fee"].to_numpy(dtype=float) / 12.0).astype("float32"),
+            borrow=(borrow.to_numpy(dtype=float) / 12.0).astype("float32"),
             B=mr.B[pos].astype("float32"), L=mr.L.astype("float32"), d=mr.d[pos].astype("float32"),
         ))
     return out

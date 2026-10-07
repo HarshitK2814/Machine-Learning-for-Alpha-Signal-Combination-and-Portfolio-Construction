@@ -27,6 +27,7 @@ from enum import Enum
 import numpy as np
 import pandas as pd
 
+from .dated import DatedC12Patch, DatedTaxLot, RealisedTaxEvent
 from .regimes import TaxRegime
 
 
@@ -48,6 +49,10 @@ class Lot:
     value: float
     side: int = 1
     washed_from: pd.Timestamp | None = None  # s1223(3): holding period tacked from a washed lot
+    dated_basis_local: float | None = None
+    dated_currency: str | None = None
+    dated_acquisition_rule_id: str | None = None
+    statutory_reference_local: float | None = None
 
     @property
     def unrealised(self) -> float:
@@ -80,6 +85,7 @@ class RealisedGain:
     amount: float            # signed: positive is a gain
     long_term: bool
     disallowed: float = 0.0  # portion denied by s1091 and rolled into a replacement lot's basis
+    dated_event: RealisedTaxEvent | None = None
 
     @property
     def allowed(self) -> float:
@@ -105,6 +111,9 @@ class TaxLotLedger:
 
     regime: TaxRegime
     method: LotMethod = LotMethod.HIFO
+    dated_engine: DatedC12Patch | None = None
+    dated_country: str | None = None
+    dated_currency: str | None = None
     lots: dict[int, list[Lot]] = field(default_factory=dict)
     realised: list[RealisedGain] = field(default_factory=list)
     _pending_losses: list[_PendingLoss] = field(default_factory=list)
@@ -160,6 +169,7 @@ class TaxLotLedger:
         if value <= 0:
             raise ValueError("buy value must be positive")
         lot = Lot(permno=permno, open_date=date, basis=value, value=value, side=1)
+        self._attach_dated_acquisition(lot, date, value)
         if self.regime.wash_sale_rule:
             self._apply_wash(lot, date, value)
         self.lots.setdefault(permno, []).append(lot)
@@ -171,6 +181,7 @@ class TaxLotLedger:
         if value <= 0:
             raise ValueError("short value must be positive")
         lot = Lot(permno=permno, open_date=date, basis=value, value=value, side=-1)
+        self._attach_dated_acquisition(lot, date, value)
         self.lots.setdefault(permno, []).append(lot)
         return lot
 
@@ -186,9 +197,16 @@ class TaxLotLedger:
             take = min(lot.value, remaining)
             fraction = take / lot.value if lot.value > 0 else 0.0
             gain = side * (take - lot.basis * fraction)
+            dated_event = self._dated_realisation(lot, date, take, fraction)
             rg = RealisedGain(date=date, permno=permno, amount=gain,
-                              long_term=self._is_long_term(lot, date, closing_short=(side == -1)))
+                              long_term=(dated_event.long_term if dated_event is not None else
+                                         self._is_long_term(lot, date, closing_short=(side == -1))),
+                              dated_event=dated_event)
             lot.basis -= lot.basis * fraction
+            if lot.dated_basis_local is not None:
+                lot.dated_basis_local -= lot.dated_basis_local * fraction
+            if lot.statutory_reference_local is not None:
+                lot.statutory_reference_local -= lot.statutory_reference_local * fraction
             lot.value -= take
             remaining -= take
             if gain < 0 and self.regime.wash_sale_rule:
@@ -267,6 +285,29 @@ class TaxLotLedger:
                     out += self.sell(permno, date, value, side=side)
         return out
 
+    def snapshot_statutory_references(self, date) -> None:
+        """Freeze lot-level FMV on a statutory reference date.
+
+        The validated security table supplies a high/close price ratio.  Applying
+        it to each lot's close value preserves units and the security-specific
+        statutory high without pretending a per-share price is a whole-lot basis.
+        """
+        if self.dated_engine is None or self.dated_country != "IND":
+            return
+        date = pd.Timestamp(date)
+        if date != pd.Timestamp("2018-01-31"):
+            return
+        assert self.dated_currency is not None
+        for permno, lots in self.lots.items():
+            reference = self.dated_engine.config.reference_values.get("IND", permno, date)
+            if reference.currency != self.dated_currency:
+                raise ValueError("section 112A reference currency mismatch")
+            for lot in lots:
+                if lot.side != 1 or lot.open_date >= pd.Timestamp("2018-02-01"):
+                    continue
+                close_local = self._accounting_to_local(lot.value, date)
+                lot.statutory_reference_local = close_local * reference.high_to_close_ratio
+
     # ---------------------------------------------------------------- internals
     def _order(self, lots: list[Lot], asof: pd.Timestamp) -> list[Lot]:
         if self.method is LotMethod.FIFO:
@@ -293,6 +334,59 @@ class TaxLotLedger:
     def _rate(self, lot: Lot, date: pd.Timestamp, closing_short: bool) -> float:
         lt = self._is_long_term(lot, date, closing_short)
         return self.regime.long_term_rate if lt else self.regime.short_term_rate
+
+    def _attach_dated_acquisition(self, lot: Lot, date: pd.Timestamp, value: float) -> None:
+        if self.dated_engine is None:
+            return
+        if not self.dated_country or not self.dated_currency:
+            raise ValueError("dated country and statutory local currency are required")
+        local_basis = self._accounting_to_local(value, date)
+        dated = self.dated_engine.acquire(
+            self.dated_country, lot.permno, date, basis=local_basis,
+            currency=self.dated_currency, side=lot.side,
+        )
+        lot.dated_basis_local = dated.basis
+        lot.dated_currency = dated.currency
+        lot.dated_acquisition_rule_id = dated.acquisition_rule_id
+
+    def _dated_realisation(self, lot: Lot, date: pd.Timestamp, take: float,
+                           fraction: float) -> RealisedTaxEvent | None:
+        if self.dated_engine is None:
+            return None
+        if lot.dated_basis_local is None or lot.dated_currency is None or not self.dated_country:
+            raise ValueError("dated lot acquisition state is missing")
+        dated_lot = DatedTaxLot(
+            country=self.dated_country,
+            security_id=lot.permno,
+            acquisition_date=lot.open_date,
+            basis=lot.dated_basis_local * fraction,
+            currency=lot.dated_currency,
+            acquisition_rule_id=str(lot.dated_acquisition_rule_id),
+            side=lot.side,
+            statutory_reference_value=(
+                None if lot.statutory_reference_local is None
+                else lot.statutory_reference_local * fraction
+            ),
+        )
+        return self.dated_engine.realise(
+            dated_lot, date, sale_value=self._accounting_to_local(take, date),
+            currency=lot.dated_currency,
+        )
+
+    def _accounting_to_local(self, amount: float, date: pd.Timestamp) -> float:
+        assert self.dated_engine is not None and self.dated_currency is not None
+        accounting = self.dated_engine.config.accounting_currency
+        if accounting == self.dated_currency:
+            return float(amount)
+        provider = self.dated_engine.config.fx_provider
+        if provider is None:
+            raise ValueError(
+                f"point-in-time FX is required for {self.dated_currency}->{accounting}"
+            )
+        rate = float(provider(self.dated_currency, accounting, pd.Timestamp(date)))
+        if rate <= 0:
+            raise ValueError("FX rate must be positive")
+        return float(amount / rate)
 
     def _register_loss(self, rg: RealisedGain, date: pd.Timestamp, permno: int, magnitude: float) -> None:
         """s1091 looking backwards: a purchase in the 30 days *before* the loss sale disallows it."""

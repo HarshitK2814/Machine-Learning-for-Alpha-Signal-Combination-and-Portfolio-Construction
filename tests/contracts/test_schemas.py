@@ -61,3 +61,46 @@ def test_dates_must_be_calendar_month_end():
     """
     with pytest.raises(SchemaError, match="calendar month-end"):
         validate(_universe_row(1, date="1972-12-29"), "universe")
+
+@pytest.mark.parametrize(
+    "column",
+    ["me", "price", "exchcd", "nyse_size_pct"],
+)
+def test_universe_descriptors_may_be_missing_when_not_in_universe(column):
+    """Missing descriptors are allowed on preserved, non-investible spine rows."""
+    df = _universe_row(1)
+    df["in_universe"] = False
+
+    if column == "exchcd":
+        df[column] = pd.Series([pd.NA], dtype="Int32")
+    else:
+        df[column] = np.nan
+
+    validate(df, "universe")
+
+
+@pytest.mark.parametrize(
+    "column",
+    ["me", "price", "exchcd", "nyse_size_pct"],
+)
+def test_universe_descriptors_cannot_be_missing_when_in_universe(column):
+    """An investible C1 row must have every descriptor needed downstream."""
+    df = _universe_row(1)
+
+    if column == "exchcd":
+        df[column] = pd.Series([pd.NA], dtype="Int32")
+    else:
+        df[column] = np.nan
+
+    with pytest.raises(SchemaError, match="in_universe=True"):
+        validate(df, "universe")
+
+
+def test_ff49_remains_nonnullable_even_off_universe():
+    """Unknown industry is represented by 0, never by a missing FF49."""
+    df = _universe_row(0)
+    df["in_universe"] = False
+    df["ff49"] = pd.Series([pd.NA], dtype="Int32")
+
+    with pytest.raises(SchemaError, match="contains nulls"):
+        validate(df, "universe")

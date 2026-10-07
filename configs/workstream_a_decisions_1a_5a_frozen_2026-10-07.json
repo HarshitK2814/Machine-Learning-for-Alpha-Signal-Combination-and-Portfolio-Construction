@@ -1,0 +1,25 @@
+{
+  "status": "SUPERSEDED_BY_workstream_a_frozen_decisions.json",
+  "approved_by": "project lead (approval recorded in Codex thread; personal name not supplied)",
+  "approval_date": "2026-10-07",
+  "approval_reference": "Codex thread: approve 1A-5A; reject 6C pending explicit borrow-fee proxy decision",
+  "decisions": {
+    "representative_taxable_investor_rate_paths": "1A__dated_top_marginal_resident_individual_rates",
+    "allowance_allocation": "2C__explicit_zero_allocation_allowance_consumed_elsewhere",
+    "statutory_currency_FX_timing": "3A__event_date_spot_and_tax_year_end_spot_previous_business_day",
+    "brokerage_platform_fee_scope": "4A__exclude_from_C14_retain_in_execution_cost_model",
+    "pre_2003_Japan_taxpayer_route": "5A__comprehensive_return_declaration_route"
+  },
+  "decision_6": {
+    "status": "PENDING_FINAL_APPROVAL",
+    "rejected_option": "6C__long_only_headline_experiment",
+    "reason": "Long-only is incompatible with the frozen dollar-neutral Workstream-B portfolio contract except at the zero portfolio and would change the research design.",
+    "prohibited_until_approved": [
+      "implicit_25bp_fill",
+      "zero_fill",
+      "presentation_of_any_proxy_as_observed_or_vendor_data",
+      "real_data_result_run"
+    ],
+    "candidate_document": "data/intl_c14/audit/BORROW_FEE_PROXY_CANDIDATE_2026-10-07.md"
+  }
+}

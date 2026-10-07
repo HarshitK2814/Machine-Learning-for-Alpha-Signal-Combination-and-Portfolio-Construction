@@ -14,7 +14,8 @@ from dataclasses import dataclass, field
 import numpy as np
 import pandas as pd
 
-VERSION = "1.2.0"   # 1.2.0: ff49 domain {0} | 1..49 with 0 = Unknown Industry; month-end date check
+VERSION = "1.3.0"   # 1.3.0: C1 descriptors nullable off-universe, complete when in_universe=True
+                    # 1.2.0: ff49 domain {0} | 1..49 with 0 = Unknown Industry; month-end date check
                     # 1.1.0: optional targets.div_next (additive, no breaking change)
 
 
@@ -63,9 +64,9 @@ SCHEMAS: dict[str, Schema] = {
             Column("date", "date"),
             Column("permno", "int"),
             Column("in_universe", "bool"),
-            Column("me", "float", minimum=0.0),
-            Column("price", "float", minimum=0.0),
-            Column("exchcd", "int"),
+            Column("me", "float", minimum=0.0, nullable=True),
+            Column("price", "float", minimum=0.0, nullable=True),
+            Column("exchcd", "int", nullable=True),
             # 0 = Unknown Industry: the security is retained in the universe but has no
             # defensible contemporaneous FF49. Absar's US C1 pilot (26 Sep 2026) found 3,763 of
             # 83,596 investible stock-months in this state - 3,725 with CRSP SICCD=0 and 38 with
@@ -76,7 +77,7 @@ SCHEMAS: dict[str, Schema] = {
             # accepted -1 and 9999 silently, and a typo'd industry code would have become a new
             # risk factor and a new neutrality constraint without anything objecting.
             Column("ff49", "int", allowed=frozenset(range(0, 50))),
-            Column("nyse_size_pct", "float", minimum=0.0, maximum=100.0),
+            Column("nyse_size_pct","float",minimum=0.0, maximum=100.0, nullable=True),
         ),
     ),
     "signals": Schema(
@@ -254,6 +255,26 @@ def validate(df: pd.DataFrame, name: str, *, allow_empty: bool = False) -> pd.Da
                     f"Normalise with `+ pd.offsets.MonthEnd(0)` and keep any true trading date in a "
                     f"separate column.")
 
+    # C1 preserves the full historical security-month spine. Descriptive
+    # fields may be unavailable on rows that are not investible, but every
+    # investible row must be complete for downstream portfolio construction.
+    if name == "universe":
+        investible = df["in_universe"]
+
+        required_when_investible = (
+            "me",
+            "price",
+            "exchcd",
+            "nyse_size_pct",
+        )
+
+        for col_name in required_when_investible:
+            bad = investible & df[col_name].isna()
+            if bad.any():
+                n_bad = int(bad.sum())
+                raise SchemaError(
+                    f"universe (C1): '{col_name}' contains {n_bad} null(s) "
+                    "where in_universe=True")
     for prefix, kind in s.prefixes:
         matches = [c for c in df.columns if c.startswith(prefix)]
         needed = s.min_prefix_matches.get(prefix, 0)

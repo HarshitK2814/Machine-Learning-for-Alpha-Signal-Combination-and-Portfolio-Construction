@@ -166,7 +166,10 @@ def test_optimiser_with_tax_awareness_holds_embedded_gains(small_panel):
 
     sold_blind = float(np.clip(prev[winners] - blind.weights.reindex(winners).fillna(0), 0, None).sum())
     sold_aware = float(np.clip(prev[winners] - aware.weights.reindex(winners).fillna(0), 0, None).sum())
-    assert sold_aware <= sold_blind + 1e-9, "the tax term must not increase sales of embedded gains"
+    # Both solves are conic and the solutions are only identified to solver
+    # feasibility tolerance.  The economically relevant condition is therefore
+    # one-sided up to sub-micro-weight numerical residue, not machine epsilon.
+    assert sold_aware <= sold_blind + 5e-7, "the tax term must not increase sales of embedded gains"
 
 
 def test_harvesting_variable_does_not_freeze_short_positions():
