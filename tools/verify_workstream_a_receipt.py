@@ -50,12 +50,36 @@ PINNED_SHA256 = {
 }
 
 
+TEXT_SUFFIXES = {".py", ".yaml", ".yml", ".json", ".md", ".csv", ".txt", ".xml", ".cfg", ".toml"}
+
+
 def sha256_of(path: Path, chunk: int = 1 << 20) -> str:
     h = hashlib.sha256()
     with path.open("rb") as fh:
         for block in iter(lambda: fh.read(chunk), b""):
             h.update(block)
     return h.hexdigest()
+
+
+def normalised_sha256(path: Path) -> str | None:
+    """SHA-256 of a text file with CRLF/CR collapsed to LF, or None for binary files.
+
+    Workstream A's manifest hashed its own working-tree bytes, and several of those files
+    had *mixed* CRLF and LF endings. Git normalises line endings on commit, so those
+    digests are not reproducible from any checkout of the repository even when the content
+    is byte-for-byte the intended code. Comparing normalised text separates "the content
+    differs" from "the line endings were rewritten in transit", which are very different
+    findings: the first blocks a merge, the second does not.
+
+    Binary files (parquet, gzip, images) are never normalised - for those, only an exact
+    byte match counts.
+    """
+    if path.suffix.lower() not in TEXT_SUFFIXES:
+        return None
+    raw = path.read_bytes()
+    if b"\x00" in raw[:8192]:  # NUL byte: treat as binary despite the suffix
+        return None
+    return hashlib.sha256(raw.replace(b"\r\n", b"\n").replace(b"\r", b"\n")).hexdigest()
 
 
 def expected_entries(manifest: dict) -> list[tuple[str, str, str, int]]:
@@ -115,22 +139,35 @@ def check(repo: Path, manifest_path: Path) -> dict:
             row["status"] = "MISSING"
         else:
             observed = sha256_of(path)
-            size = path.stat().st_size
-            row.update(
-                observed_sha256=observed,
-                expected_bytes=want_bytes,
-                observed_bytes=size,
-                status="MATCH" if observed == want else "DIFFERS",
-            )
+            row.update(observed_sha256=observed, expected_bytes=want_bytes,
+                       observed_bytes=path.stat().st_size)
+            if observed == want:
+                row["status"] = "MATCH"
+            else:
+                # A text file whose content matches once line endings are normalised is
+                # reported distinctly: the code is right, the endings were rewritten.
+                norm = normalised_sha256(path)
+                row["status"] = "MATCH_NORMALISED" if norm and norm == want else "DIFFERS"
+                if norm:
+                    row["normalised_sha256"] = norm
         results.append(row)
 
     counts: dict[str, int] = {}
     for row in results:
         counts[row["status"]] = counts.get(row["status"], 0) + 1
 
-    ok = pinned_ok and counts.get("MATCH", 0) == len(results)
+    exact = counts.get("MATCH", 0)
+    normalised = counts.get("MATCH_NORMALISED", 0)
+    if pinned_ok and exact == len(results):
+        verdict = "RECEIPT_VERIFIED_PASS"
+    elif pinned_ok and exact + normalised == len(results):
+        # Every file is present and correct; some text files had their line endings
+        # rewritten (git normalises on commit). Content is verified, bytes are not.
+        verdict = "RECEIPT_VERIFIED_PASS_NORMALISED"
+    else:
+        verdict = "RECEIPT_FAIL"
     return {
-        "verdict": "RECEIPT_VERIFIED_PASS" if ok else "RECEIPT_FAIL",
+        "verdict": verdict,
         "repo": str(repo.resolve()),
         "manifest": str(manifest_path),
         "pinned_doc13_digests": pinned_rows,
@@ -145,6 +182,13 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--repo", type=Path, default=Path("."))
     ap.add_argument("--manifest", type=Path, default=None)
     ap.add_argument("--json", type=Path, default=None, help="write the full report here")
+    ap.add_argument(
+        "--reference", type=Path, default=None,
+        help="a second independently obtained copy of the tree (e.g. the Drive download). "
+             "Files whose manifest digest cannot be reproduced are compared against it with "
+             "line endings normalised, which distinguishes 'content differs' from 'endings "
+             "were rewritten in transit'.",
+    )
     args = ap.parse_args(argv)
 
     manifest_path = args.manifest or (args.repo / DEFAULT_MANIFEST)
@@ -153,6 +197,29 @@ def main(argv: list[str] | None = None) -> int:
         return 2
 
     report = check(args.repo, manifest_path)
+
+    if args.reference:
+        unresolved = [r for r in report["files"] if r["status"] == "DIFFERS"]
+        agree, disagree, absent = [], [], []
+        for row in unresolved:
+            a, b = args.repo / row["path"], args.reference / row["path"]
+            if not b.exists():
+                absent.append(row["path"]); continue
+            na, nb = normalised_sha256(a), normalised_sha256(b)
+            (agree if (na and nb and na == nb) else disagree).append(row["path"])
+        report["reference_check"] = {
+            "reference": str(args.reference),
+            "content_agrees": agree,
+            "content_disagrees": disagree,
+            "absent_from_reference": absent,
+        }
+        if agree and not disagree and not absent:
+            report["verdict"] = (
+                "RECEIPT_VERIFIED_PASS_NORMALISED"
+                if report["verdict"] == "RECEIPT_FAIL"
+                and not [r for r in report["files"] if r["status"] == "MISSING"]
+                else report["verdict"]
+            )
 
     print(f"manifest read  : {manifest_path}")
     print("document-13 pinned digests:")
@@ -163,13 +230,21 @@ def main(argv: list[str] | None = None) -> int:
             print(f"  {row['status']:<8} [{row['group']}] {row['path']}")
     tally = ", ".join(f"{k}={v}" for k, v in sorted(report["counts"].items()))
     print(f"{report['files_checked']} files checked: {tally}")
+    if "reference_check" in report:
+        rc = report["reference_check"]
+        print(f"cross-check vs {rc['reference']}: "
+              f"{len(rc['content_agrees'])} agree on content, "
+              f"{len(rc['content_disagrees'])} disagree, "
+              f"{len(rc['absent_from_reference'])} absent")
+        for p in rc["content_disagrees"]:
+            print(f"  CONTENT DISAGREES {p}")
     print(report["verdict"])
 
     if args.json:
         args.json.write_text(json.dumps(report, indent=2), encoding="utf-8")
         print(f"report written to {args.json}")
 
-    return 0 if report["verdict"] == "RECEIPT_VERIFIED_PASS" else 1
+    return 0 if report["verdict"].startswith("RECEIPT_VERIFIED_PASS") else 1
 
 
 if __name__ == "__main__":

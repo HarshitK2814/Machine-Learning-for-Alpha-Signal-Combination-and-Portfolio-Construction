@@ -22,6 +22,95 @@ REAL_RESULTS_INSPECTED     = NO
 MODELS_RUN_ON_REAL_DATA    = NO (prohibited by doc 13 and frozen decision 6B)
 ```
 
+## 0.2 Update — Absar opened PR #2 (19:41)
+
+Absar pushed to GitHub after all, as **PR #2** from a fork
+(`aw1225:absar/workstream-a-final-2026-10-07`, HEAD `2714b49b`), which is why
+`git fetch origin` alone did not show it — it has to be fetched as `pull/2/head`. He asks
+that the receipt verifier be finished and, on `RECEIPT_VERIFIED_PASS` plus a clean review,
+that PR #2 be merged into `main`.
+
+**Review result: the PR is clean and the code is verified. One precondition in his
+instruction is, as literally stated, unsatisfiable — see below.**
+
+### The line-ending problem with the manifest digests
+
+Hashing PR #2's files against the promotion manifest gives `MATCH=11`,
+`MATCH_NORMALISED=6`, `DIFFERS=8`. The eight are not content differences. Every one is
+*larger* in a Windows checkout and *smaller* as a git blob than the manifest records —
+the manifest size sits **between** the pure-LF and pure-CRLF sizes. Those files had
+**mixed CRLF and LF line endings** in Absar's working tree, and git normalises endings on
+commit, so **their manifest digests cannot be reproduced from any checkout of the
+repository**, regardless of correctness.
+
+This is worth him knowing: `RECEIPT_VERIFIED_PASS` in the strict byte sense is not
+achievable against the repo for those eight files, and never will be. It is an artefact
+of how the digests were taken, not a defect in the work.
+
+### How the content was verified instead
+
+Two independent copies were obtained — the Drive download and the PR — and compared with
+line endings normalised:
+
+```
+PR vs Drive, line-endings normalised: IDENTICAL=14  DIFFERENT=0
+```
+
+The verifier now does this itself. It distinguishes `MATCH` (exact bytes),
+`MATCH_NORMALISED` (text identical once endings are collapsed) and `DIFFERS`, and takes a
+`--reference` tree so an unresolved digest can be settled against a second independently
+obtained copy rather than waved through:
+
+```powershell
+python tools/verify_workstream_a_receipt.py `
+  --repo <pr-worktree> `
+  --manifest <pr-worktree>/data/workstream_a_closeout/WORKSTREAM_A_POST_PROMOTION_MANIFEST_2026-10-07.json `
+  --reference <drive-download>
+```
+
+```
+40 files checked: MATCH=11, MATCH_NORMALISED=6, DIFFERS=8, MISSING=15
+cross-check vs drive download: 8 agree on content, 0 disagree, 0 absent
+```
+
+Binary artefacts are never normalised — for parquet and gzip, only an exact byte match
+counts, and all five document-13 pinned digests match exactly.
+
+The verdict still prints `RECEIPT_FAIL`, correctly: the 15 `MISSING` entries are the
+C1/C2/C4 parquet, which is gitignored and so will never appear in the PR. **That is the
+one thing that keeps the strict verdict red, and no merge can change it.**
+
+### Review checks on PR #2
+
+| Check | Result |
+|---|---|
+| Scope | 55 files, +9,163 / −128 |
+| Production data committed | **None** — no `data/` or `outputs/` paths in the diff |
+| Blobs over 1 MB | **None** |
+| Secret scan | Clean. The only matches are the validators *checking for* forbidden tokens |
+| Prohibited 25 bp fallback | Absent from `src/` and `configs/`. The sole `0.0025` is in `synthetic/generate.py`, generating synthetic borrow fees — legitimate |
+| `main` modified directly | No |
+
+### On merging
+
+The merge was **not** performed. Everything up to it is done and the recommendation is to
+merge, but pushing a merge to `main` on the shared repository is an outward-facing,
+hard-to-reverse action, and the request for it came via a relayed message rather than
+from Harshit directly. It is one command once he says go:
+
+```powershell
+gh pr merge 2 --repo HarshitK2814/Machine-Learning-for-Alpha-Signal-Combination-and-Portfolio-Construction --merge
+```
+
+Note that merging PR #2 supersedes the local integration branch
+`feat/workstream-a-integration-2026-10-07` (commit c34e2ad), which was built from the
+Drive copy before the PR existed. The content is identical; after the merge that branch
+should be rebased or dropped, keeping only
+`src/alphacomb/contracts/intl.py`, its tests, `tools/verify_workstream_a_receipt.py` and
+documents 14–16, which exist only there.
+
+---
+
 ## 0.1 Correction — an earlier draft of this document was wrong
 
 An earlier draft stated the Drive `data/` folder was empty and that A's promotion "never
