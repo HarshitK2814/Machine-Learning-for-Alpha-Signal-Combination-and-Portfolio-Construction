@@ -144,3 +144,40 @@ Such a run is legitimate as a labelled diagnostic of *why* the registered effect
 is not legitimate as a replacement headline, and choosing an AUM because its results look better is
 precisely the specification search frozen decision 6B exists to prevent. If it is run, it is
 reported as exploratory, alongside the registered scenarios, never instead of them.
+
+### How small would AUM have to be for the cap to stop binding?
+
+Cheap to answer, and it carries no selection risk: the capacity ceiling is a property of the
+universe, computed from ADV alone, with no strategy formed and no performance involved. At
+2014-06-30 (253 eligible names, median ADV $0.84m):
+
+| AUM | max attainable gross | share of names ADV-capped |
+|---|---|---|
+| $50m | 0.841 | 79.5% |
+| $100m | 0.622 | 87.4% |
+| $250m | 0.414 | 91.3% |
+| $500m | 0.297 | 93.7% |
+| **$1bn (registered)** | **0.202** | **97.6%** |
+| **$10bn (registered)** | **0.024** | **100.0%** |
+
+The constraint never fully relaxes anywhere near a plausible AUM. Even at $50m - a twentieth of the
+registered baseline - four names in five are still capped and the attainable gross is 0.84 against
+a budget of 2.0. Reaching the full budget would need an AUM of order $20m, which is not a fund.
+
+So the earlier framing needs tightening: this is not "the registered AUM happens to be too large".
+**The German tradeable panel cannot support a 100/100 market-neutral book at 5% participation at
+any institutionally meaningful size.** The capacity result is a statement about the market, not
+about the choice of scenario, and the registered {1e9, 1e10} grid is bracketing a universe that was
+already constrained before the grid was written.
+
+That makes the exploratory small-AUM diagnostic less interesting than it first appeared - it cannot
+produce an unconstrained benchmark, only a less constrained one - and makes the capacity finding
+itself more central to the paper.
+
+### Side effect worth recording: the held books were not dollar neutral
+
+The stale pre-fix weights show mean |net| of 0.021-0.026 against gross of 0.060-0.140 - up to 35%
+net exposure in a design that claims dollar neutrality. Holding a drifting book abandons the
+neutrality constraint along with everything else, because nothing is re-solved. The refreshed cells
+report mean |net| of exactly 0.0000. Another reason a held month is not comparable to a solved one,
+beyond the staleness itself.
