@@ -154,7 +154,15 @@ def main(argv: list[str] | None = None) -> int:
 
     if not missing:
         report = factorial.attribution_report(cells, periods=args.periods)
+        # State the estimation window rather than letting the table imply the full sample.
+        n_used = report["cells"].attrs.get("n_months")
+        dropped = report["cells"].attrs.get("months_dropped", 0)
+        print(f"months in panel  : {len(cells)}")
+        print(f"months estimated : {n_used}" + (f"  ({dropped} dropped as unbalanced)"
+                                                if dropped else "  (balanced)"))
         for key, table in report.items():
+            if key == "balance" and not len(table):
+                continue
             path = args.out / f"e29_{key}.csv"
             table.to_csv(path)
             print(f"wrote {path}")

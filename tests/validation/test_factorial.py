@@ -174,11 +174,45 @@ def test_unbalanced_panel_raises_rather_than_silently_comparing_periods():
         factorial.factorial_effects(df)
 
 
-def test_partial_missing_months_warn():
+def test_partial_missing_months_raise_by_default():
+    """A few missing months must not silently move the window of every effect at once.
+
+    This asserted a warning until 8 October 2026, which is what the code did - but the function's
+    own docstring promised a raise, and a warning on a headline table is not a control: it does not
+    appear in the exhibit and nothing downstream records that the sample changed.
+    """
     df = simulate({"nonlinear": 0.003}, n_months=100)
     df.iloc[:60, 0] = np.nan
-    with pytest.warns(UserWarning, match="months to missing cells"):
+    with pytest.raises(ValueError, match="unbalanced"):
         factorial.factorial_effects(df)
+
+
+def test_balanced_subset_is_available_but_must_be_asked_for():
+    df = simulate({"nonlinear": 0.003}, n_months=100)
+    df.iloc[:60, 0] = np.nan
+    eff = factorial.factorial_effects(df, require_balanced=False)
+    assert len(eff) == 15
+    assert (eff["n_months"] == 40).all(), "effects must be estimated on the balanced subset only"
+
+
+def test_unbalanced_months_lists_the_offending_cells():
+    df = simulate({"nonlinear": 0.003}, n_months=100)
+    df.iloc[:3, 0] = np.nan
+    df.iloc[5, 2] = np.nan
+    bad = factorial.unbalanced_months(df)
+    assert len(bad) == 4
+    assert df.columns[0] in bad["cells"].iloc[0]
+    assert df.columns[2] in bad["cells"].iloc[-1]
+    assert (bad["n_missing"] == 1).all()
+
+
+def test_report_records_the_estimation_window():
+    df = simulate({"nonlinear": 0.003}, n_months=100)
+    df.iloc[:10, 0] = np.nan
+    rep = factorial.attribution_report(df, require_balanced=False)
+    assert rep["cells"].attrs["n_months"] == 90
+    assert rep["cells"].attrs["months_dropped"] == 10
+    assert len(rep["balance"]) == 10
 
 
 # ----------------------------------------------------------------- Shapley
@@ -207,7 +241,8 @@ def test_shapley_assigns_a_negative_factor_negative_value():
 def test_attribution_report_assembles_all_three_tables():
     df = simulate({"nonlinear": 0.004, "conditional": 0.002})
     rep = factorial.attribution_report(df)
-    assert set(rep) == {"cells", "effects", "shapley"}
+    assert set(rep) == {"cells", "effects", "shapley", "balance"}
+    assert len(rep["balance"]) == 0, "a complete panel has no unbalanced months"
     assert len(rep["cells"]) == 16
     assert len(rep["effects"]) == 15  # 4 + 6 + 4 + 1
     assert len(rep["shapley"]) == 4

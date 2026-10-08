@@ -115,13 +115,39 @@ def _contrast_series(returns: pd.DataFrame, weights: pd.Series) -> np.ndarray:
     return aligned.to_numpy(dtype="float64") @ weights.to_numpy(dtype="float64")
 
 
+def unbalanced_months(returns: pd.DataFrame) -> pd.DataFrame:
+    """Months where at least one cell has no return, and which cells are missing.
+
+    A contrast is only a difference between specifications if every cell is measured over the same
+    months. Dropping an incomplete month silently changes the estimation window for *all* effects
+    at once, and nothing downstream carries a record that it happened.
+    """
+    missing = returns.isna()
+    bad = missing.any(axis=1)
+    if not bad.any():
+        return pd.DataFrame(columns=["n_missing", "cells"])
+    rows = []
+    for date in returns.index[bad]:
+        absent = [c for c in returns.columns if bool(missing.loc[date, c])]
+        rows.append({"n_missing": len(absent), "cells": ", ".join(absent)})
+    return pd.DataFrame(rows, index=returns.index[bad])
+
+
 def factorial_effects(returns: pd.DataFrame, max_order: int = 4,
-                      periods: int = 12, lags: int | None = None) -> pd.DataFrame:
+                      periods: int = 12, lags: int | None = None,
+                      require_balanced: bool = True) -> pd.DataFrame:
     """Estimate every factorial effect up to ``max_order``.
 
     ``returns`` is months x cells of **net-of-cost (and, for the main table, after-tax) returns**,
     with cell codes as columns. Every cell must be present on every month: an unbalanced panel
-    would make the contrasts compare different time periods, so this raises instead of dropping.
+    makes the contrasts compare different time periods, so by default this **raises** rather than
+    dropping. ``require_balanced=False`` estimates on the balanced subset instead, and the caller
+    is then responsible for reporting which months went - ``unbalanced_months`` lists them.
+
+    (Until 8 October 2026 the docstring promised that raise and the code did not do it: it dropped
+    incomplete months and warned only if more than half the panel disappeared. A handful of missing
+    months would therefore have moved the estimation window of every effect in the headline table
+    with nothing on the face of the exhibit saying so.)
 
     Each effect is the mean of its own contrast series, with a Newey-West standard error. The
     contrast is scaled so the estimate is a difference of group means (the conventional "effect"),
@@ -129,16 +155,18 @@ def factorial_effects(returns: pd.DataFrame, max_order: int = 4,
     """
     if returns.empty:
         raise ValueError("no cell returns supplied")
+    bad = unbalanced_months(returns)
+    if len(bad) and require_balanced:
+        worst = bad.head(5).to_string()
+        raise ValueError(
+            f"factorial panel is unbalanced: {len(bad)} of {len(returns)} months are missing at "
+            f"least one cell. Contrasts across different months are not differences between "
+            f"specifications. Re-run the missing cells, or pass require_balanced=False to estimate "
+            f"on the balanced subset and report the loss.\n{worst}")
     frame = returns.dropna(how="any")
     if frame.empty:
         raise ValueError(
             "no month has a return for every cell; factorial contrasts require a balanced panel")
-    if len(frame) < len(returns) * 0.5:
-        # Not fatal, but the caller should know a lot of months went.
-        import warnings
-        warnings.warn(
-            f"factorial panel lost {len(returns) - len(frame)} of {len(returns)} months to missing "
-            "cells; effects are estimated on the balanced subset only", stacklevel=2)
 
     cells = list(frame.columns)
     design = design_matrix(cells)
@@ -224,8 +252,14 @@ def shapley_attribution(returns: pd.DataFrame, periods: int = 12) -> pd.DataFram
 
 
 def attribution_report(returns: pd.DataFrame, periods: int = 12,
-                       max_order: int = 4) -> dict[str, pd.DataFrame]:
-    """Both attributions plus the cell table, ready for the paper's main exhibit."""
+                       max_order: int = 4,
+                       require_balanced: bool = True) -> dict[str, pd.DataFrame]:
+    """Both attributions plus the cell table, ready for the paper's main exhibit.
+
+    The returned ``cells`` table carries ``attrs["n_months"]`` and ``attrs["months_dropped"]`` so
+    the exhibit can state the estimation window rather than implying the full sample.
+    """
+    bad = unbalanced_months(returns)
     frame = returns.dropna(how="any")
     cells = design_matrix(list(frame.columns))
     cells["mean_monthly"] = frame.mean()
@@ -234,8 +268,12 @@ def attribution_report(returns: pd.DataFrame, periods: int = 12,
     cells["sharpe_annualised"] = np.where(
         cells["sd_monthly"] > 0,
         cells["mean_monthly"] / cells["sd_monthly"] * np.sqrt(periods), np.nan)
+    cells.attrs["n_months"] = int(len(frame))
+    cells.attrs["months_dropped"] = int(len(bad))
     return {
         "cells": cells.sort_values("annualised", ascending=False),
-        "effects": factorial_effects(frame, max_order=max_order, periods=periods),
+        "effects": factorial_effects(returns, max_order=max_order, periods=periods,
+                                     require_balanced=require_balanced),
         "shapley": shapley_attribution(frame, periods=periods),
+        "balance": bad,
     }
