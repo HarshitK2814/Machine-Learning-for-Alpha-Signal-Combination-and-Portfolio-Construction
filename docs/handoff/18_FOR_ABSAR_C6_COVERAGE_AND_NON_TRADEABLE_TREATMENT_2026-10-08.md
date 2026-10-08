@@ -27,7 +27,28 @@ The stale-portfolio guard that exists to catch exactly this did not fire, becaus
 `counts.get("failed_hold", 0)` and the status was `failed_hold_missing_cost`. **If you have a
 similar guard keyed on an exact status string, check it.** Mine now matches any `failed_hold*`.
 
-## 2. C6 `adv_usd` is non-null for only 55% of DEU — is that expected?
+## 2. ~~C6 `adv_usd` is non-null for only 55% of DEU~~ ANSWERED by your own audit
+
+**Withdrawn 9 October.** You had already answered this and I had not read it.
+`data/intl_c6/audit/C6_DAILY_COVERAGE_BY_COUNTRY_YEAR.csv` has been in my checkout the whole time.
+Over the frozen 2009-2019 window:
+
+| country | investible months | ADV available | **21-day volume complete** |
+|---|---|---|---|
+| DEU | 50,004 | 98.98% | **65.09%** |
+| IND | 44,233 | 99.98% | 99.19% |
+| JPN | 247,412 | 100.00% | 99.80% |
+
+65.09% matches the 65.2% eligibility I measured on the German alpha cross-section to within a
+rounding error, so the mechanism is settled: monthly `adv_usd` needs a **complete 21-day volume
+window**, daily ADV is ~99% present, and only Germany fails the completeness test. The 55.3% I
+quoted is the full 1990-2020 history, which includes the early 1990s where German daily volume is
+absent entirely (`adv_any_rate` = 0.000 for 1990-1992).
+
+Not a promotion gap, and nothing for you to fix. The German tradeable universe really is ~246
+names a month. Sorry for the noise - the answer was in the file you shipped.
+
+**The original question, kept for the record:**
 
 This is the question I need you to answer. On the promoted DEU C6 (122,784 rows, 1990-2020):
 
@@ -46,14 +67,12 @@ So the tradeable German universe is ~246 names a month, not the ~360 that carry 
 treating that as real and reporting it — document 13 requirement 2 says an uncertified
 security-month is non-tradeable and must not be imputed, and I have not imputed anything.
 
-**What I need from you:** is 55% ADV coverage the true extent of the source data, or is it a gap in
-the promotion (a join that dropped rows, a unit/currency filter, a vendor field that was available
-but not carried through)? The answer changes the paper's universe-construction section, and if it
-is recoverable it materially increases the investable universe. I am proceeding on the assumption
-that it is real.
+**What I need from you now: nothing on this.** The only thing worth your time is a sanity check on
+one inference - I read `volume_21_complete` as the binding requirement behind monthly `adv_usd`.
+If that is wrong, say so, because the paper's universe-construction section now states it in print.
 
-Same question for IND and JPN — I have not profiled those yet, and if the pattern differs by
-country, the cross-country comparison inherits it.
+The cross-country pattern does differ, sharply, and it has become the paper's main experiment; see
+section 6.
 
 ## 2b. One more fault, on the cost-objective axis: the projection had no trade cap
 
@@ -143,3 +162,41 @@ python -m pytest tests/portfolio -q                      # 50 tests incl. 13 on 
 
 Coverage and churn figures: `docs/NON_TRADEABLE_TREATMENT.md`. Capacity and the leverage confound:
 `docs/CAPACITY_CONSTRAINT_DEU.md`.
+
+---
+
+## 6. The cross-country capacity gradient (added 9 October) — and the one thing I need from you
+
+Your coverage audit turned the paper around. The three panels are not three replications of one
+design, they are a natural experiment in capacity, and the gradient is large:
+
+| country | eligible names/month | eligibility | **max attainable gross at $1bn** | median ADV |
+|---|---|---|---|---|
+| **JPN** | 1,666 - 2,425 | 99.3-100% | **0.64 - 0.85** | $0.43-1.38m |
+| **DEU** | 219 - 253 | 56-71% | **0.19 - 0.23** | $0.63-1.69m |
+| **IND** | 219 - 380 | 99.6-100% | **0.11 - 0.15** | $0.42-1.49m |
+
+against a pre-registered gross budget of 2.0. Japan can carry four times the book Germany can,
+because it has ten times the eligible names.
+
+India is the cleanest control in the set: **full ADV coverage and yet tighter capacity than
+Germany.** That separates the two candidate explanations for Germany's near-zero net-of-cost
+result - missing data versus genuine capacity - because India has the capacity problem without the
+data problem. If India behaves like Germany, capacity is the driver. India is running now.
+
+**The ask.** Japan is the one I cannot reach: 247,412 investible months and ~2,400-name
+cross-sections put it at roughly a day of compute on this laptop, and it is the
+least-capacity-constrained end of the gradient - the place where ML combination value should show
+up if it exists anywhere. **If you have access to anything faster, Japan is the single most
+valuable run left in this project.** Everything needed is in the repo:
+
+```bash
+python pipelines/02_train_models.py --country JPN --cells all --baselines all --years 2009 2019 --fast
+python pipelines/04_construct_portfolios.py --country JPN --strategies <16 cells + 5 baselines>
+python tools/dev_backtest.py --country JPN --strategies <same>
+python tools/exp_e29_attribution.py --source real_JPN --out outputs/e29_jpn
+```
+
+Nothing else is blocked on you. The borrow-fee question is closed by your own
+`C6_BORROW_FEE_SOURCE_AUDIT.json`: 266 libraries probed, no securities-lending fee field in the
+entitlements, so `MODELLED_FLAT_BORROW_PROXY_V1` stands and the paper will say exactly that.
