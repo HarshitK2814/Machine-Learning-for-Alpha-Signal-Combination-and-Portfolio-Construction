@@ -194,6 +194,11 @@ def did(panel: pd.DataFrame, country: str, *, include_truncated: bool) -> dict:
         return {"country": country, "error": "no usable pre/post variation", "n_obs": int(len(d))}
     d["tax_per_gain"] = d["tax_ret"] / d["gross_ret"]
     d = d[np.isfinite(d["tax_per_gain"])].copy()
+    # The ratio outcome carries the same defect as the cross-sectional wedge test: a tax year with
+    # a negative gross return has no gains to divide by, and on the German panel 79 of 176 full tax
+    # years are negative. So tax paid per unit of NAV is the primary outcome - it needs no
+    # denominator and is strictly positive here - and the ratio is reported beside it.
+    n_neg_gross = int((d["gross_ret"] < 0).sum())
 
     # Demean turnover so the main 'post' coefficient reads as the effect at average turnover
     # rather than at the economically meaningless turnover of zero.
@@ -204,16 +209,27 @@ def did(panel: pd.DataFrame, country: str, *, include_truncated: bool) -> dict:
     # common to every cell within a year and is not what the test is about.
     X = np.c_[np.ones(len(d)), (d["post"] * d["p_c"]).to_numpy(), d["p_c"].to_numpy(),
               cell_d.to_numpy(), year_d.to_numpy()]
-    y = d["tax_per_gain"].to_numpy(dtype=float)
-    beta, se = ols_cluster(y, X, d["tax_year"].to_numpy())
-    tstat = beta[1] / se[1] if se[1] > 0 else np.nan
+    def fit(col: str) -> tuple[float, float, float, float, float]:
+        y = d[col].to_numpy(dtype=float)
+        b, s = ols_cluster(y, X, d["tax_year"].to_numpy())
+        _, s_cell = ols_cluster(y, X, d["cell"].to_numpy())
+        t_year = b[1] / s[1] if s[1] > 0 else np.nan
+        t_cell = b[1] / s_cell[1] if s_cell[1] > 0 else np.nan
+        return float(b[1]), float(s[1]), float(t_year), float(s_cell[1]), float(t_cell)
+
+    # Primary: tax paid per unit of NAV, in levels. 112A raises the long-term rate 0.00 -> 0.10, so
+    # the tax increase is 0.10 * long-term gains, and the long-term share is HIGHER in the slower
+    # cells - so the increase falls hardest on the patient ones and the interaction is negative.
+    lv_b, lv_se, lv_t, lv_se_cell, lv_t_cell = fit("tax_ret")
+    beta1, se1, tstat, se_cell1, t_cell1 = fit("tax_per_gain")
+    beta, se = [np.nan, beta1], [np.nan, se1]
+    se_cell = [np.nan, se_cell1]
+    t_cell = t_cell1
     # Clustering on the tax year gives about eleven clusters and only one of them is post-112A,
     # which is exactly the case where cluster-robust standard errors are known to be too small.
     # Clustering on the cell instead gives sixteen clusters and treats the overlapping months
     # within a cell as the dependence. Neither is clearly right, so both are reported and the
     # weaker of the two is what the write-up should lean on.
-    _, se_cell = ols_cluster(y, X, d["cell"].to_numpy())
-    t_cell = beta[1] / se_cell[1] if se_cell[1] > 0 else np.nan
     pre, post = d[d["post"] == 0], d[d["post"] == 1]
     return {
         "country": country,
@@ -223,6 +239,14 @@ def did(panel: pd.DataFrame, country: str, *, include_truncated: bool) -> dict:
         "n_post_years": int(post["tax_year"].nunique()),
         "wedge_before": 0.15 if country == "IND" else 0.0,
         "wedge_after": 0.05 if country == "IND" else 0.0,
+        "n_taxyears_with_negative_gross": n_neg_gross,
+        # PRIMARY: tax paid per unit of NAV, needs no denominator
+        "tax_level_interaction": lv_b,
+        "tax_level_t": lv_t,
+        "tax_level_t_cluster_cell": lv_t_cell,
+        "tax_level_significant_5pct": bool(np.isfinite(lv_t) and np.isfinite(lv_t_cell)
+                                           and abs(lv_t) > 1.96 and abs(lv_t_cell) > 1.96),
+        # SECONDARY: the ratio, ill-defined wherever gross < 0
         "interaction_post_x_turnover": float(beta[1]),
         "interaction_se": float(se[1]),
         "interaction_t": float(tstat),
@@ -282,13 +306,24 @@ def main(argv: list[str] | None = None) -> int:
     print("  prediction: post x turnover interaction NEGATIVE in India (wedge 0.15 -> 0.05),")
     print("              and ZERO in Germany/Japan, whose law did not change on that date.")
     print()
+    fmt = lambda v: f"{v:,.6f}"  # noqa: E731
+    print("PRIMARY: tax paid per unit of NAV (no denominator)")
     cols = [c for c in ["country", "wedge_before", "wedge_after", "n_obs", "n_cells",
-                        "n_tax_years", "n_post_years", "interaction_post_x_turnover",
-                        "interaction_t", "interaction_t_cluster_cell", "significant_5pct",
-                        "mean_tax_per_gain_pre", "mean_tax_per_gain_post",
-                        "mean_lt_share_pre", "mean_lt_share_post"]
+                        "n_tax_years", "n_post_years", "tax_level_interaction", "tax_level_t",
+                        "tax_level_t_cluster_cell", "tax_level_significant_5pct"]
             if c in res.columns]
-    print(res[cols].to_string(index=False, float_format=lambda v: f"{v:,.4f}"))
+    print(res[cols].to_string(index=False, float_format=fmt))
+    print()
+    print("SECONDARY: tax per unit of gain - ILL-DEFINED where a tax year's gross return < 0")
+    cols = [c for c in ["country", "n_taxyears_with_negative_gross", "n_obs",
+                        "interaction_post_x_turnover", "interaction_t",
+                        "interaction_t_cluster_cell", "significant_5pct"] if c in res.columns]
+    print(res[cols].to_string(index=False, float_format=fmt))
+    print()
+    print("Holding-period composition, which 112A must NOT move (the portfolio is fixed)")
+    cols = [c for c in ["country", "mean_lt_share_pre", "mean_lt_share_post",
+                        "mean_tax_per_gain_pre", "mean_tax_per_gain_post"] if c in res.columns]
+    print(res[cols].to_string(index=False, float_format=fmt))
     print()
     for _, r in res.iterrows():
         if "error" in res.columns and isinstance(r.get("error"), str):
@@ -297,15 +332,15 @@ def main(argv: list[str] | None = None) -> int:
         treated = r["wedge_before"] != r["wedge_after"]
         if treated:
             verdict = ("CONSISTENT with the wedge channel"
-                       if r["interaction_post_x_turnover"] < 0 else
+                       if r["tax_level_interaction"] < 0 else
                        "AGAINST the wedge channel (interaction should be negative)")
         else:
             verdict = ("CONSISTENT with the control (no law change, no gradient)"
-                       if not r["significant_5pct"] else
+                       if not r["tax_level_significant_5pct"] else
                        "AGAINST the control - a gradient appears where no law moved")
-        print(f"  {r['country']}: interaction {r['interaction_post_x_turnover']:+.4f} "
-              f"t={r['interaction_t']:+.2f} (year-clustered) "
-              f"t={r['interaction_t_cluster_cell']:+.2f} (cell-clustered) -> {verdict}")
+        print(f"  {r['country']}: tax-level interaction {r['tax_level_interaction']:+.6f} "
+              f"t={r['tax_level_t']:+.2f} (year-clustered) "
+              f"t={r['tax_level_t_cluster_cell']:+.2f} (cell-clustered) -> {verdict}")
     print(f"\nwrote {args.out / 'event_112a.csv'} and {args.out / 'tax_year_panel.csv'}")
     print("\nNOTE: the cells are not tax-aware, so this measures the INCIDENCE of the statute on a")
     print("fixed portfolio - a comparative static of the theory - not a behavioural response.")
