@@ -280,3 +280,50 @@ def load_panel(mode: PanelMode | str = PanelMode.POOLED_FIT_SEPARATE_CONSTRUCT,
         pooled["signal_meta"] = next(iter(by_country.values()))["signal_meta"]
 
     return {"mode": mode, "countries": countries, "by_country": by_country, "pooled": pooled}
+
+
+def load_country_bundle(country: str, validate_contracts: bool = False):
+    """Assemble one country's promoted contracts into a :class:`DataBundle`.
+
+    This is the adapter Workstream A asked for - "assemble the country-specific real-data B
+    bundles" - and it is what lets the existing pipelines run on the international panel without
+    materialising the prohibited ``data/real`` layout. Everything is read in place from
+    ``data/intl_c*`` and joined in memory.
+
+    Three things it must get right, each of which would fail silently otherwise:
+
+    * **C6 is one combined file across all three countries.** It carries a ``country`` column, so
+      the filter is exact rather than an inference from permno ranges.
+    * **C6 market fields stay as they are.** Missing spread, sigma_d or adv_usd makes a
+      security-month non-tradeable (document 13 requirement 2); nothing is imputed here, and the
+      cost consumer is what fails closed on it.
+    * **``borrow_fee`` stays null.** The modelled proxy is injected at the C11/experiment layer
+      only (frozen decision 6B), never persisted into the bundle.
+
+    ``source`` is set to ``"real_<COUNTRY>"`` so that downstream code which branches on a
+    synthetic source - the imputation escape in the cost consumer, for one - keeps failing closed.
+    """
+    from .io import DataBundle
+
+    tables = load_country(country, with_costs=False)
+    universe = tables["universe"]
+
+    costs = pd.read_csv(cost_inputs_path(), parse_dates=["date"])
+    if "country" in costs.columns:
+        costs = costs.loc[costs["country"] == country]
+    else:  # pragma: no cover - the promoted C6 always carries country
+        costs = costs.loc[costs["permno"].isin(universe["permno"].unique())]
+    keep = [c for c in ("date", "permno", "spread", "sigma_d", "adv_usd", "borrow_fee")
+            if c in costs.columns]
+    costs = costs[keep].reset_index(drop=True)
+    costs["permno"] = costs["permno"].astype(universe["permno"].dtype)
+
+    return DataBundle(
+        universe=universe,
+        signals=tables["signals"],
+        signal_meta=tables["signal_meta"],
+        targets=tables["targets"],
+        states=tables["states"],
+        cost_inputs=costs,
+        source=f"real_{country}",
+    )
