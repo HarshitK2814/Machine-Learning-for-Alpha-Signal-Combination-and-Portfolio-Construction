@@ -59,6 +59,8 @@ class CellRunConfig:
     #: ``validation.preregistration`` exists to prevent. Use ``EXPLORATORY_KAPPA_GRID`` for a wider
     #: search, and report the result as exploratory with its own, larger N.
     kappa_grid: tuple[float, ...] = CONFIRMATORY_KAPPA_GRID
+    #: Gross the economic policy is forced to propose at. None uses configs/models.yaml.
+    economic_gross: float | None = None
     economic_max_train_months: int = 240
     validation_months_for_kappa: int = 12
     gamma: float = 25.0
@@ -225,6 +227,7 @@ def run_economic_cell(spec: CellSpec, df: pd.DataFrame, features, calendar: list
         best, best_val, best_params = None, -np.inf, None
         for policy, params in economic.candidates(models_cfg, spec.is_nonlinear, gamma=cfg.gamma, seed=cfg.seed,
                                                   n_members=members, fast=cfg.fast,
+                                                  gross=cfg.economic_gross,
                                                   tax_regime=cfg.tax_regime,
                                                   harvest_haircut=cfg.tax_harvest_haircut):
             policy.fit(train_months, val_months)

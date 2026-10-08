@@ -39,6 +39,8 @@ def main() -> None:
     p.add_argument("--country", default=None, choices=["DEU", "IND", "JPN"],
                    help="run the promoted international panel for one country (amendment 001A "
                         "freezes DEU/IND/JPN as separate runs)")
+    p.add_argument("--economic-gross", type=float, default=None,
+                   help="gross the economic policy is forced to propose at. The default (2.0, the optimiser gross budget) is unattainable wherever the ADV cap binds first - see docs/ECONOMIC_ARM_CAPABILITY_GAP.md")
     p.add_argument("--max-names", type=int, default=None,
                    help="cap each month to the N largest names by market cap (amendment 001B; slack for DEU/IND, binds on JPN)")
     p.add_argument("--fast", action="store_true", help="small grids and short training, for development")
@@ -99,7 +101,7 @@ def main() -> None:
         from alphacomb.models import compare_to_cell_gap, run_seeds
 
         for spec in cells:
-            run_cfg = CellRunConfig(horizon=a.horizon, first_test_year=first, last_test_year=last,
+            run_cfg = CellRunConfig(economic_gross=a.economic_gross, horizon=a.horizon, first_test_year=first, last_test_year=last,
                                     fast=a.fast, uncertainty_members=a.members)
             table = run_seeds(spec, bundle, risk, list(a.seeds), run_cfg, base_cfg=cfg)
             out = paths.outputs_root() / f"seed_stability_{spec.code}.csv"
@@ -110,7 +112,7 @@ def main() -> None:
 
     for spec in cells:
         started = time.time()
-        run_cfg = CellRunConfig(horizon=a.horizon, first_test_year=first, last_test_year=last, fast=a.fast,
+        run_cfg = CellRunConfig(economic_gross=a.economic_gross, horizon=a.horizon, first_test_year=first, last_test_year=last, fast=a.fast,
                                 seed=a.seed, uncertainty_members=a.members,
                                 tax_regime=tax_regime, tax_harvest_haircut=a.harvest_haircut,
                                 strategy_suffix=a.suffix)
@@ -135,7 +137,7 @@ def main() -> None:
         from alphacomb.models import run_baseline
 
         started = time.time()
-        run_cfg = CellRunConfig(horizon=a.horizon, first_test_year=first, last_test_year=last,
+        run_cfg = CellRunConfig(economic_gross=a.economic_gross, horizon=a.horizon, first_test_year=first, last_test_year=last,
                                 fast=a.fast, seed=a.seed)
         log.info("=== baseline %s (E10-E12) ===", code)
         try:
@@ -153,7 +155,7 @@ def main() -> None:
         from alphacomb.models import run_benchmark
 
         started = time.time()
-        run_cfg = CellRunConfig(horizon=a.horizon, first_test_year=first, last_test_year=last, fast=a.fast,
+        run_cfg = CellRunConfig(economic_gross=a.economic_gross, horizon=a.horizon, first_test_year=first, last_test_year=last, fast=a.fast,
                                 seed=a.seed)
         log.info("=== benchmark %s (E13) ===", name)
         try:

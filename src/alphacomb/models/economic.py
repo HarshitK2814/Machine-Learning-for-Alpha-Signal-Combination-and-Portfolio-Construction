@@ -311,6 +311,7 @@ class EconomicPolicy:
 
 
 def candidates(models_cfg: dict, nonlinear: bool, gamma: float, seed: int = 0, n_members: int = 1,
+               gross: float | None = None,
                fast: bool = False, tax_regime=None, harvest_haircut: float = 1.0):
     """(policy, params) pairs for the economic arm.
 
@@ -323,6 +324,13 @@ def candidates(models_cfg: dict, nonlinear: bool, gamma: float, seed: int = 0, n
     tax_long = float(getattr(tax_regime, "long_term_rate", 0.0) or 0.0)
     tax_months = float(getattr(tax_regime, "long_term_months", 12) or 12)
     cfg = models_cfg["economic_policy"]
+    # The policy normalises every proposal to EXACTLY this gross, so it is not a cap but the book
+    # size the policy is forced to run at. Defaulting it to the optimiser's gross budget is only
+    # right when that budget is attainable; where the ADV participation cap binds first - as it
+    # does at $1bn in all three panels, attainable gross about 0.1 against a budget of 2.0 - the
+    # policy is trained at a leverage it will never be run at and cannot learn that a smaller book
+    # is better. See docs/ECONOMIC_ARM_CAPABILITY_GAP.md.
+    budget = float(gross if gross is not None else cfg.get("gross", 2.0))
     hidden_options = [tuple(cfg["hidden"])] if not fast else [tuple(cfg["hidden"])]
     lrs = [cfg["learning_rate"]] if fast else [cfg["learning_rate"], cfg["learning_rate"] * 2]
     for hidden in hidden_options:
@@ -331,6 +339,7 @@ def candidates(models_cfg: dict, nonlinear: bool, gamma: float, seed: int = 0, n
                       "learning_rate": lr, "n_members": n_members,
                       "tax_regime": getattr(tax_regime, "name", None)}
             yield EconomicPolicy(nonlinear=nonlinear, hidden=hidden, gamma=gamma, learning_rate=lr,
+                                 gross=budget,
                                  max_epochs=12 if fast else cfg["max_epochs"], patience=cfg["patience"],
                                  bptt_months=cfg["bptt_months"], seed=seed, n_members=n_members,
                                  tax_short_rate=tax_short, tax_long_rate=tax_long,
