@@ -145,9 +145,24 @@ def deflated_sharpe(observed_sr: float, n_trials: int, returns=None, trial_sr_sd
     ``n_trials`` independent attempts would produce under a null of no skill?" With enough trials
     an impressive Sharpe is the expected outcome of searching, not evidence of anything.
 
-    ``n_trials`` must be the **real** number of configurations fitted, from ``outputs/trials.csv``,
-    not the number reported in the paper. Using the reported count is the most common way this
-    statistic is misapplied.
+    ``n_trials`` must **bound the search that produced the number being deflated**. Two readings of
+    that were in conflict in this repository until 8 October 2026: this docstring demanded the
+    realised count from ``outputs/trials.csv``, while ``tools/exp_e29_attribution.py`` used the
+    count frozen in the pre-registration and argued that N is a property of the design. The rule
+    that satisfies both:
+
+    * the registered N is used when it is **greater than or equal to** the number of distinct
+      configurations actually fitted on the evaluation sample, because over-stating N raises the
+      hurdle and is the conservative direction;
+    * otherwise the realised count replaces it, because deflating at a registered N smaller than
+      the search actually conducted understates the hurdle - which is the misapplication this
+      docstring was warning about.
+
+    The driver now verifies which case holds rather than assuming, and counts configurations from
+    the trial rows whose ``run_id`` matches the artefacts the exhibit is actually built from -
+    ``trials.csv`` accumulates every fit ever logged, including synthetic development runs that
+    never saw the evaluation sample and so cannot have overfitted it. On the German exhibit the
+    realised count is 52 against a registered N of 64.
     """
     r = np.asarray(returns, dtype=float) if returns is not None else None
     if r is not None:

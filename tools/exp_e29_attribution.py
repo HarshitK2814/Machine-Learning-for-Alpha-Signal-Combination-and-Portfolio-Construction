@@ -92,6 +92,48 @@ def build_panel(files: dict[str, Path], column: str,
     return pd.DataFrame(cells).sort_index(), pd.DataFrame(others).sort_index(), sources
 
 
+def observed_trial_count(cells_present: list[str]) -> tuple[int, dict]:
+    """Distinct configurations actually fitted for the artefacts THIS exhibit is built from.
+
+    The deflation hurdle is only honest if ``N`` bounds the search that produced the numbers being
+    deflated. ``outputs/trials.csv`` accumulates every fit ever logged - on this project that is
+    1,371 rows over 13 commits and three weeks, most of them synthetic development runs that never
+    saw the real evaluation sample and so cannot have overfitted it. Counting all of them would
+    overstate the search; trusting the pre-registered N without looking would risk understating it.
+
+    The exact link is the run id: a trial row's ``run_id`` is the stem of the model artefact it
+    produced, so the configurations behind this exhibit are the rows whose ``run_id`` matches the
+    artefact each cell actually resolved to. That is a property of the files in the exhibit, not of
+    a time window or a guess.
+    """
+    trials_path = paths.outputs_root() / "trials.csv"
+    if not trials_path.exists():
+        return 0, {}
+    trials = pd.read_csv(trials_path)
+    if not {"run_id", "params_json", "cell"} <= set(trials.columns):
+        return 0, {}
+
+    per_cell: dict[str, int] = {}
+    for code in cells_present:
+        strategy = f"cell_{code}"
+        artefact = None
+        for kind in ("predictions", "weight_proposals"):
+            found = paths.latest_run(kind, strategy)
+            if found is not None:
+                artefact = found
+                break
+        if artefact is None:
+            continue
+        run_id = artefact.stem
+        rows = trials.loc[trials["run_id"] == run_id]
+        if rows.empty:
+            # Older artefacts predate run-id logging; fall back to the cell's own rows so the
+            # count is never silently zero for a cell that is in the exhibit.
+            rows = trials.loc[trials["cell"] == code]
+        per_cell[code] = int(rows["params_json"].nunique())
+    return int(sum(per_cell.values())), per_cell
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--column", default="net_ret",
@@ -198,6 +240,27 @@ def main(argv: list[str] | None = None) -> int:
         print(f"\npre-registered N : {n_trials}  ({note})")
     else:
         print("\nPLAN_001 absent - deflation skipped rather than guessing N")
+
+    # Verify N bounds the search rather than assuming it. Over-stating N raises the hurdle and is
+    # the safe direction; under-stating it is not, so an observed count above the registered one
+    # replaces it and is reported.
+    if n_trials:
+        observed, per_cell = observed_trial_count(list(cells.columns))
+        print(f"configurations fitted for these artefacts: {observed} "
+              f"(registered N = {n_trials})")
+        if observed > n_trials:
+            print("")
+            print(f"WARNING: the search exceeded the registered trial count ({observed} > {n_trials}).")
+            print("Deflating at the registered N would understate the search, so the observed "
+                  "count is used.")
+            print("Per cell: " + ", ".join(f"{k}={v}" for k, v in sorted(per_cell.items())))
+            stamp["trial_count_exceeded_registration"] = True
+            n_trials = observed
+        else:
+            print(f"  registered N is conservative by {n_trials - observed} configurations")
+        stamp["configurations_fitted"] = observed
+        stamp["configurations_per_cell"] = per_cell
+        stamp["n_trials_used"] = int(n_trials)
 
     if n_trials:
         panel = pd.concat([cells, others], axis=1)
