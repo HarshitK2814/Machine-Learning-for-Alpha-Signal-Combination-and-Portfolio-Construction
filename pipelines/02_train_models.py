@@ -28,7 +28,11 @@ log = logging.getLogger("stage02")
 
 def main() -> None:
     p = argparse.ArgumentParser(description="Train factorial model cells (experiments E20-E28).")
-    p.add_argument("--cells", nargs="+", default=["all"], help="cell codes such as N-C-E-U, or 'all'")
+    p.add_argument("--cells", nargs="+", default=["all"],
+                   help="cell codes such as N-C-E-U, 'all', or 'none' to run only --baselines "
+                        "/--benchmarks. 'none' matters because re-running a cell writes a new C9 "
+                        "artefact that latest_run would then resolve to, silently detaching the "
+                        "exhibit's provenance from the artefact a running stage 04 is consuming.")
     p.add_argument("--years", nargs=2, type=int, metavar=("FIRST", "LAST"), default=None)
     p.add_argument("--horizon", type=int, default=1, choices=[1, 3, 6, 12])
     p.add_argument("--data", default=None, help="synthetic | real (default: configs/base.yaml)")
@@ -78,7 +82,14 @@ def main() -> None:
         bundle = load_bundle(source)
     risk = RiskCache(StructuralRiskModel(bundle, cfg))
 
-    cells = ALL_CELLS if a.cells == ["all"] else [CellSpec.parse(c) for c in a.cells]
+    if a.cells == ["all"]:
+        cells = ALL_CELLS
+    elif [c.lower() for c in a.cells] == ["none"]:
+        cells = []
+    else:
+        cells = [CellSpec.parse(c) for c in a.cells]
+    if not cells and not (a.baselines or a.benchmarks):
+        raise SystemExit("--cells none requires --baselines or --benchmarks; nothing to run")
     first, last = (a.years if a.years else (None, None))
     manifest_rows = []
 
