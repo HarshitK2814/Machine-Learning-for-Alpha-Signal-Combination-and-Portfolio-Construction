@@ -95,11 +95,34 @@ remain *in the book*, so every aggregate limit is written on the whole book:
 Omitting any of these would let the optimiser spend a budget the portfolio has already committed,
 and the reported exposures would not be the exposures held.
 
-The sleeve does not accumulate: eligibility is re-tested every month, so a name that regains
-certified inputs becomes tradeable again. Its size is bounded by the currently-ineligible held set,
-~12 names and about 5% of gross on DEU. `n_frozen`, `gross_frozen` and `n_exited` are written into
-the optimiser diagnostics every month, so a reader can see how much of the book could not be traded
-rather than having to trust that it was small.
+### How large the sleeve actually gets
+
+I first asserted that the sleeve "does not accumulate, ~12 names and about 5% of gross". Measured
+over the 132 real DEU months of cell `L-C-P-0`, that was wrong in both directions:
+
+| | value |
+|---|---|
+| frozen names, first month | 0 |
+| frozen names, median | **56** |
+| frozen names, max | 84 |
+| trend | +1.4 names per year |
+| frozen share of gross, mean | **0.45%** |
+| frozen share of gross, max | 1.44% |
+
+It **does** accumulate, because a name that never regains certified inputs is never traded out of:
+eligibility being re-tested monthly lets a name *leave* the sleeve, but does not stop the sleeve
+from filling. It plateaus at 55-65 rather than growing without bound because ADV coverage churns in
+both directions and delisted names are dropped, so inflow and outflow balance.
+
+What stays negligible is its **weight**, not its headcount: under 1.5% of gross in every month.
+That is not a coincidence - the positions that lose pricing are the illiquid ones whose ADV
+participation cap made them tiny in the first place. So the sleeve is a long tail of near-zero
+positions rather than a meaningful block of frozen risk, and the treatment costs the strategy very
+little gross budget.
+
+Reported anyway, every month: `n_frozen`, `gross_frozen` and `n_exited` are in the optimiser
+diagnostics, so a reader can see how much of the book could not be traded rather than having to
+trust that it was small. Reproduce with `python tools/verify_trade_caps.py --country DEU`.
 
 The backtest drops exited names from the cost base for the same reason - the position no longer
 exists, and keeping it there would halt the fail-closed cost consumer on a phantom holding.

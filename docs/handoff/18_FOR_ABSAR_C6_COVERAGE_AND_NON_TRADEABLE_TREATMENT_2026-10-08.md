@@ -105,9 +105,14 @@ Two consequences for your engine:
 * **Borrow on a frozen short still accrues.** I charge the modelled flat proxy on any negative
   weight, frozen or not: not being able to trade a borrow does not make it free.
 
-The sleeve averages ~12 names and about 5% of gross on DEU, and it does not accumulate, because
-eligibility is retested monthly. `n_frozen`, `gross_frozen` and `n_exited` are in the optimiser
-diagnostics every month.
+**How big the sleeve actually is** (corrected - my first estimate was wrong in both directions).
+Measured over the 132 real DEU months of cell `L-C-P-0`: it grows from 0 names to a plateau of
+55-65 (median 56, max 84, +1.4 names a year), because a name that never regains certified inputs
+is never traded out of. But it carries only **0.45% of gross on average and 1.44% at worst**, since
+the positions that lose pricing are the illiquid ones whose ADV cap made them tiny anyway. So it is
+a long tail of near-zero positions, not a block of frozen risk.
+
+`n_frozen`, `gross_frozen` and `n_exited` are in the optimiser diagnostics every month.
 
 ## 4. Capacity binds before the risk budget — relevant to your cost model
 

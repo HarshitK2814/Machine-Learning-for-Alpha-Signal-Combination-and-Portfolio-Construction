@@ -134,8 +134,13 @@ def partition_prior_book(date, cost_inputs: pd.DataFrame,
     * **frozen**    - still in the panel but not priceable this month. It cannot be traded at a
       certified cost, and selling it at an imputed one is exactly what document 13 requirement 2
       prohibits, so the position is carried at its drifted weight and the optimiser works around
-      it. On the DEU panel this sleeve averages ~12 names, about 5% of gross, and it does not
-      accumulate because eligibility is re-tested every month.
+      it. Measured over the 132 real DEU months (cell L-C-P-0): the sleeve **does** accumulate,
+      from 0 names to a plateau of 55-65 (median 56, max 84, trend +1.4 names a year), because a
+      name that never regains certified inputs is never traded out of. It plateaus rather than
+      growing without bound because ADV coverage churns in both directions and delisted names are
+      dropped, so inflow and outflow balance. What stays negligible is its **weight**: 0.45% of
+      gross on average and 1.44% at worst, because the positions that lose pricing are the
+      illiquid ones whose ADV cap made them tiny to begin with.
     * **exited**    - no longer in the panel; closed at the delisting return.
 
     The alternative previously in force - hold the *entire* prior book whenever any held name lost
