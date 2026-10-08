@@ -241,6 +241,8 @@ def bound_breach(w_val: np.ndarray, prev: np.ndarray, adv_cap: np.ndarray, pos_c
         return float("inf")
     w = np.asarray(w_val, dtype=float).ravel()
     scale = max(cfg.gross_max, 1e-12)
+    # Same cap the constraints enforce; see widened_pos_cap.
+    pos_cap = widened_pos_cap(pos_cap, prev, adv_cap)
     fz = frozen if frozen is not None and not frozen.empty else None
     g_fz = fz.gross if fz else 0.0
     n_fz = fz.net if fz else 0.0
@@ -259,6 +261,24 @@ def bound_breach(w_val: np.ndarray, prev: np.ndarray, adv_cap: np.ndarray, pos_c
         worst.append((abs(float(risk.B[col].to_numpy(dtype=float) @ w) + i_fz) - cfg.industry_abs_max)
                      / max(cfg.industry_abs_max, 1e-12))
     return max(0.0, max(worst))
+
+
+def widened_pos_cap(pos_cap: np.ndarray, prev: np.ndarray, adv_cap: np.ndarray) -> np.ndarray:
+    """The position cap the constraint set actually enforces, given an already-drifted book.
+
+    A position that has drifted outside its nominal cap cannot be traded back inside it in one
+    month, because ``|w - prev| <= adv_cap`` pins ``w`` near ``prev``. ``book_constraints``
+    therefore widens the cap to ``max(pos_cap, |prev| - adv_cap)``, which is the smallest value
+    that keeps the box non-empty.
+
+    It is exposed here because ``bound_breach`` has to measure against the **same** cap. Measuring
+    a solution against the nominal cap while the constraints enforce the widened one scores a
+    perfectly feasible book as breached, which sends the month down the soft-constraint path for no
+    reason. On the real DEU panel that fired on nearly every month of every prediction cell, paying
+    for a second solve with slack variables each time - and the project's own notes say the soft
+    formulation measurably worsens conditioning, so it also cost clean ``optimal`` statuses.
+    """
+    return np.maximum(pos_cap, np.abs(prev) - adv_cap)
 
 
 @dataclass
@@ -366,7 +386,7 @@ def book_constraints(w, prev: np.ndarray, adv_cap: np.ndarray, pos_cap: np.ndarr
     # Hard, and non-empty by construction: each w_i may range over
     # [max(-pos_cap, prev - adv_cap), min(pos_cap, prev + adv_cap)], which is non-empty once
     # pos_cap >= |prev| - adv_cap.
-    pos_cap = np.maximum(pos_cap, np.abs(prev) - adv_cap)
+    pos_cap = widened_pos_cap(pos_cap, prev, adv_cap)
     cons = [cp.abs(w) <= pos_cap, cp.abs(w - prev) <= adv_cap]
 
     penalty, violations = 0.0, {}
