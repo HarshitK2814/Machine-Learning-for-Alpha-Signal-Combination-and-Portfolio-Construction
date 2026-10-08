@@ -82,6 +82,8 @@ def main() -> None:
     p.add_argument("--dividend-yield", type=float, default=0.02)
     p.add_argument("--cost-multiplier", type=float, default=1.0)
     p.add_argument("--aum", type=float, default=None, help="override AUM (cost and impact scale)")
+    p.add_argument("--max-names", type=int, default=None,
+                   help="cap each month to the N largest names by market cap (amendment 001B; slack for DEU/IND, binds on JPN)")
     p.add_argument("--save-returns", action="store_true", help="write the full monthly C12 tables")
     p.add_argument("--dated", action="store_true",
                    help="resolve the tax rule on each event's own date through the frozen C14 "
@@ -98,7 +100,7 @@ def main() -> None:
                                   "offshore_fund"]
     if a.country:
         from alphacomb.contracts import intl
-        bundle = intl.load_country_bundle(a.country)
+        bundle = intl.load_country_bundle(a.country, max_names=a.max_names)
         if a.regimes is None:
             # The paper's treatment variable is the statutory holding-period wedge, so the default
             # regime for a country run is the one its own law specifies, derived from the frozen

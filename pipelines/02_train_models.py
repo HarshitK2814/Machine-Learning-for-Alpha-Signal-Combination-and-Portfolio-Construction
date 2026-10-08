@@ -39,6 +39,8 @@ def main() -> None:
     p.add_argument("--country", default=None, choices=["DEU", "IND", "JPN"],
                    help="run the promoted international panel for one country (amendment 001A "
                         "freezes DEU/IND/JPN as separate runs)")
+    p.add_argument("--max-names", type=int, default=None,
+                   help="cap each month to the N largest names by market cap (amendment 001B; slack for DEU/IND, binds on JPN)")
     p.add_argument("--fast", action="store_true", help="small grids and short training, for development")
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--members", type=int, default=5, help="ensemble members for uncertainty cells")
@@ -74,7 +76,7 @@ def main() -> None:
         # load_bundle to open. Amendment 001A freezes DEU/IND/JPN as separate runs, which is
         # why this is one country per invocation rather than a pooled panel.
         from alphacomb.contracts import intl
-        bundle = intl.load_country_bundle(a.country)
+        bundle = intl.load_country_bundle(a.country, max_names=a.max_names)
         source = bundle.source
         log.info("international bundle %s: %d security-months, %d signals",
                  a.country, len(bundle.universe), len(bundle.signal_columns))

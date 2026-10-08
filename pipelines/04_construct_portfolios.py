@@ -113,6 +113,8 @@ def main() -> None:
                    help="also forbid repurchasing a name inside the s1091 window")
     p.add_argument("--harvest-haircut", type=float, default=1.0,
                    help="how usable a realised loss is (1.0 = fully offsets other gains)")
+    p.add_argument("--max-names", type=int, default=None,
+                   help="cap each month to the N largest names by market cap (amendment 001B; slack for DEU/IND, binds on JPN)")
     p.add_argument("--suffix", default="", help="append to the strategy name, e.g. '_taxaware'")
     p.add_argument("--max-held-share", type=float, default=0.02,
                    help="fail the run if more than this share of months fall back to held weights "
@@ -127,7 +129,7 @@ def main() -> None:
         # bundle that load_bundle would look for. The bundle's source stays "real_<COUNTRY>" so
         # the cost consumer keeps failing closed on missing market fields rather than imputing.
         from alphacomb.contracts import intl
-        bundle = intl.load_country_bundle(a.country)
+        bundle = intl.load_country_bundle(a.country, max_names=a.max_names)
         log.info("international bundle %s: %d security-months", a.country, len(bundle.universe))
     else:
         bundle = load_bundle(a.data or cfg["data_source"])

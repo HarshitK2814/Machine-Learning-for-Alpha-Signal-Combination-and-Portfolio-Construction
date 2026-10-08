@@ -57,6 +57,7 @@ Pre-2009 rows stay available for training and feature construction.
 from __future__ import annotations
 
 import json
+import logging
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
@@ -64,6 +65,8 @@ from pathlib import Path
 import pandas as pd
 
 from . import paths
+
+log = logging.getLogger(__name__)
 
 COUNTRIES: tuple[str, ...] = ("DEU", "IND", "JPN")
 
@@ -282,7 +285,46 @@ def load_panel(mode: PanelMode | str = PanelMode.POOLED_FIT_SEPARATE_CONSTRUCT,
     return {"mode": mode, "countries": countries, "by_country": by_country, "pooled": pooled}
 
 
-def load_country_bundle(country: str, validate_contracts: bool = False):
+def apply_breadth_cap(universe: pd.DataFrame, max_names: int) -> pd.DataFrame:
+    """Keep only the ``max_names`` largest names by market cap in each month (amendment 001B).
+
+    This narrows ``in_universe`` rather than dropping rows, so every other table stays aligned on
+    (date, permno) and anything downstream that already respects the flag honours the cap without
+    knowing about it. Dropping rows instead would silently desynchronise signals from targets.
+
+    See ``docs/AMENDMENT_001B_UNIVERSE_BREADTH_CAP.md``. The cap is slack for Germany (379 names per
+    month) and India (335) and binds only on Japan (3,687), which is why it is one uniform rule
+    rather than a per-country exception.
+    """
+    if "me" not in universe.columns:
+        raise ValueError("breadth cap needs a market-cap column 'me' on the universe table")
+    out = universe.copy()
+    live = out["in_universe"].astype(bool)
+    if not live.any():
+        return out
+    # A missing market cap cannot be ranked, and leaving it in would make membership depend on how
+    # pandas happens to order NaN - it sorts last whatever `ascending` says, so such a name would
+    # be kept whenever the month holds fewer than max_names priced names, and dropped otherwise.
+    # It is excluded outright instead.
+    ranked = out.loc[live, ["date", "permno", "me"]].copy()
+    unpriced = ranked["me"].isna()
+    ranked = ranked.loc[~unpriced]
+    # Rank descending by size, breaking ties by permno so the selection is reproducible.
+    ranked = ranked.sort_values(["date", "me", "permno"], ascending=[True, False, True])
+    ranked["rank"] = ranked.groupby("date").cumcount()
+    keep = set(map(tuple, ranked.loc[ranked["rank"] < max_names, ["date", "permno"]]
+                   .itertuples(index=False, name=None)))
+    pairs = list(map(tuple, out.loc[live, ["date", "permno"]].itertuples(index=False, name=None)))
+    mask = pd.Series([p in keep for p in pairs], index=out.index[live])
+    out.loc[mask.index, "in_universe"] = mask.to_numpy()
+    if unpriced.any():
+        log.info("breadth cap: %d in-universe security-months have no market cap and were excluded",
+                 int(unpriced.sum()))
+    return out
+
+
+def load_country_bundle(country: str, validate_contracts: bool = False,
+                        max_names: int | None = None):
     """Assemble one country's promoted contracts into a :class:`DataBundle`.
 
     This is the adapter Workstream A asked for - "assemble the country-specific real-data B
@@ -307,6 +349,15 @@ def load_country_bundle(country: str, validate_contracts: bool = False):
 
     tables = load_country(country, with_costs=False)
     universe = tables["universe"]
+    if max_names is not None:
+        before = int(universe["in_universe"].astype(bool).sum())
+        universe = apply_breadth_cap(universe, max_names)
+        after = int(universe["in_universe"].astype(bool).sum())
+        months = universe.loc[universe["in_universe"].astype(bool), "date"].nunique()
+        log.info("%s breadth cap %d names/month (amendment 001B): in_universe %d -> %d "
+                 "security-months, %.0f names/month over %d months%s", country, max_names,
+                 before, after, after / max(months, 1), months,
+                 "" if after < before else "  [CAP IS SLACK - no name was excluded]")
 
     costs = pd.read_csv(cost_inputs_path(), parse_dates=["date"])
     if "country" in costs.columns:
