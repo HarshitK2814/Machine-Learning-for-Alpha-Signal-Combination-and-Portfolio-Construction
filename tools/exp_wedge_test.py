@@ -136,6 +136,26 @@ def country_test(d: pd.DataFrame, country: str, as_of: str) -> dict:
     b3, se3, t3, _ = slope_on(tax_bps, p, extra=g)
     out.update(tax_level_slope=b3, tax_level_t=t3)
 
+    # (4a) The factorial's two objective arms occupy DISJOINT turnover ranges - the economic-loss
+    # cells all trade several times faster than every prediction-loss cell - so a slope fitted
+    # across all sixteen is a comparison of two tight clusters, not a gradient, and its n is
+    # effectively two. Worse, the high-turnover cluster is the arm with negative GROSS Sharpe in
+    # both countries, i.e. the one that failed to train. The within-arm slopes are therefore
+    # computed and reported alongside, and the full-sample slope must never be read without them.
+    arm = t["strategy"].str.extract(r"cell_[LN]-[SC]-([PE])-")[0].to_numpy()
+    for label in ("P", "E"):
+        m = arm == label
+        key = f"lt_share_slope_{label}_only"
+        if m.sum() < 4 or np.nanstd(lt[m]) < 1e-12:
+            out[key], out[f"lt_share_t_{label}_only"] = np.nan, np.nan
+        else:
+            bb, _, tt2, _ = slope_on(lt[m], p[m])
+            out[key], out[f"lt_share_t_{label}_only"] = bb, tt2
+        out[f"turnover_range_{label}_only"] = (
+            f"{p[m].min():.4f}-{p[m].max():.4f}" if m.any() else "")
+    if (arm == "P").any() and (arm == "E").any():
+        out["arms_turnover_overlap"] = bool(p[arm == "P"].max() >= p[arm == "E"].min())
+
     # (4) the mechanism: lt_share_of_gains on turnover
     degenerate = bool(np.nanstd(lt) < 1e-12)
     out["lt_share_degenerate"] = degenerate
@@ -226,6 +246,27 @@ def main(argv: list[str] | None = None) -> int:
                         "lt_share_degenerate"] if c in res.columns]
     print(res[cols].to_string(index=False, float_format=fmt))
 
+    print("\n(4b) THE SAME SLOPE, WITHIN EACH OBJECTIVE ARM - read this before believing (4)")
+    print("     the two arms occupy disjoint turnover ranges, so a slope across all 16 cells is a")
+    print("     two-cluster comparison with an effective n of 2, and the fast cluster is the arm")
+    print("     with negative GROSS Sharpe in every country measured, i.e. the one that failed.")
+    cols = [c for c in ["country", "lt_share_slope", "lt_share_t", "lt_share_slope_P_only",
+                        "lt_share_t_P_only", "lt_share_slope_E_only", "lt_share_t_E_only",
+                        "turnover_range_P_only", "turnover_range_E_only",
+                        "arms_turnover_overlap"] if c in res.columns]
+    print(res[cols].to_string(index=False, float_format=fmt))
+    for _, r in res.iterrows():
+        if r.get("lt_share_degenerate"):
+            continue
+        survives = (np.isfinite(r.get("lt_share_t_P_only", np.nan))
+                    and abs(r["lt_share_t_P_only"]) > 1.96)
+        if not survives:
+            print(f"\n  *** {r['country']}: the full-sample slope does NOT survive within the")
+            print(f"  prediction-loss arm (t = {r.get('lt_share_t_P_only', float('nan')):+.2f}). The")
+            print("  full-sample figure is a between-arm artefact and must not be reported as a")
+            print("  turnover gradient. What remains is the CROSS-COUNTRY contrast in the level of")
+            print("  lt_share, which is a statutory fact and needs no regression.")
+
     print("\nREADING, by country:")
     for _, r in res.iterrows():
         if "error" in res.columns and isinstance(r.get("error"), str):
@@ -244,29 +285,45 @@ def main(argv: list[str] | None = None) -> int:
                       f"before reporting.")
         else:
             direction = "falls" if r["lt_share_slope"] < 0 else "rises"
-            verdict = ("CONSISTENT with the holding-period channel"
-                       if r["lt_share_slope"] < 0 and r["lt_share_significant_5pct"]
-                       else "not significant" if r["lt_share_slope"] < 0
-                       else "AGAINST the channel - faster trading should not raise the long-term share")
+            t_p = r.get("lt_share_t_P_only", float("nan"))
+            # A full-sample slope only means something if it also holds inside an arm, because the
+            # arms do not overlap in turnover. Without that, it is a two-cluster difference.
+            within = bool(np.isfinite(t_p) and abs(t_p) > 1.96 and r["lt_share_slope_P_only"] < 0)
+            if within:
+                verdict = "CONSISTENT with the holding-period channel, and it survives within-arm"
+            elif r["lt_share_slope"] < 0:
+                verdict = (f"NOT ESTABLISHED as a turnover gradient - between-arm artefact "
+                           f"(within prediction-loss arm t = {t_p:+.2f}); the cross-country "
+                           f"LEVEL contrast is what stands")
+            else:
+                verdict = "AGAINST the channel - faster trading should not raise the long-term share"
             print(f"  {r['country']} (wedge {wedge:.3f}, boundary {r['boundary_months']}m): "
-                  f"lt_share {direction} with turnover, slope {r['lt_share_slope']:+.3f} "
-                  f"t={r['lt_share_t']:+.2f}, range {r['lt_share_range']} -> {verdict}")
+                  f"lt_share {direction} with turnover across all cells, slope "
+                  f"{r['lt_share_slope']:+.3f} t={r['lt_share_t']:+.2f}, range "
+                  f"{r['lt_share_range']} -> {verdict}")
 
     zero = res[res["wedge"] == 0.0]
     pos = res[res["wedge"] > 0.0]
     if len(zero) and len(pos):
         print("\nCROSS-COUNTRY ORDERING on the mechanism:")
         flat_degenerate = bool(zero["lt_share_degenerate"].all())
-        wedge_works = bool((pos["lt_share_slope"] < 0).all()
-                           and pos["lt_share_significant_5pct"].all())
-        print(f"  every flat-rate country has lt_share identically zero : {flat_degenerate}")
-        print(f"  every wedge country has lt_share falling in turnover  : {wedge_works}")
-        if flat_degenerate and wedge_works:
-            print("  This is the predicted ordering, and a tax-LEVEL story cannot produce it:")
-            print(f"  Germany is taxed at 26.375% against India's 15% short-term rate and still")
-            print("  shows no holding-period channel at all, because its statute has no boundary.")
-        else:
-            print("  PREDICTED ORDERING NOT OBTAINED on the mechanism either - report as such.")
+        t_p = pos.get("lt_share_t_P_only")
+        wedge_within = bool(t_p is not None and t_p.notna().all()
+                            and (t_p.abs() > 1.96).all()
+                            and (pos["lt_share_slope_P_only"] < 0).all())
+        print(f"  every flat-rate country has lt_share identically zero       : {flat_degenerate}")
+        print(f"  every wedge country's gradient survives WITHIN an arm       : {wedge_within}")
+        print("\n  WHAT STANDS: the cross-country contrast in the LEVEL of lt_share. It is")
+        print("  identically 0.0000 in every flat-rate cell because the statute creates no")
+        print(f"  long-term category, against {pos['lt_share_range'].iloc[0]} where it creates one.")
+        print("  That is a statutory fact about which gains can exist, not an estimate, and a")
+        print("  tax-LEVEL story cannot produce it: Germany is taxed at 26.375% against India's")
+        print("  15% short-term rate and still has no holding-period category at all.")
+        if not wedge_within:
+            print("\n  WHAT DOES NOT STAND: the within-country turnover gradient. The objective")
+            print("  arms occupy disjoint turnover ranges and the fast arm failed to train")
+            print("  (negative gross Sharpe), so the full-sample slope is a two-cluster")
+            print("  difference. It must not be reported as a turnover gradient.")
         print("\n  Note the magnitudes before calling this a large effect:")
         for _, r in res.iterrows():
             print(f"    {r['country']}: tax drag {r['mean_tax_drag_bps']:.2f} bps vs cost drag "

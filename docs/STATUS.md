@@ -12,13 +12,27 @@ handoff to Workstream B is complete.
 > cells with gains). **My earlier report that Germany's -21.99 "showed the placebo holds" is
 > retracted**; that number was an artefact, not evidence.
 >
-> **Measuring the mechanism directly does give the predicted pattern.** `lt_share_of_gains`
-> (= `1 - Phi(p,H)` as the lot ledger realised it) is **identically 0.0000 in all 16 German
-> cells** - with no holding-period boundary there is no long-term category, so the variable the
-> mechanism works through does not exist - and in India falls from 0.6413 to 0.3826 with
-> turnover, slope -8.78, **t = -4.36**. A tax-LEVEL story cannot produce that: Germany is taxed
-> at 26.375% against India's 15% and shows no channel at all. **This is post-hoc** and is
-> labelled so everywhere; `docs/handoff/19_FOR_MAHAM_...` asks Maham to rule on it.
+> **The post-hoc replacement ALSO failed.** I promoted a turnover gradient in
+> `lt_share_of_gains` (India, slope -8.78, **t = -4.36**) and then ran the obvious robustness
+> check: it does not survive splitting by objective arm. The two arms occupy **disjoint**
+> turnover ranges, so a line through all 16 cells measures the gap between two clusters and its
+> effective n is **2, not 16** - within the healthy prediction-loss arm t = **-0.86**, and the
+> economic arm has the wrong sign (+13.1). **The t = -4.36 is spurious. Do not quote it.**
+>
+> **What does survive** is narrower and is not an estimate at all: `lt_share` is **identically
+> 0.0000 in every German cell**, because Abgeltungsteuer creates no long-term category for a gain
+> to fall into, against 0.3826-0.6413 in India where the statute creates one. A tax-LEVEL story
+> cannot produce that contrast - Germany is taxed at 26.375% against India's 15% and has no
+> category whatsoever. So statute determines **whether the channel can exist**; it is not
+> established that the channel orders the friction penalty.
+>
+> **TOP BLOCKER: the economic-loss arm looks broken.** It trains on net-of-cost utility with a
+> `- cost(w_t - w_{t-1})` term, so it should trade less; instead it trades 3.3x more and has
+> **negative gross Sharpe before any costs** (India: E -0.272 vs P +0.534; all 8 E cells negative,
+> all 8 P positive, same on the German panel). That most likely means it failed to train. It
+> matters because the factorial's one significant main effect IS the economic one, so that effect
+> may be measuring a training failure - and it supplied all the turnover variation the test above
+> depended on. `docs/handoff/19_FOR_MAHAM_...` asks Maham to rule on debug-vs-flag.
 >
 > **Magnitudes reframe the claim.** Tax drag is 5.23 bps against 27.67 bps of cost in Germany,
 > and 0.45 against 24.30 in India - costs dominate 5x and 53x. India's drag is small *because*

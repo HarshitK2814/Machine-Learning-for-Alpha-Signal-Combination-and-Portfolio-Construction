@@ -1,7 +1,46 @@
-# For Maham (workstream C): the pre-registered statistic failed and I respecified. Please rule on it.
+# For Maham (workstream C): two tests failed tonight. Please rule on what is left.
 
 **From:** Harshit, workstream B
-**Date:** 2026-10-09, 02:10 IST
+**Date:** 2026-10-09, 02:10 IST. **Revised 02:35 IST - please read the UPDATE below first.**
+
+---
+
+## UPDATE at 02:35, before you read anything else
+
+When I wrote this at 02:10 I was asking you to rule on a post-hoc statistic (§3) that looked
+strong: India's `lt_share_of_gains` falling with turnover, slope -8.78, **t = -4.36**.
+
+**I then ran the obvious robustness check and it does not survive.** Splitting by objective arm:
+
+| sample | n | slope | t | turnover range |
+|---|---|---|---|---|
+| all 16 cells | 16 | -8.783 | **-4.36** | 0.0043 - 0.0226 |
+| prediction-loss arm only | 8 | -5.468 | **-0.86** | 0.0043 - 0.0099 |
+| economic-loss arm only | 8 | **+13.095** | +0.75 | 0.0191 - 0.0226 |
+
+The two arms occupy **disjoint** turnover ranges - every economic-loss cell trades faster than
+every prediction-loss cell - so a line through all 16 is measuring the gap between two tight
+clusters and its effective n is **2, not 16**. Within either cluster there is nothing, and the
+high-turnover cluster is the arm that failed to train (see the new §7 below). **The t = -4.36 is
+spurious and I am withdrawing §3's claim before you spend time on it.** The tool now prints the
+within-arm split above the full-sample slope and refuses the favourable verdict unless the
+gradient survives within an arm.
+
+So the question for you is no longer "is this respecification acceptable". It is narrower:
+
+* **What survives** is a cross-country contrast in *levels*: `lt_share` is identically 0.0000 in
+  every German cell because Abgeltungsteuer creates no long-term category at all, against
+  0.3826-0.6413 in India. That is a statutory fact about which gains can exist, not an estimate,
+  and needs no standard error. A tax-LEVEL story cannot produce it - Germany is taxed at 26.375%
+  against India's 15% and has no category whatsoever.
+* **What does not** is any within-country turnover gradient, in any specification I have tried.
+* **Separately, §7 is now the top blocker** and I would value your read on it more than on
+  anything else here.
+
+I have kept §1-§6 below as originally written, because the sequence matters and I do not want to
+present a tidied-up version of how this went.
+
+---
 **Decision needed from you:** whether the respecification in §3 is acceptable, and if so under what
 label it may appear in the paper. I have **not** written it up as a passed test. See §5 for the
 three options as I see them.
@@ -142,3 +181,37 @@ you have ruled.
 * `tools/exp_112a_event_study.py` — the event study, with both clusterings reported
 * `outputs/wedge_test/wedge_test.csv` — the numbers
 * `docs/AMENDMENT_001B_UNIVERSE_BREADTH_CAP.md` — the Japanese universe cap, needs countersignature
+
+
+---
+
+## 7. ADDED 02:35 - the economic-loss arm looks broken, which undercuts the factorial too
+
+The economic-loss cells train on net-of-cost utility including a `- cost(w_t - w_{t-1})` term, so
+they should trade LESS than the prediction-loss cells. They trade more, and they have **negative
+gross Sharpe - before any costs are charged**:
+
+| India, by arm | gross Sharpe | net Sharpe | gross mean p.a. | turnover | cost drag |
+|---|---|---|---|---|---|
+| prediction-loss (P) | **+0.534** | +0.217 | +0.00158 | 0.0066 | 9.6 bps |
+| economic-loss (E) | **-0.272** | -0.912 | -0.00161 | 0.0214 | 39.2 bps |
+
+All 8 E cells negative, all 8 P cells positive, and the same pattern on the German panel. An
+objective that prices turnover, trades 3.3x more and earns negative gross alpha has most likely
+failed to train rather than discovered that economic objectives are worse.
+
+**Why this is the top blocker:** the factorial's one significant main effect IS the economic one
+(DEU -0.0054, t = -3.77; IND -0.0063, 81.6% of total). If the E arm is misconfigured, that effect
+measures a training failure and not a design trade-off - and it is currently the most robust
+finding in the project, replicating across two countries. It also supplies all the turnover
+variation that §3/§5 depended on.
+
+I have not debugged it yet. Candidates, in the order I would check them: the cost term's scale
+relative to the return term in training; whether `w_{t-1}` in the truncated 12-month sequences is
+the drifted prior book or a reset to zero (the same drift trap that invalidated the first
+real-data run); and whether the policy is simply undertrained at these cross-section sizes.
+
+**Question for you:** is the right move to debug the E arm, or to report the factorial with the E
+arm explicitly flagged as not-fit-for-purpose and lean the paper on the P arm plus the
+cross-country tax contrast? I can argue either. I would rather you decide than have me pick the
+one that makes the results look better.
