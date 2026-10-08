@@ -24,10 +24,14 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from alphacomb.contracts import load_bundle, load_config, new_run_id, paths, read_table, write_table  # noqa: E402
 from alphacomb.tax import LotMethod, TaxConfig, after_tax_backtest, get_regime, summarise_after_tax  # noqa: E402
 
+ROOT = Path(__file__).resolve().parents[1]
 log = logging.getLogger("stage06")
 
+# Jurisdiction of listing, which is what the dated schedule and the FX cache are keyed on.
+LOCAL_CURRENCY = {"DEU": "EUR", "IND": "INR", "JPN": "JPY"}
+
 REPORT_COLUMNS = [
-    "strategy", "country", "wedge", "held_share", "regime", "lot_method", "months", "gross_sharpe", "net_sharpe", "after_tax_sharpe",
+    "strategy", "country", "wedge", "dated", "held_share", "regime", "lot_method", "months", "gross_sharpe", "net_sharpe", "after_tax_sharpe",
     "gross_mean_ann", "net_mean_ann", "after_tax_mean_ann", "after_tax_liq_mean_ann",
     "cost_drag_ann_bps", "tax_drag_ann_bps", "total_drag_ann_bps", "tax_share_of_gross",
     "wash_disallowed_ann_bps", "lt_share_of_gains", "turnover_mean", "max_drawdown",
@@ -79,6 +83,11 @@ def main() -> None:
     p.add_argument("--cost-multiplier", type=float, default=1.0)
     p.add_argument("--aum", type=float, default=None, help="override AUM (cost and impact scale)")
     p.add_argument("--save-returns", action="store_true", help="write the full monthly C12 tables")
+    p.add_argument("--dated", action="store_true",
+                   help="resolve the tax rule on each event's own date through the frozen C14 "
+                        "dated engine instead of holding one statutory regime fixed. Requires "
+                        "--country and forces year_end accounting (frozen decision 3A). This is "
+                        "what makes India's section 112A change visible inside the sample.")
     a = p.parse_args()
 
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
@@ -105,6 +114,29 @@ def main() -> None:
     else:
         bundle = load_bundle(a.data or cfg["data_source"])
 
+    dated_engine = None
+    dated_currency = None
+    if a.dated:
+        if not a.country:
+            raise SystemExit("--dated requires --country; the dated engine resolves by jurisdiction")
+        if a.accounting != "year_end":
+            # The engine refuses anything else, and silently rewriting the user's choice would
+            # hide which accounting convention produced the numbers.
+            raise SystemExit("--dated requires --accounting year_end (frozen decision 3A)")
+        from alphacomb.tax.dated import DatedC12Patch
+
+        dated_engine = DatedC12Patch.from_frozen_evaluation_artifacts(ROOT)
+        dated_currency = LOCAL_CURRENCY[a.country]
+        window = ("2009-01-01", "2019-12-31")
+        coverage = dated_engine.schedule.validate(*window)
+        log.info("dated C14 engine: %s rules cover %s..%s, currency %s",
+                 coverage, window[0], window[1], dated_currency)
+        for probe in ("2018-03-31", "2018-04-01"):
+            rule = dated_engine.schedule.resolve(a.country, probe)
+            log.info("  %s rule in force on %s: %s short=%s long=%s boundary=%sm transition=%s",
+                     a.country, probe, rule.legal_regime, rule.cgt_short, rule.cgt_long,
+                     rule.holding_period_months, rule.transition_rule)
+
     root = paths.outputs_root() / "weights"
     if not root.exists():
         raise SystemExit("no weights found; run pipelines/04_construct_portfolios.py first")
@@ -122,13 +154,22 @@ def main() -> None:
             for method_name in a.lot_methods:
                 tc = TaxConfig(regime=get_regime(regime_name), lot_method=LotMethod(method_name),
                                accounting=a.accounting, dividend_yield_annual=a.dividend_yield,
-                               initial_nav=float(cfg["costs"]["aum_usd_2020"]))
+                               initial_nav=float(cfg["costs"]["aum_usd_2020"]),
+                               **({} if dated_engine is None or regime_name == "tax_exempt" else
+                                  {"dated_engine": dated_engine, "dated_country": a.country,
+                                   "dated_local_currency": dated_currency}))
                 frame = after_tax_backtest(weights, bundle, cfg, tc, a.cost_multiplier)
                 summary = {"strategy": folder.name, **summarise_after_tax(frame)}
                 rows.append(summary)
                 reg = get_regime(regime_name)
                 summary["regime"] = reg.name
                 summary["wedge"] = reg.rate_spread
+                # In a dated run the wedge is a function of time, not a scalar, so publishing the
+                # as-of value in this column would invite exactly the misreading the dated engine
+                # exists to prevent.
+                summary["dated"] = bool(dated_engine is not None and regime_name != "tax_exempt")
+                if summary["dated"]:
+                    summary["wedge"] = float("nan")
                 summary["country"] = a.country or ""
                 log.info("%s | %s | %s: after-tax Sharpe %.3f, tax drag %.0f bps, "
                          "lt_share %.3f, wedge %.5f",

@@ -167,7 +167,8 @@ def main() -> None:
         held = sum(v for k, v in counts.items() if str(k).startswith("failed_hold"))
         held_share = held / months if months else 0.0
         rows.append({"strategy": name, "source_artefact": str(artefact), "weights": str(out),
-                     "run_id": run_id, "cost_multiplier": a.cost_multiplier, "aum": opt.aum_usd,
+                     "run_id": run_id, "country": a.country or "",
+                     "cost_multiplier": a.cost_multiplier, "aum": opt.aum_usd,
                      "gamma": opt.gamma, "tax_aware": a.tax_aware, "wash_block": a.wash_block,
                      "months": months, "n_optimal": counts.get("optimal", 0),
                      "n_inaccurate": counts.get("optimal_inaccurate", 0), "n_held": held,
@@ -187,6 +188,17 @@ def main() -> None:
     append_manifest(manifest, path)
     print(manifest.to_string(index=False))
     print(f"\nmanifest: {path}")
+    if a.country and not manifest.empty:
+        # outputs/weights/<strategy>/ is shared across countries and paths.latest_run resolves by
+        # modification time, so once a second country has run stage 04 there is nothing on disk
+        # that says which country a weights file belongs to. Naming this run's ids here is what
+        # lets a downstream exhibit load the right country's book instead of the most recent one.
+        index_dir = paths.outputs_root() / "weights_index"
+        index_dir.mkdir(parents=True, exist_ok=True)
+        tag = f"{opt.aum_usd:.0e}".replace("e+0", "e").replace("e+", "e")
+        index = index_dir / f"{a.country}_{tag}.csv"
+        manifest[["country", "aum", "strategy", "run_id", "weights"]].to_csv(index, index=False)
+        print(f"weights index: {index}")
 
 
 if __name__ == "__main__":
