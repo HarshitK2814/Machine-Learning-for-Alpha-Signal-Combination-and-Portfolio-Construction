@@ -1,7 +1,47 @@
 # Workstream B status (Harshit)
 
-Updated: **2026-10-08 (evening)**. Workstream A is production-promoted and its real-data
+Updated: **2026-10-09 (02:15 IST)**. Workstream A is production-promoted and its real-data
 handoff to Workstream B is complete.
+
+> ## The headline, as of this update
+>
+> **The pre-registered wedge statistic failed, and was separately found to be ill-defined.**
+> India returned slope -4.83, t = -2.59 - significantly the WRONG sign - and the statistic
+> divides tax by mean gross return, which is negative for 6 of 16 German and 8 of 16 Indian
+> cells. Its sign flips with specification (Germany -21.99 on all cells, **+11.56** on the
+> cells with gains). **My earlier report that Germany's -21.99 "showed the placebo holds" is
+> retracted**; that number was an artefact, not evidence.
+>
+> **Measuring the mechanism directly does give the predicted pattern.** `lt_share_of_gains`
+> (= `1 - Phi(p,H)` as the lot ledger realised it) is **identically 0.0000 in all 16 German
+> cells** - with no holding-period boundary there is no long-term category, so the variable the
+> mechanism works through does not exist - and in India falls from 0.6413 to 0.3826 with
+> turnover, slope -8.78, **t = -4.36**. A tax-LEVEL story cannot produce that: Germany is taxed
+> at 26.375% against India's 15% and shows no channel at all. **This is post-hoc** and is
+> labelled so everywhere; `docs/handoff/19_FOR_MAHAM_...` asks Maham to rule on it.
+>
+> **Magnitudes reframe the claim.** Tax drag is 5.23 bps against 27.67 bps of cost in Germany,
+> and 0.45 against 24.30 in India - costs dominate 5x and 53x. India's drag is small *because*
+> its wedge shelters: with LTCG exempt and 38-64% of gains long-term, most Indian gains were
+> taxed at zero, so the wedge rewards patience rather than punishing turnover.
+> Supported: *the holding-period channel is created and bounded by statute and is identically
+> absent under a flat rate.* **Not supported: the friction penalty is ordered by the wedge.**
+>
+> Read `docs/RESULTS_WEDGE_TEST.md` - §2 is the failure and the retraction - before any number
+> below.
+>
+> **Also settled overnight:** India's net-of-cost factorial replicates Germany's (economic main
+> effect -0.0063 p.a., 81.6% of total, against Germany's -0.0054). The dated C14 engine is now
+> driven by stage 06 (`--dated`), which makes India's section 112A change visible inside the
+> sample; both arms of that event study are running. Japan is running under amendment 001B.
+>
+> **Two provenance/correctness holes closed:** `outputs/weights/<s>/` is shared across countries
+> and `paths.latest_run` resolves by modification time, so after India's stage 04 ran, "the
+> latest weights" for a cell silently meant India's - a Germany exhibit run afterwards would
+> have scored India's book against German prices with no visible symptom. Stage 04 now writes
+> `outputs/weights_index/<C>_<aum>.csv` and consumers refuse to fall back to mtime. And Japan's
+> panel starts in **1996**, so with default `--years` its evaluation window would have been 300
+> months against Germany's and India's 132.
 
 **Real empirical results now exist.** The scenario grid was frozen in
 `prereg/AMENDMENT_001A_international_scenario_freeze_2026-10-08` (awaiting Maham's
@@ -23,8 +63,14 @@ fixed (`36e839a`, 13 new tests), but any result produced before that commit is v
 Two data facts that shape every result: C6 `adv_usd` is non-null for only 55% of DEU rows,
 so the tradeable universe is ~246 names a month rather than ~360; and at $1bn AUM the
 largest attainable gross is 0.19-0.23 against a budget of 2.0, so capacity binds long
-before the risk budget. Question 2 of `docs/handoff/18_FOR_ABSAR_...` asks Absar whether
-the ADV gap is the source data or a promotion gap; it is unanswered.
+before the risk budget. Question 2 of `docs/handoff/18_FOR_ABSAR_...` asked Absar whether
+the ADV gap is the source data or a promotion gap. **It is answered and withdrawn**: his
+`data/intl_c6/audit/` files (32 of them, already in the checkout) show monthly `adv_usd`
+requires a complete 21-day volume window, which only Germany fails (65.09%, matching the
+measured 65.2%); India is 99.19% and Japan 99.80%. Not a promotion gap, nothing to fix. The
+same audit closes the borrow-fee question: he probed 266 WRDS libraries and no
+securities-lending fee source is entitled, so `MODELLED_FLAT_BORROW_PROXY_V1` is the only
+option rather than a shortcut, and the paper can cite the audit.
 
 ## Current Workstream-A handoff boundary
 
