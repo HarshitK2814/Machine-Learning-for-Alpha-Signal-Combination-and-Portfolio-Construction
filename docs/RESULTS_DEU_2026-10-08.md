@@ -85,6 +85,25 @@ be expected to produce by chance. This is the result the deflated Sharpe exists 
 should be reported as the headline, not buried: **on Germany, net of costs, no configuration in the
 pre-registered design is distinguishable from the outcome of the search that produced it.**
 
+### Multiple testing: the same answer from two more directions
+
+| test | result |
+|---|---|
+| Romano-Wolf StepM, family-wise over 16 cells | **0 of 16 reject** at 5%; best adjusted p = 0.581 (`N-C-P-U`) |
+| PBO by CSCV | **0.069** |
+
+Romano-Wolf agrees with the deflation: once the family of 16 is corrected for, nothing is
+significant, and it is not close - fifteen of sixteen cells have an adjusted p of 1.000.
+
+PBO deserves care, because 6.9% is a *low* number and low PBO is normally good news. It says the
+configuration that wins in sample lands in the bottom half out of sample only 6.9% of the time, so
+the selection **procedure** is stable. But stability is not profitability, and here the stability
+is largely inherited from the E-vs-P separation in section 1: the gap between prediction-loss and
+economic-loss cells is large and persistent, so whichever prediction cell wins in sample is
+reliably above median out of sample. The honest summary of the three tests together is: **the
+design picks the same winner consistently, and that winner is not good enough to clear the hurdle
+its own search creates.**
+
 ## 4. Why: capacity binds before the model matters
 
 This is the mechanism, and it is what makes the negative result informative rather than empty.
