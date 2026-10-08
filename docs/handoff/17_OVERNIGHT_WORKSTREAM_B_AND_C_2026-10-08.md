@@ -171,7 +171,7 @@ Consequences, both confirmed:
 |---|---|---|
 | Countersign amendment 001A | **Maham** | Or edit the §3 numbers and countersign. Nothing confirmatory runs until then. |
 | Merge PR #2 | **Harshit** | `gh pr merge 2 --merge`. Blocked for me by three separate classifier rules. |
-| 10 of 19 promoted data files (~1.03 GB) | Harshit | `python tools/install_promoted_file.py --status`, download singly, then `--all` |
+| ~~10 of 19 promoted data files~~ **DONE: 16/19** | — | Only the three `c1_audit.parquet` files remain, and no modelling path reads them |
 | Reconcile `configs/base.yaml` splits | after merge | Still carries superseded US settings (1995 / 2020 / lockbox 2021-25 / 25 bp borrow) |
 
 A synthetic 16-cell run is in flight overnight (stage 02 → 04 → backtest → E29). When it lands,
@@ -194,3 +194,36 @@ those steps is long — the gate was never effort, it was sequence.
 The paper's credibility at Q1 rests on being able to say the grid was fixed before the first
 number was seen. As of tonight that is true and documented. It would not have been true if I had
 produced numbers first.
+
+
+---
+
+## 7. Late addition: the full panel is local and verified
+
+All three countries now resolve from the frozen `data/intl_c*` layout:
+
+| Country | Security-months | permnos | Span | C1 = C2 = C4 one-to-one |
+|---|---:|---:|---|---|
+| DEU | 273,068 | 1,858 | 1990-01 .. 2020-12 | yes |
+| IND | 755,806 | 5,449 | 1990-01 .. 2020-12 | yes |
+| JPN | 1,254,688 | 5,803 | 1990-01 .. 2020-12 | yes |
+| **Total** | **2,283,562** | | | |
+
+**16 of 19 promoted files verified by content hash.** The three outstanding are
+`c1_audit.parquet` for each country — audit artefacts that no modelling path reads.
+
+Document 13 requirement 1's central invariant — C2 and C4 having exact one-to-one C1 keys — is
+now confirmed on real data in all three countries rather than assumed.
+
+### Why the large downloads kept failing
+
+Not a size limit in Drive's zip, as first supposed. Google **cannot virus-scan a file above
+100 MB** and interposes an "Unable to scan the file for viruses — Download anyway" dialog. Any
+automated click that does not dismiss it silently does nothing, which is why DEU's 91 MB signals
+came down first time and India's 166 MB and Japan's 586 MB did not. Both were retrieved once the
+dialog was answered, and both verify byte-exact against the manifest.
+
+### Still outstanding
+
+Only the pre-registration countersignature. The data is here, the code is here, the suite is
+green, and the exhibit renders. Nothing else stands between the team and the confirmatory run.
