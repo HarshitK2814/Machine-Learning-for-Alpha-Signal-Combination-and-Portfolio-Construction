@@ -1,20 +1,29 @@
-# Handoff pack — workstream B
+# Handoff pack — Workstream B
 
-**22 September 2026.** Four documents, written together. Read in this order.
+**Updated 7 October 2026.** The sole current Workstream-A handoff is
+[`13_WORKSTREAM_A_PRODUCTION_PROMOTION_AND_WORKSTREAM_B_HANDOFF_2026-10-07.md`](13_WORKSTREAM_A_PRODUCTION_PROMOTION_AND_WORKSTREAM_B_HANDOFF_2026-10-07.md).
+It records the completed production promotion, frozen evaluation windows,
+borrow-proxy boundary, 290-test validation, and exact Workstream-B integration
+instructions. Intermediate Workstream-A handoffs 06-12 remain in the Drive
+audit archive and are superseded wherever they conflict with handoff 13.
+
+The original Workstream-B handoff documents remain below as design and
+ownership history.
 
 | # | Document | Audience | What it answers |
 |---|---|---|---|
-| 1 | [`01_NEEDS_FROM_ABSAR.md`](01_NEEDS_FROM_ABSAR.md) | Absar (workstream A) | Everything workstream B needs from data engineering, including every preprocessing step, so what arrives is analysis-ready |
-| 2 | [`02_NEEDS_FROM_MAHAM.md`](02_NEEDS_FROM_MAHAM.md) | Maham (workstream C) | What B needs from statistics and reporting — and the one ownership decision that has to be settled |
-| 3 | [`03_HARSHIT_WORK_COMPLETED.md`](03_HARSHIT_WORK_COMPLETED.md) | Everyone | What workstream B has built, what is verified, what is not, and the eleven silent failures |
-| 4 | [`04_WHO_DOES_WHAT_NEXT.md`](04_WHO_DOES_WHAT_NEXT.md) | Everyone | Who does what with B's work, and the five decisions that need owners |
+| 1 | [`01_NEEDS_FROM_ABSAR.md`](01_NEEDS_FROM_ABSAR.md) | Absar (Workstream A) | The original requested data-engineering contracts and preprocessing |
+| 2 | [`02_NEEDS_FROM_MAHAM.md`](02_NEEDS_FROM_MAHAM.md) | Maham (Workstream C) | Required statistics and reporting interfaces |
+| 3 | [`03_HARSHIT_WORK_COMPLETED.md`](03_HARSHIT_WORK_COMPLETED.md) | Everyone | What Workstream B built and its silent-failure safeguards |
+| 4 | [`04_WHO_DOES_WHAT_NEXT.md`](04_WHO_DOES_WHAT_NEXT.md) | Everyone | Original ownership and integration boundaries |
+| 5 | [`05_REPLY_TO_ABSAR_C1_PILOT.md`](05_REPLY_TO_ABSAR_C1_PILOT.md) | Everyone | Historical C1 pilot response |
 
-**Supersedes** `docs/ASK_ABSAR.md` and `docs/HARSHIT_NEEDS_FROM_ABSAR.md`, and consolidates
-`docs/HARSHIT_PROVIDES.md`. Those three remain in the repository as history.
+## Current boundary
 
-## The two sentences that matter most
+Workstream A and the real-data handoff are complete. No real empirical result
+had been inspected at handoff. Workstream B must validate handoff 13 before
+producing real C11 weights, after which Absar owns final C12 accounting.
 
-**Everything is blocked on real data, and nothing else is close to binding.** Absar's one-page
-feasibility note (document 1, §1) gates the entire project and is wanted this week — if only the
-United States is sourceable, the research claim changes, and we need to know that now rather than
-after a year of work.
+The earlier files under `docs/ASK_ABSAR.md`, `docs/HARSHIT_NEEDS_FROM_ABSAR.md`,
+and `docs/HARSHIT_PROVIDES.md` remain repository history and are not the current
+Workstream-A execution contract.

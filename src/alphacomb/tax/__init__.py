@@ -6,6 +6,10 @@ order of magnitude as the trading cost, so "net of costs" is not the same as "ne
 answers the question the literature skips: what does the investor actually keep?
 """
 from .backtest import TaxConfig, after_tax_backtest, compare_regimes, summarise_after_tax  # noqa: F401
+from .dated import (DatedC12Patch, DatedPatchConfig, DatedRegimeSchedule, DatedRule,  # noqa: F401
+                    DatedTaxLot, LossCarryforwardBook, LossVintage,
+                    MissingDatedTaxConfiguration, PointInTimeFXStore, SecurityReferenceValueStore,
+                    StatutoryAmount, production_architecture_gate)
 from .jurisdictions import (CHINA_A, GERMANY, HONG_KONG, INDIA, JAPAN, JURISDICTIONS,  # noqa: F401
                             SINGAPORE, TAIWAN, UNITED_KINGDOM, UNITED_STATES, Jurisdiction, LossRelief,
                             TransactionTaxes, get_jurisdiction, identification_table)
@@ -22,4 +26,7 @@ __all__ = [
     "harvesting_decomposition", "overhang_trajectory", "Lot", "LotMethod", "REGIMES", "RealisedGain", "TAXABLE_US", "TAX_EXEMPT",
     "TRADER_475F", "TaxConfig", "TaxLotLedger", "TaxRegime", "after_tax_backtest", "compare_regimes",
     "get_regime", "summarise_after_tax",
+    "DatedC12Patch", "DatedPatchConfig", "DatedRegimeSchedule", "DatedRule", "DatedTaxLot",
+    "LossCarryforwardBook", "LossVintage", "MissingDatedTaxConfiguration",
+    "PointInTimeFXStore", "SecurityReferenceValueStore", "StatutoryAmount", "production_architecture_gate",
 ]

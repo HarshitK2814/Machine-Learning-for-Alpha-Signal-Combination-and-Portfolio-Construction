@@ -1,0 +1,47 @@
+{
+  "status": "FROZEN_6_OF_6",
+  "approved_by": "Absar Wani",
+  "approval_date": "2026-10-07",
+  "configuration_reference": "MODELLED_FLAT_BORROW_PROXY_V1",
+  "real_results_inspected_before_freeze": false,
+  "decisions": {
+    "representative_taxable_investor_rate_paths": {
+      "choice": "1A",
+      "value": "dated_top_marginal_resident_individual_rates",
+      "applicable_surtaxes_and_cesses": true,
+      "missing_numeric_rate_behavior": "FAIL_CLOSED"
+    },
+    "allowance_allocation": {
+      "choice": "2C",
+      "value": "zero_strategy_allocation_allowance_consumed_elsewhere",
+      "allocation_fraction": 0.0
+    },
+    "statutory_currency_FX_timing": {
+      "choice": "3A",
+      "value": "event_date_spot_and_tax_year_end_spot_previous_available_business_day",
+      "future_rate_prohibited": true
+    },
+    "brokerage_platform_fee_scope": {
+      "choice": "4A",
+      "value": "outside_C14_retained_in_execution_cost_model",
+      "double_count_with_C6_prohibited": true
+    },
+    "pre_2003_Japan_taxpayer_route": {
+      "choice": "5A",
+      "value": "comprehensive_return_declaration_route",
+      "retrospective_monthly_route_switching_prohibited": true
+    },
+    "missing_borrow_fee_treatment": {
+      "choice": "6B",
+      "model": "MODELLED_FLAT_BORROW_PROXY_V1",
+      "classification": "MODELLED_PREREGISTERED_PROXY_NOT_OBSERVED",
+      "annual_rate": 0.01,
+      "sensitivity_annual_rates": [0.003, 0.006, 0.043, 0.07],
+      "injection_layer": "C11_and_experiment_consumers_only",
+      "certified_C6_borrow_fee_column": "PRESERVE_NULL",
+      "legacy_25bp_fallback": "PROHIBITED",
+      "verified_unshortable_security_months": "INELIGIBLE",
+      "results_must_not_be_inspected_before_scenarios_are_fixed": true
+    }
+  }
+}

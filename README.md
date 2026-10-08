@@ -15,19 +15,34 @@ Harshit = models/portfolio/risk/interpretation, Maham = baselines/statistics/rep
 
 | Workstream | Owner | State |
 |---|---|---|
-| A - data, costs, backtest | Absar | **Not started.** A synthetic stand-in generator lives in `src/alphacomb/synthetic/` so the other workstreams are unblocked. What is needed, by when, and in what format: `docs/HARSHIT_NEEDS_FROM_ABSAR.md`. |
-| B - models, portfolio, risk, interpretation | Harshit | **Code complete on synthetic data**: 16 factorial cells (E20-E28), cost-aware optimiser (E33), risk model (C7/E64), published benchmarks (E13), seed stability (E56), interpretation (E60-E62). 53 tests pass. Status and next actions: `docs/STATUS.md`. |
+| A - data, costs, backtest | Absar | **Complete and production-promoted.** C1-C6 are ready; the dated C14/C12 integration and six frozen human decisions pass semantic preflight. The real-data handoff to Workstream B is complete in `docs/handoff/13_WORKSTREAM_A_PRODUCTION_PROMOTION_AND_WORKSTREAM_B_HANDOFF_2026-10-07.md`. |
+| B - models, portfolio, risk, interpretation | Harshit | **Code complete on synthetic data; real-data inputs handed off.** Next: validate the handoff, produce real C11 weights under the frozen experiment, and return those weights to Absar for final C12 accounting. |
 | C - baselines, statistics, reporting | Maham | Not started. Contracts, example outputs and a worked "how to plug a baseline in" snippet are ready: `docs/HARSHIT_PROVIDES.md`. |
 
-No real-data or paper results exist yet, and none can until workstream A delivers contracts C1-C6.
-Everything below runs on the synthetic panel.
+No real empirical result had been run or inspected at the Workstream-A handoff.
+The repository suite passes 290/290 tests; real-data model execution remains a
+separately gated Workstream-B step.
+
+### Frozen Workstream-A boundary
+
+- C1-C6 are ready for the real-data experiment.
+- Tax-dependent international evaluation is restricted to 2009-01 through
+  2019-12. The clean mechanism window is 2014-01 through 2018-03.
+- `MODELLED_FLAT_BORROW_PROXY_V1` is a configuration-layer assumption only.
+  Certified C6 `borrow_fee` observations remain null; the legacy implicit 25 bp
+  fallback is prohibited.
+- Workstream-B must assemble and run one flat bundle per country using a
+  separate `ALPHACOMB_DATA` root. C6/C14 are shared lookup sources; they do not
+  authorize pooled DEU/IND/JPN ranking or portfolio construction.
+- Absar's remaining downstream responsibility is final C12 accounting after
+  Harshit supplies real C11 weights.
 
 ## Quick start
 
 ```bash
 python -m pip install -e .
 python pipelines/run_all.py --smoke               # generate data, 2 cells, 2 years, end to end
-pytest -q                                         # 53 tests
+pytest -q                                         # 290 tests
 
 # or stage by stage
 python -m alphacomb.synthetic.generate --out data/synthetic          # C1-C6 fixtures + truth.json

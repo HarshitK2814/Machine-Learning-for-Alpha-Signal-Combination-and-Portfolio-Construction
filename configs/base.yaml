@@ -25,8 +25,14 @@ costs:
   commission_bps: 1.0
   impact_k: 1.0                # multiplier on the square-root impact term
   impact_power: 1.5            # total cost power on |dw| (0.5 impact + linear trade size)
-  borrow_gc_bps_pa: 25.0
-  borrow_htb_bps_pa: 500.0
+  # Approved 2026-10-07 as decision 6B. This is an experiment assumption,
+  # never a replacement for the all-null certified C6 borrow_fee column.
+  borrow_fee_model:
+    enabled: true
+    name: MODELLED_FLAT_BORROW_PROXY_V1
+    annual_rate: 0.01
+    sensitivity_annual_rates: [0.003, 0.006, 0.043, 0.07]
+    certified_c6_unchanged: true
   aum_usd_2020: 1.0e9
   sensitivity_multipliers: [0.5, 1.0, 2.0, 3.0]
 
