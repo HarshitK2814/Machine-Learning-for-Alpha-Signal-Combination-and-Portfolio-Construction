@@ -150,13 +150,26 @@ class StructuralRiskModel:
         # ---- factor returns: cross-sectional WLS of month-t return on exposures known at t ----
         frets, resid_rows = [], []
         for date, d in panel.groupby("date", sort=True):
-            d = d.dropna(subset=["r_1m"])
+            # ``me`` is dropped alongside ``r_1m``, not merely clipped. A security with no market
+            # equity has no cap weight, so it cannot take part in a cap-weighted cross-sectional
+            # regression at all - and ``np.clip`` does not remove a NaN, it passes it through, so
+            # one missing ``me`` turns ``wgt.mean()`` into NaN and with it every row of Xw and yw.
+            # LAPACK then reports "SVD did not converge", which reads like an ill-conditioning
+            # problem and is really a single missing value. The real DEU panel hits this on its
+            # very first month (1990-01-31: 196 names, X and y finite, all 196 weights NaN);
+            # synthetic data always carries ``me``, so it never surfaced before 8 October 2026.
+            d = d.dropna(subset=["r_1m", "me"])
             if len(d) < len(self.factor_cols) + 10:
                 continue
             X = d[self.factor_cols].to_numpy(dtype=float)
             y = d["r_1m"].to_numpy(dtype=float)
             wgt = np.sqrt(np.clip(d["me"].to_numpy(dtype=float), 1e-6, None))
-            wgt = wgt / wgt.mean()
+            mean_w = wgt.mean()
+            if not np.isfinite(mean_w) or mean_w <= 0:
+                continue
+            wgt = wgt / mean_w
+            if not (np.isfinite(X).all() and np.isfinite(y).all()):
+                continue
             Xw, yw = X * wgt[:, None], y * wgt
             coef, *_ = np.linalg.lstsq(Xw, yw, rcond=None)
             frets.append(pd.Series(coef, index=self.factor_cols, name=date))
