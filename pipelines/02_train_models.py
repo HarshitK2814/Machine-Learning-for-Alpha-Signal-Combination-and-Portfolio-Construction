@@ -28,16 +28,27 @@ log = logging.getLogger("stage02")
 
 def main() -> None:
     p = argparse.ArgumentParser(description="Train factorial model cells (experiments E20-E28).")
-    p.add_argument("--cells", nargs="+", default=["all"], help="cell codes such as N-C-E-U, or 'all'")
+    p.add_argument("--cells", nargs="+", default=["all"],
+                   help="cell codes such as N-C-E-U, 'all', or 'none' to run only --baselines "
+                        "/--benchmarks. 'none' matters because re-running a cell writes a new C9 "
+                        "artefact that latest_run would then resolve to, silently detaching the "
+                        "exhibit's provenance from the artefact a running stage 04 is consuming.")
     p.add_argument("--years", nargs=2, type=int, metavar=("FIRST", "LAST"), default=None)
     p.add_argument("--horizon", type=int, default=1, choices=[1, 3, 6, 12])
     p.add_argument("--data", default=None, help="synthetic | real (default: configs/base.yaml)")
+    p.add_argument("--country", default=None, choices=["DEU", "IND", "JPN"],
+                   help="run the promoted international panel for one country (amendment 001A "
+                        "freezes DEU/IND/JPN as separate runs)")
     p.add_argument("--fast", action="store_true", help="small grids and short training, for development")
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--members", type=int, default=5, help="ensemble members for uncertainty cells")
     p.add_argument("--manifest", default=None, help="CSV to append run metadata to")
     p.add_argument("--benchmarks", nargs="*", default=None,
                    help="published benchmark presets to run as well (E13), e.g. gkx_nn3 gkx_gbrt")
+    p.add_argument("--baselines", nargs="*", default=None,
+                   help="pre-registered comparators to run (E10-E12): BASE-EW BASE-THEME-EW "
+                        "BASE-IC BASE-OLS BASE-RIDGE, or 'all'. They route through the same cell "
+                        "runner and stage-04 path, which is what gives cost parity.")
     p.add_argument("--after-tax-objective", default=None, metavar="REGIME",
                    help="train economic cells on net-of-cost-AND-TAX utility, e.g. taxable_us_top_bracket")
     p.add_argument("--harvest-haircut", type=float, default=1.0,
@@ -57,10 +68,28 @@ def main() -> None:
             a.suffix = "_aftertax"
     cfg = load_config("base")
     source = a.data or cfg["data_source"]
-    bundle = load_bundle(source)
+    if a.country:
+        # The promoted international panel is read in place from data/intl_c*; document 13
+        # prohibits materialising the legacy flat data/real bundle, so there is nothing for
+        # load_bundle to open. Amendment 001A freezes DEU/IND/JPN as separate runs, which is
+        # why this is one country per invocation rather than a pooled panel.
+        from alphacomb.contracts import intl
+        bundle = intl.load_country_bundle(a.country)
+        source = bundle.source
+        log.info("international bundle %s: %d security-months, %d signals",
+                 a.country, len(bundle.universe), len(bundle.signal_columns))
+    else:
+        bundle = load_bundle(source)
     risk = RiskCache(StructuralRiskModel(bundle, cfg))
 
-    cells = ALL_CELLS if a.cells == ["all"] else [CellSpec.parse(c) for c in a.cells]
+    if a.cells == ["all"]:
+        cells = ALL_CELLS
+    elif [c.lower() for c in a.cells] == ["none"]:
+        cells = []
+    else:
+        cells = [CellSpec.parse(c) for c in a.cells]
+    if not cells and not (a.baselines or a.benchmarks):
+        raise SystemExit("--cells none requires --baselines or --benchmarks; nothing to run")
     first, last = (a.years if a.years else (None, None))
     manifest_rows = []
 
@@ -95,6 +124,28 @@ def main() -> None:
                        "horizon": a.horizon, "source": source, "fast": a.fast})
         manifest_rows.append(result)
         log.info("%s -> %s (%d rows, %.1f min)", spec.code, result["artefact"], result["rows"], result["minutes"])
+
+    baseline_codes = a.baselines or []
+    if baseline_codes == ["all"]:
+        from alphacomb.models import BASELINES
+        baseline_codes = sorted(BASELINES)
+    for code in baseline_codes:
+        from alphacomb.models import run_baseline
+
+        started = time.time()
+        run_cfg = CellRunConfig(horizon=a.horizon, first_test_year=first, last_test_year=last,
+                                fast=a.fast, seed=a.seed)
+        log.info("=== baseline %s (E10-E12) ===", code)
+        try:
+            result = run_baseline(code, bundle, risk, run_cfg, base_cfg=cfg)
+            result.update({"status": "ok", "minutes": round((time.time() - started) / 60, 2),
+                           "horizon": a.horizon, "source": source, "fast": a.fast})
+            log.info("%s -> %s (%d rows, %.1f min)", code, result["artefact"], result["rows"],
+                     result["minutes"])
+        except Exception as exc:  # pragma: no cover - keeps a long batch alive
+            log.exception("baseline %s failed: %s", code, exc)
+            result = {"cell": code, "status": "failed", "error": str(exc)}
+        manifest_rows.append(result)
 
     for name in (a.benchmarks or []):
         from alphacomb.models import run_benchmark

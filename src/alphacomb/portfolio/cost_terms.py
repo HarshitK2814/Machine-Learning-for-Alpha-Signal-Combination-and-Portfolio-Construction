@@ -112,6 +112,56 @@ def ineligible_held_permnos(date, cost_inputs: pd.DataFrame,
     return held.difference(eligible, sort=False)
 
 
+def priced_at(date, cost_inputs: pd.DataFrame) -> pd.Index:
+    """Names C6 carries a row for at ``date``, whether or not its market fields are usable.
+
+    The distinction matters for a held name that cannot be traded. If C6 has no row at all the
+    security has left the investable panel - it delisted or fell out of the universe - and the
+    position is closed by the delisting return the targets table already applies. If the row is
+    present but its spread/volatility/ADV are not certified, the security is still alive and
+    simply cannot be priced for trading this month. Verified on the promoted DEU panel: across
+    2,106 held-name observations that lost eligibility, "C6 has a row" agreed with "in universe"
+    in every single case.
+    """
+    return pd.Index(cost_inputs.loc[cost_inputs["date"] == pd.Timestamp(date), "permno"].unique())
+
+
+def partition_prior_book(date, cost_inputs: pd.DataFrame,
+                         w_prev: pd.Series | None) -> tuple[pd.Index, pd.Index, pd.Index]:
+    """Split last month's book into (tradeable, frozen, exited) at ``date``.
+
+    * **tradeable** - certified market inputs exist, so the optimiser may trade the position.
+    * **frozen**    - still in the panel but not priceable this month. It cannot be traded at a
+      certified cost, and selling it at an imputed one is exactly what document 13 requirement 2
+      prohibits, so the position is carried at its drifted weight and the optimiser works around
+      it. Measured over the 132 real DEU months (cell L-C-P-0): the sleeve **does** accumulate,
+      from 0 names to a plateau of 55-65 (median 56, max 84, trend +1.4 names a year), because a
+      name that never regains certified inputs is never traded out of. It plateaus rather than
+      growing without bound because ADV coverage churns in both directions and delisted names are
+      dropped, so inflow and outflow balance. What stays negligible is its **weight**: 0.45% of
+      gross on average and 1.44% at worst, because the positions that lose pricing are the
+      illiquid ones whose ADV cap made them tiny to begin with.
+    * **exited**    - no longer in the panel; closed at the delisting return.
+
+    The alternative previously in force - hold the *entire* prior book whenever any held name lost
+    its cost inputs - turns one unpriceable name into a frozen portfolio, and because the book then
+    never changes it stays frozen for every later month. On real DEU data that produced 131 held
+    months out of 132.
+    """
+    empty = pd.Index([])
+    if w_prev is None or not len(w_prev):
+        return empty, empty, empty
+    held = pd.Index(w_prev.index[np.abs(w_prev.to_numpy(dtype=float)) > 1e-12])
+    if not len(held):
+        return empty, empty, empty
+    tradeable = eligible_cost_input_permnos(date, cost_inputs, held)
+    stuck = held.difference(tradeable, sort=False)
+    present = priced_at(date, cost_inputs)
+    frozen = stuck.intersection(present, sort=False)
+    exited = stuck.difference(present, sort=False)
+    return tradeable, frozen, exited
+
+
 def cost_inputs_for(
     date,
     cost_inputs: pd.DataFrame,

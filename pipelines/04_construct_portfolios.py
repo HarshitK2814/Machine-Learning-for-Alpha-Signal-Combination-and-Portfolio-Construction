@@ -65,7 +65,11 @@ def build_weights(strategy: str, artefact: Path, kind: str, bundle, risk: RiskCa
             res = construct(date, alpha, prev, rm, bundle.cost_inputs, cfg, tax_state)
         else:
             proposal = pd.Series(group["w_prop"].to_numpy(), index=group["permno"].to_numpy()).dropna()
-            res = project(date, proposal, rm, bundle.cost_inputs, cfg)
+            # The prior book goes in so the projection faces the same per-name trade cap as the
+            # prediction cells. Without it the economic-loss cells were allowed trades of up to
+            # 20x the ADV participation limit on one name-month in six - an advantage sitting
+            # exactly on the design's cost-objective axis. See optimizer.project.
+            res = project(date, proposal, rm, bundle.cost_inputs, cfg, w_prev=prev)
         statuses.append(res.status)
         w = res.weights
         weights_rows.append(pd.DataFrame({"date": pd.Timestamp(date), "permno": w.index.astype("int32"),
@@ -95,6 +99,9 @@ def main() -> None:
     p = argparse.ArgumentParser(description="Construct portfolios from model outputs (contract C11).")
     p.add_argument("--strategies", nargs="+", default=["all"])
     p.add_argument("--data", default=None)
+    p.add_argument("--country", default=None, choices=["DEU", "IND", "JPN"],
+                   help="construct from the promoted international panel for one country "
+                        "(amendment 001A freezes DEU/IND/JPN as separate runs)")
     p.add_argument("--gamma", type=float, default=None, help="risk aversion (default: configs/portfolio.yaml)")
     p.add_argument("--cost-multiplier", type=float, default=1.0, help="cost sensitivity (E31)")
     p.add_argument("--aum", type=float, default=None, help="AUM in 2020 dollars (E30/E32)")
@@ -114,7 +121,16 @@ def main() -> None:
 
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
     cfg = load_config("base")
-    bundle = load_bundle(a.data or cfg["data_source"])
+    if a.country:
+        # Mirrors pipelines/02_train_models.py: the promoted international panel is read in place
+        # from data/intl_c*, because document 13 prohibits materialising the flat data/real
+        # bundle that load_bundle would look for. The bundle's source stays "real_<COUNTRY>" so
+        # the cost consumer keeps failing closed on missing market fields rather than imputing.
+        from alphacomb.contracts import intl
+        bundle = intl.load_country_bundle(a.country)
+        log.info("international bundle %s: %d security-months", a.country, len(bundle.universe))
+    else:
+        bundle = load_bundle(a.data or cfg["data_source"])
     risk = RiskCache(StructuralRiskModel(bundle, cfg))
 
     opt = OptimizerConfig.from_files(cfg)
@@ -144,7 +160,11 @@ def main() -> None:
                   else None)
         out, counts = build_weights(name, artefact, kind, bundle, risk, opt, run_id, ledger)
         months = sum(counts.values())
-        held = counts.get("failed_hold", 0)
+        # Every held variant counts, not just the bare "failed_hold". The guard below exists to
+        # stop a stale book reaching a results table, and an exact-key lookup silently missed
+        # "failed_hold_missing_cost" - which on the real DEU panel was 131 of 132 months. A guard
+        # that only catches the spelling it was written against is not a guard.
+        held = sum(v for k, v in counts.items() if str(k).startswith("failed_hold"))
         held_share = held / months if months else 0.0
         rows.append({"strategy": name, "source_artefact": str(artefact), "weights": str(out),
                      "run_id": run_id, "cost_multiplier": a.cost_multiplier, "aum": opt.aum_usd,

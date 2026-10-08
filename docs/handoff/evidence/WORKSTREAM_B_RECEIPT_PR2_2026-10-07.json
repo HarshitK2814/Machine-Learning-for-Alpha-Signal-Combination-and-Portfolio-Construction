@@ -1,0 +1,390 @@
+{
+  "verdict": "RECEIPT_FAIL",
+  "repo": "C:\\Users\\Harshit Kumar\\Downloads\\Machine Learning for Alpha Signal Combination and Portfolio Construction\\drive_pull\\pr2",
+  "manifest": "..\\drive_pull\\pr2\\data\\workstream_a_closeout\\WORKSTREAM_A_POST_PROMOTION_MANIFEST_2026-10-07.json",
+  "pinned_doc13_digests": [
+    {
+      "path": "data/intl_c14/production/c14_regime_candidate_source_frozen.csv",
+      "expected_sha256": "992a491c3f387d8f68ed253d0258d948ccbf4b722ede37e2dedbaf6e974f775a",
+      "observed_sha256": "992a491c3f387d8f68ed253d0258d948ccbf4b722ede37e2dedbaf6e974f775a",
+      "status": "MATCH"
+    },
+    {
+      "path": "data/intl_c6/production/C6_COST_INPUTS_WORKING_CANDIDATE.csv.gz",
+      "expected_sha256": "bb296e488327b822281940ff2669ce7a46fe7a60e5d8b79f3f7c5548d758fa4c",
+      "observed_sha256": "bb296e488327b822281940ff2669ce7a46fe7a60e5d8b79f3f7c5548d758fa4c",
+      "status": "MATCH"
+    },
+    {
+      "path": "data/workstream_a_closeout/FINAL_PRODUCTION_PROMOTION_MANIFEST_2026-10-07.json",
+      "expected_sha256": "9fe4d029e1acf86ce7d41c65cbc1e8fa2a9f35296a2c1c8685b492ea3b2dab28",
+      "observed_sha256": "9fe4d029e1acf86ce7d41c65cbc1e8fa2a9f35296a2c1c8685b492ea3b2dab28",
+      "status": "MATCH"
+    },
+    {
+      "path": "data/workstream_a_closeout/WORKSTREAM_A_POST_PROMOTION_TESTS_2026-10-07.xml",
+      "expected_sha256": "dee50cc7a5ad037fa6aee3e95976b110d67869064a728b18d04be5c595bd5a47",
+      "observed_sha256": "dee50cc7a5ad037fa6aee3e95976b110d67869064a728b18d04be5c595bd5a47",
+      "status": "MATCH"
+    },
+    {
+      "path": "data/workstream_a_closeout/WORKSTREAM_A_POST_PROMOTION_VALIDATION_2026-10-07.json",
+      "expected_sha256": "37a2b38aacfe6476b3c98983b1a19d8a665549ed814e29ae0f74d30370b64c02",
+      "observed_sha256": "37a2b38aacfe6476b3c98983b1a19d8a665549ed814e29ae0f74d30370b64c02",
+      "status": "MATCH"
+    }
+  ],
+  "files_checked": 40,
+  "counts": {
+    "MATCH": 11,
+    "MATCH_NORMALISED": 6,
+    "DIFFERS": 8,
+    "MISSING": 15
+  },
+  "files": [
+    {
+      "group": "promotion:source",
+      "path": "data/intl_c6/candidate_working/C6_COST_INPUTS_WORKING_CANDIDATE.csv.gz",
+      "expected_sha256": "bb296e488327b822281940ff2669ce7a46fe7a60e5d8b79f3f7c5548d758fa4c",
+      "observed_sha256": "bb296e488327b822281940ff2669ce7a46fe7a60e5d8b79f3f7c5548d758fa4c",
+      "expected_bytes": 24266629,
+      "observed_bytes": 24266629,
+      "status": "MATCH"
+    },
+    {
+      "group": "promotion:destination",
+      "path": "data/intl_c6/production/C6_COST_INPUTS_WORKING_CANDIDATE.csv.gz",
+      "expected_sha256": "bb296e488327b822281940ff2669ce7a46fe7a60e5d8b79f3f7c5548d758fa4c",
+      "observed_sha256": "bb296e488327b822281940ff2669ce7a46fe7a60e5d8b79f3f7c5548d758fa4c",
+      "expected_bytes": 24266629,
+      "observed_bytes": 24266629,
+      "status": "MATCH"
+    },
+    {
+      "group": "promotion:source",
+      "path": "data/intl_c14/candidate_working/c14_regime_candidate_source_frozen.csv",
+      "expected_sha256": "992a491c3f387d8f68ed253d0258d948ccbf4b722ede37e2dedbaf6e974f775a",
+      "observed_sha256": "992a491c3f387d8f68ed253d0258d948ccbf4b722ede37e2dedbaf6e974f775a",
+      "expected_bytes": 11065,
+      "observed_bytes": 11065,
+      "status": "MATCH"
+    },
+    {
+      "group": "promotion:destination",
+      "path": "data/intl_c14/production/c14_regime_candidate_source_frozen.csv",
+      "expected_sha256": "992a491c3f387d8f68ed253d0258d948ccbf4b722ede37e2dedbaf6e974f775a",
+      "observed_sha256": "992a491c3f387d8f68ed253d0258d948ccbf4b722ede37e2dedbaf6e974f775a",
+      "expected_bytes": 11065,
+      "observed_bytes": 11065,
+      "status": "MATCH"
+    },
+    {
+      "group": "integration",
+      "path": "configs/workstream_a_frozen_decisions.json",
+      "expected_sha256": "03fdf43467aad013630d70b6f20cd53c78075690132c767555736453961dc36a",
+      "observed_sha256": "83ca04fb47d428123e13cf9f066e6d685a121de1c8dc4e8a8aaed4f63fa0ae0b",
+      "expected_bytes": 1759,
+      "observed_bytes": 1806,
+      "status": "MATCH_NORMALISED",
+      "normalised_sha256": "03fdf43467aad013630d70b6f20cd53c78075690132c767555736453961dc36a"
+    },
+    {
+      "group": "integration",
+      "path": "configs/base.yaml",
+      "expected_sha256": "d283bf8447309bfdbb2aed00a5b525d550397e478fd504e2f811e517162f2151",
+      "observed_sha256": "3129165f9ba62cf29da7ce4c2f239178e04c154b253c6859ce6081f4f5b502dc",
+      "expected_bytes": 1637,
+      "observed_bytes": 1650,
+      "status": "DIFFERS",
+      "normalised_sha256": "1baa9cd09d76edf151a3404b501f02f8abccc431f708196f01e3c5d2a99e01a1"
+    },
+    {
+      "group": "integration",
+      "path": "src/alphacomb/portfolio/cost_terms.py",
+      "expected_sha256": "e5c0a60d7decc4a5c7e5c6e4b241ab94254f5d8d09b3059e1c25ccb3b79473a1",
+      "observed_sha256": "ab7199879291b1202c94fc9ce49866dd3a705b9b68eaf3298f6ae0eed54ea119",
+      "expected_bytes": 7127,
+      "observed_bytes": 7224,
+      "status": "DIFFERS",
+      "normalised_sha256": "99938745170ef51afd33890f793546835d6f087816f090d2845746bd7aa026b0"
+    },
+    {
+      "group": "integration",
+      "path": "src/alphacomb/portfolio/optimizer.py",
+      "expected_sha256": "d00a6ea8bd0c09550479c942cce263c6bfb9159a957af5bfbbe6243b9b1fc0b6",
+      "observed_sha256": "9d1b8fc5995bf41c9095fd77c8a6ba859fec71869e200b0190cce072a96fd580",
+      "expected_bytes": 27755,
+      "observed_bytes": 27815,
+      "status": "DIFFERS",
+      "normalised_sha256": "1ddde401d784cbec58eed2c0ed2fdc8e9c1c9b501a6629e2df730df83b7c9650"
+    },
+    {
+      "group": "integration",
+      "path": "src/alphacomb/portfolio/robust.py",
+      "expected_sha256": "17ed62a51f8f74f3b5af4c09c99e86833bfbaefee888d9008df9c0a1294dc409",
+      "observed_sha256": "0639547f9a4f8a6e8122228e106a47e632666d6b5b51aa4d759a884ac7a6db50",
+      "expected_bytes": 7556,
+      "observed_bytes": 7572,
+      "status": "DIFFERS",
+      "normalised_sha256": "02ce3aa26e5965eb08599ec0a22015262f49497770bd8d4d777a7d04480d8204"
+    },
+    {
+      "group": "integration",
+      "path": "src/alphacomb/models/economic.py",
+      "expected_sha256": "c1accede2ff536ed8a76a741d81ae72427a7aa7b08a29bd7bb12db85ce40f566",
+      "observed_sha256": "2953ad80fbbed88faf78e549cec93bff4967e86b561ba3a730cded0e20c44250",
+      "expected_bytes": 16989,
+      "observed_bytes": 17012,
+      "status": "DIFFERS",
+      "normalised_sha256": "10518f372d10ca12a1c3b3d2614269aaf599a93034772b9facb58390eb915d60"
+    },
+    {
+      "group": "integration",
+      "path": "src/alphacomb/models/cells.py",
+      "expected_sha256": "7398a880b74291b64426ed644948fe7b8a599da359fffb47358433e5bd2c1eb0",
+      "observed_sha256": "a9c92b9ed19b817d6cf9c101b43d6934647af3aa164eb7caafdc2298ab399682",
+      "expected_bytes": 15619,
+      "observed_bytes": 15623,
+      "status": "DIFFERS",
+      "normalised_sha256": "bedbc585a03d50c990656ff93a645b82ef42520d7f071b3847242f8d7ed070e0"
+    },
+    {
+      "group": "integration",
+      "path": "src/alphacomb/tax/dated.py",
+      "expected_sha256": "2d62f3f4f55111541fe10adc0cc19ac30fb70712b429c9036fcf2979d28d0826",
+      "observed_sha256": "232e3db73e890d5adbe0db7be4219ac3e101bff32e773574ff56bb6a867c28e9",
+      "expected_bytes": 33994,
+      "observed_bytes": 34760,
+      "status": "MATCH_NORMALISED",
+      "normalised_sha256": "2d62f3f4f55111541fe10adc0cc19ac30fb70712b429c9036fcf2979d28d0826"
+    },
+    {
+      "group": "integration",
+      "path": "src/alphacomb/tax/backtest.py",
+      "expected_sha256": "b8bee3f0f0f44371b45b6a56c7864b991a57d0a6d4769fb0968bcdb14cc55f61",
+      "observed_sha256": "b55f7c48181fc8fb6435495ac453b338af5d0e76875496259edd70892145e7ab",
+      "expected_bytes": 30101,
+      "observed_bytes": 30470,
+      "status": "DIFFERS",
+      "normalised_sha256": "8f79e20ab4eeeb19c59167fa9f9ff65ce758c6661b5ac940870e166fd6abb74c"
+    },
+    {
+      "group": "integration",
+      "path": "src/alphacomb/tax/__init__.py",
+      "expected_sha256": "3534e4b32d353a5f2e48582273b963518775080230a80a7b1b55f2695bca0d8a",
+      "observed_sha256": "f660b33d4a9af9f42af5cf4d828820dbb17e758654385a488c56a1ab2fc79fb0",
+      "expected_bytes": 2381,
+      "observed_bytes": 2391,
+      "status": "DIFFERS",
+      "normalised_sha256": "0aa4c76a602f82db5268000a42947731766b5cd0c2c0a23c95e203d7807625d9"
+    },
+    {
+      "group": "integration",
+      "path": "tests/portfolio/test_borrow_fee_policy.py",
+      "expected_sha256": "e27f630a6c01327cd95dc1fbc1c835b5949bac9083ccc87ba07baa0c8d826137",
+      "observed_sha256": "ed77c602d0e3d4d22962cbfceacffcad8dd174ce87dac74a5220582aa20c83c1",
+      "expected_bytes": 2825,
+      "observed_bytes": 2909,
+      "status": "MATCH_NORMALISED",
+      "normalised_sha256": "e27f630a6c01327cd95dc1fbc1c835b5949bac9083ccc87ba07baa0c8d826137"
+    },
+    {
+      "group": "integration",
+      "path": "tests/c14/test_c14_dated_production_integration.py",
+      "expected_sha256": "75008caea2d22386f7ec2340abbf080d97ed3bc98eaeb3a0130716508b26a1d6",
+      "observed_sha256": "16c76dc37e9d45d842f550fdb2bf665b7daf792e2555f6b33abc2a9a2d3106da",
+      "expected_bytes": 8629,
+      "observed_bytes": 8833,
+      "status": "MATCH_NORMALISED",
+      "normalised_sha256": "75008caea2d22386f7ec2340abbf080d97ed3bc98eaeb3a0130716508b26a1d6"
+    },
+    {
+      "group": "integration",
+      "path": "configs/workstream_a_c14_evaluation_sample_2026-10-07.json",
+      "expected_sha256": "1276067b4eba77616e20f7776253ab0f2d330cfca3114a7c3f1ea3ee7f5d96fa",
+      "observed_sha256": "b0f81ce85ab6323ff9ad90bcfa0e638950e029d95357bc4a12d24ad058fe1818",
+      "expected_bytes": 1074,
+      "observed_bytes": 1108,
+      "status": "MATCH_NORMALISED",
+      "normalised_sha256": "1276067b4eba77616e20f7776253ab0f2d330cfca3114a7c3f1ea3ee7f5d96fa"
+    },
+    {
+      "group": "integration",
+      "path": "validate_c14_evaluation_sample.py",
+      "expected_sha256": "82736239a6f54236bc2ee6055cace8fd794b8957cb7e17e56338e20d4d28d82c",
+      "observed_sha256": "12a48bb32bb6046d256f6c280b1a79f11ee7861280c6b1268132438de2309c1f",
+      "expected_bytes": 11862,
+      "observed_bytes": 12125,
+      "status": "MATCH_NORMALISED",
+      "normalised_sha256": "82736239a6f54236bc2ee6055cace8fd794b8957cb7e17e56338e20d4d28d82c"
+    },
+    {
+      "group": "integration",
+      "path": "data/intl_c14/audit/C14_EVALUATION_SAMPLE_VALIDATION_2026-10-07.json",
+      "expected_sha256": "dfcdc224d003651a136de65bc7de102bdf3888bedf470f61cdc79b7d9c94c02d",
+      "observed_sha256": "dfcdc224d003651a136de65bc7de102bdf3888bedf470f61cdc79b7d9c94c02d",
+      "expected_bytes": 4963,
+      "observed_bytes": 4963,
+      "status": "MATCH"
+    },
+    {
+      "group": "integration",
+      "path": "data/intl_c14/audit/WORKSTREAM_A_PRE_RESULTS_SAMPLE_AMENDMENT_2026-10-07.md",
+      "expected_sha256": "b62b1b86de80734b0d40f5b8fcee417782571a79cdb34b84a52dd6d99ec883ce",
+      "observed_sha256": "b62b1b86de80734b0d40f5b8fcee417782571a79cdb34b84a52dd6d99ec883ce",
+      "expected_bytes": 3106,
+      "observed_bytes": 3106,
+      "status": "MATCH"
+    },
+    {
+      "group": "unchanged_C1_C5",
+      "path": "data/intl_c1/production/DEU/c1_audit.parquet",
+      "expected_sha256": "4181891510d29f8db26a1600d17052dd4e60c05ebd3bd6b395146aba3799dd20",
+      "status": "MISSING"
+    },
+    {
+      "group": "unchanged_C1_C5",
+      "path": "data/intl_c1/production/DEU/universe.parquet",
+      "expected_sha256": "f0652cafccc1a5f4ba6fb283ebc916be186c993cf1710b147e607b807d659695",
+      "status": "MISSING"
+    },
+    {
+      "group": "unchanged_C1_C5",
+      "path": "data/intl_c1/production/IND/c1_audit.parquet",
+      "expected_sha256": "c1dc225ddddf3a41a83144acd741b3f3f2f3170b8c7a29b2f6ab2306fd6ffdad",
+      "status": "MISSING"
+    },
+    {
+      "group": "unchanged_C1_C5",
+      "path": "data/intl_c1/production/IND/universe.parquet",
+      "expected_sha256": "dac4c9f2577cbc46e288ab1052fec2bec9185c446ee4d5ca51c57b7ba483554c",
+      "observed_sha256": "dac4c9f2577cbc46e288ab1052fec2bec9185c446ee4d5ca51c57b7ba483554c",
+      "expected_bytes": 9410641,
+      "observed_bytes": 9410641,
+      "status": "MATCH"
+    },
+    {
+      "group": "unchanged_C1_C5",
+      "path": "data/intl_c1/production/JPN/c1_audit.parquet",
+      "expected_sha256": "3bf4f683827901bdd035aa94405884a21c125839227c34075e1e4db35453704b",
+      "status": "MISSING"
+    },
+    {
+      "group": "unchanged_C1_C5",
+      "path": "data/intl_c1/production/JPN/universe.parquet",
+      "expected_sha256": "aa0b91952e2662b2941b5927d9e376074849b526a7dbe4328243e467ad56d70c",
+      "status": "MISSING"
+    },
+    {
+      "group": "unchanged_C1_C5",
+      "path": "data/intl_c2/production/DEU/signal_meta.csv",
+      "expected_sha256": "c454bd19201d506678889bc29649d1e4e9437a8e1b85252e626a46655c4705db",
+      "status": "MISSING"
+    },
+    {
+      "group": "unchanged_C1_C5",
+      "path": "data/intl_c2/production/DEU/signals.parquet",
+      "expected_sha256": "232142813ea63d7c33be21016d31afab06baf5df1874cee4200f48fe129fae1c",
+      "status": "MISSING"
+    },
+    {
+      "group": "unchanged_C1_C5",
+      "path": "data/intl_c2/production/IND/signal_meta.csv",
+      "expected_sha256": "c454bd19201d506678889bc29649d1e4e9437a8e1b85252e626a46655c4705db",
+      "status": "MISSING"
+    },
+    {
+      "group": "unchanged_C1_C5",
+      "path": "data/intl_c2/production/IND/signals.parquet",
+      "expected_sha256": "274186fdced6ce3d0f3ef293267587b706e610ce2901ddc87032a2fc984f4fc3",
+      "status": "MISSING"
+    },
+    {
+      "group": "unchanged_C1_C5",
+      "path": "data/intl_c2/production/JPN/signal_meta.csv",
+      "expected_sha256": "c454bd19201d506678889bc29649d1e4e9437a8e1b85252e626a46655c4705db",
+      "status": "MISSING"
+    },
+    {
+      "group": "unchanged_C1_C5",
+      "path": "data/intl_c2/production/JPN/signals.parquet",
+      "expected_sha256": "e4dff3fe8c4ec5b508a5e5e64918d9d479130c393c40ee21a38edcceb80ea284",
+      "status": "MISSING"
+    },
+    {
+      "group": "unchanged_C1_C5",
+      "path": "data/intl_c2/production/signal_meta.csv",
+      "expected_sha256": "c454bd19201d506678889bc29649d1e4e9437a8e1b85252e626a46655c4705db",
+      "status": "MISSING"
+    },
+    {
+      "group": "unchanged_C1_C5",
+      "path": "data/intl_c4/production/DEU/targets.parquet",
+      "expected_sha256": "ba903a1a75fc04cf8659a25e1e40ae818bd218b4fae3fa5feb244ebfd344a2d2",
+      "status": "MISSING"
+    },
+    {
+      "group": "unchanged_C1_C5",
+      "path": "data/intl_c4/production/IND/targets.parquet",
+      "expected_sha256": "835b955c3e33df162f839741300f9064a21f7adc2635a99bca1cbb351094fd1f",
+      "status": "MISSING"
+    },
+    {
+      "group": "unchanged_C1_C5",
+      "path": "data/intl_c4/production/JPN/targets.parquet",
+      "expected_sha256": "d7984e5e3b2a1ff74d026f74ed0a7a28dcb762fb721045c9117165af8b6df432",
+      "status": "MISSING"
+    },
+    {
+      "group": "unchanged_C1_C5",
+      "path": "data/intl_c5/candidate_final_working/C5_FINAL_WORKING_AUDIT.json",
+      "expected_sha256": "bfcb39ec2f0a44dbd9bb2d1bb86ea1fc523e9add05f6c993ecabbdb00c2d7516",
+      "observed_sha256": "bfcb39ec2f0a44dbd9bb2d1bb86ea1fc523e9add05f6c993ecabbdb00c2d7516",
+      "expected_bytes": 1477,
+      "observed_bytes": 1477,
+      "status": "MATCH"
+    },
+    {
+      "group": "unchanged_C1_C5",
+      "path": "data/intl_c5/candidate_final_working/DEU/states.parquet",
+      "expected_sha256": "97e4d943b1b3bba943297dc69944ebbe4f2a8cc4264964600b4b58d0c5863213",
+      "observed_sha256": "97e4d943b1b3bba943297dc69944ebbe4f2a8cc4264964600b4b58d0c5863213",
+      "expected_bytes": 63987,
+      "observed_bytes": 63987,
+      "status": "MATCH"
+    },
+    {
+      "group": "unchanged_C1_C5",
+      "path": "data/intl_c5/candidate_final_working/IND/states.parquet",
+      "expected_sha256": "e298c690868b3cf2fa4663bc3dfe9f1e33783d6c9d484d761f0e50330e352787",
+      "observed_sha256": "e298c690868b3cf2fa4663bc3dfe9f1e33783d6c9d484d761f0e50330e352787",
+      "expected_bytes": 57148,
+      "observed_bytes": 57148,
+      "status": "MATCH"
+    },
+    {
+      "group": "unchanged_C1_C5",
+      "path": "data/intl_c5/candidate_final_working/JPN/states.parquet",
+      "expected_sha256": "3ec2d05486d21166c175fab9ecb0555652d2964f6bc151079f7a5d9b80d8d8a0",
+      "observed_sha256": "3ec2d05486d21166c175fab9ecb0555652d2964f6bc151079f7a5d9b80d8d8a0",
+      "expected_bytes": 62005,
+      "observed_bytes": 62005,
+      "status": "MATCH"
+    }
+  ],
+  "reference_check": {
+    "reference": "..\\drive_pull\\code",
+    "content_agrees": [
+      "configs/base.yaml",
+      "src/alphacomb/portfolio/cost_terms.py",
+      "src/alphacomb/portfolio/optimizer.py",
+      "src/alphacomb/portfolio/robust.py",
+      "src/alphacomb/models/economic.py",
+      "src/alphacomb/models/cells.py",
+      "src/alphacomb/tax/backtest.py",
+      "src/alphacomb/tax/__init__.py"
+    ],
+    "content_disagrees": [],
+    "absent_from_reference": []
+  }
+}

@@ -1,0 +1,313 @@
+{
+  "verdict": "RECEIPT_FAIL",
+  "repo": "C:\\Users\\Harshit Kumar\\Downloads\\Machine Learning for Alpha Signal Combination and Portfolio Construction\\alphacomb",
+  "manifest": "..\\absar sent work\\WORKSTREAM_A_POST_PROMOTION_MANIFEST_2026-10-07.json",
+  "pinned_doc13_digests": [
+    {
+      "path": "data/intl_c14/production/c14_regime_candidate_source_frozen.csv",
+      "expected_sha256": "992a491c3f387d8f68ed253d0258d948ccbf4b722ede37e2dedbaf6e974f775a",
+      "status": "MISSING"
+    },
+    {
+      "path": "data/intl_c6/production/C6_COST_INPUTS_WORKING_CANDIDATE.csv.gz",
+      "expected_sha256": "bb296e488327b822281940ff2669ce7a46fe7a60e5d8b79f3f7c5548d758fa4c",
+      "status": "MISSING"
+    },
+    {
+      "path": "data/workstream_a_closeout/FINAL_PRODUCTION_PROMOTION_MANIFEST_2026-10-07.json",
+      "expected_sha256": "9fe4d029e1acf86ce7d41c65cbc1e8fa2a9f35296a2c1c8685b492ea3b2dab28",
+      "status": "MISSING"
+    },
+    {
+      "path": "data/workstream_a_closeout/WORKSTREAM_A_POST_PROMOTION_TESTS_2026-10-07.xml",
+      "expected_sha256": "dee50cc7a5ad037fa6aee3e95976b110d67869064a728b18d04be5c595bd5a47",
+      "status": "MISSING"
+    },
+    {
+      "path": "data/workstream_a_closeout/WORKSTREAM_A_POST_PROMOTION_VALIDATION_2026-10-07.json",
+      "expected_sha256": "37a2b38aacfe6476b3c98983b1a19d8a665549ed814e29ae0f74d30370b64c02",
+      "status": "MISSING"
+    }
+  ],
+  "files_checked": 40,
+  "counts": {
+    "MISSING": 29,
+    "MATCH": 3,
+    "DIFFERS": 8
+  },
+  "files": [
+    {
+      "group": "promotion:source",
+      "path": "data/intl_c6/candidate_working/C6_COST_INPUTS_WORKING_CANDIDATE.csv.gz",
+      "expected_sha256": "bb296e488327b822281940ff2669ce7a46fe7a60e5d8b79f3f7c5548d758fa4c",
+      "status": "MISSING"
+    },
+    {
+      "group": "promotion:destination",
+      "path": "data/intl_c6/production/C6_COST_INPUTS_WORKING_CANDIDATE.csv.gz",
+      "expected_sha256": "bb296e488327b822281940ff2669ce7a46fe7a60e5d8b79f3f7c5548d758fa4c",
+      "status": "MISSING"
+    },
+    {
+      "group": "promotion:source",
+      "path": "data/intl_c14/candidate_working/c14_regime_candidate_source_frozen.csv",
+      "expected_sha256": "992a491c3f387d8f68ed253d0258d948ccbf4b722ede37e2dedbaf6e974f775a",
+      "status": "MISSING"
+    },
+    {
+      "group": "promotion:destination",
+      "path": "data/intl_c14/production/c14_regime_candidate_source_frozen.csv",
+      "expected_sha256": "992a491c3f387d8f68ed253d0258d948ccbf4b722ede37e2dedbaf6e974f775a",
+      "status": "MISSING"
+    },
+    {
+      "group": "integration",
+      "path": "configs/workstream_a_frozen_decisions.json",
+      "expected_sha256": "03fdf43467aad013630d70b6f20cd53c78075690132c767555736453961dc36a",
+      "observed_sha256": "03fdf43467aad013630d70b6f20cd53c78075690132c767555736453961dc36a",
+      "expected_bytes": 1759,
+      "observed_bytes": 1759,
+      "status": "MATCH"
+    },
+    {
+      "group": "integration",
+      "path": "configs/base.yaml",
+      "expected_sha256": "d283bf8447309bfdbb2aed00a5b525d550397e478fd504e2f811e517162f2151",
+      "observed_sha256": "1b5cb8916fbf22a7f9af65007c75889518f2e0708d2eaafe6590b674f0ee1c5b",
+      "expected_bytes": 1637,
+      "observed_bytes": 1314,
+      "status": "DIFFERS"
+    },
+    {
+      "group": "integration",
+      "path": "src/alphacomb/portfolio/cost_terms.py",
+      "expected_sha256": "e5c0a60d7decc4a5c7e5c6e4b241ab94254f5d8d09b3059e1c25ccb3b79473a1",
+      "observed_sha256": "141d57751f6fb09269c1c32ce050d7f4bf717df274f623cb973705f1ee9a3ac2",
+      "expected_bytes": 7127,
+      "observed_bytes": 3612,
+      "status": "DIFFERS"
+    },
+    {
+      "group": "integration",
+      "path": "src/alphacomb/portfolio/optimizer.py",
+      "expected_sha256": "d00a6ea8bd0c09550479c942cce263c6bfb9159a957af5bfbbe6243b9b1fc0b6",
+      "observed_sha256": "abfa71eb17a08f2cd3d20b5000f1666f84ee927b6e5b1be951f82de3926fc7b2",
+      "expected_bytes": 27755,
+      "observed_bytes": 25237,
+      "status": "DIFFERS"
+    },
+    {
+      "group": "integration",
+      "path": "src/alphacomb/portfolio/robust.py",
+      "expected_sha256": "17ed62a51f8f74f3b5af4c09c99e86833bfbaefee888d9008df9c0a1294dc409",
+      "observed_sha256": "8f482d0e4ec8fdb781dab1ea19b2508265f372b0fdfcb4f3f98bceac0c72c593",
+      "expected_bytes": 7556,
+      "observed_bytes": 6998,
+      "status": "DIFFERS"
+    },
+    {
+      "group": "integration",
+      "path": "src/alphacomb/models/economic.py",
+      "expected_sha256": "c1accede2ff536ed8a76a741d81ae72427a7aa7b08a29bd7bb12db85ce40f566",
+      "observed_sha256": "fbd4d4e8375de5802462a7799233dc6fddc44cc8dbe81a6921e4012bf4c4723b",
+      "expected_bytes": 16989,
+      "observed_bytes": 16186,
+      "status": "DIFFERS"
+    },
+    {
+      "group": "integration",
+      "path": "src/alphacomb/models/cells.py",
+      "expected_sha256": "7398a880b74291b64426ed644948fe7b8a599da359fffb47358433e5bd2c1eb0",
+      "observed_sha256": "e11b8dac6d287458937c3e9679d84462af52e5f584fc25ad72b11db79c9ea411",
+      "expected_bytes": 15619,
+      "observed_bytes": 15459,
+      "status": "DIFFERS"
+    },
+    {
+      "group": "integration",
+      "path": "src/alphacomb/tax/dated.py",
+      "expected_sha256": "2d62f3f4f55111541fe10adc0cc19ac30fb70712b429c9036fcf2979d28d0826",
+      "status": "MISSING"
+    },
+    {
+      "group": "integration",
+      "path": "src/alphacomb/tax/backtest.py",
+      "expected_sha256": "b8bee3f0f0f44371b45b6a56c7864b991a57d0a6d4769fb0968bcdb14cc55f61",
+      "observed_sha256": "daa345b27162d2edab76d9a38a8cda3713424a05ab1e942e474c0bf1ae04d3ef",
+      "expected_bytes": 30101,
+      "observed_bytes": 18974,
+      "status": "DIFFERS"
+    },
+    {
+      "group": "integration",
+      "path": "src/alphacomb/tax/__init__.py",
+      "expected_sha256": "3534e4b32d353a5f2e48582273b963518775080230a80a7b1b55f2695bca0d8a",
+      "observed_sha256": "c892936426c2de59b5e68e5a70bae0981600f0bdd2ed726cbb365f3bd1444c1c",
+      "expected_bytes": 2381,
+      "observed_bytes": 1776,
+      "status": "DIFFERS"
+    },
+    {
+      "group": "integration",
+      "path": "tests/portfolio/test_borrow_fee_policy.py",
+      "expected_sha256": "e27f630a6c01327cd95dc1fbc1c835b5949bac9083ccc87ba07baa0c8d826137",
+      "status": "MISSING"
+    },
+    {
+      "group": "integration",
+      "path": "tests/c14/test_c14_dated_production_integration.py",
+      "expected_sha256": "75008caea2d22386f7ec2340abbf080d97ed3bc98eaeb3a0130716508b26a1d6",
+      "status": "MISSING"
+    },
+    {
+      "group": "integration",
+      "path": "configs/workstream_a_c14_evaluation_sample_2026-10-07.json",
+      "expected_sha256": "1276067b4eba77616e20f7776253ab0f2d330cfca3114a7c3f1ea3ee7f5d96fa",
+      "observed_sha256": "1276067b4eba77616e20f7776253ab0f2d330cfca3114a7c3f1ea3ee7f5d96fa",
+      "expected_bytes": 1074,
+      "observed_bytes": 1074,
+      "status": "MATCH"
+    },
+    {
+      "group": "integration",
+      "path": "validate_c14_evaluation_sample.py",
+      "expected_sha256": "82736239a6f54236bc2ee6055cace8fd794b8957cb7e17e56338e20d4d28d82c",
+      "status": "MISSING"
+    },
+    {
+      "group": "integration",
+      "path": "data/intl_c14/audit/C14_EVALUATION_SAMPLE_VALIDATION_2026-10-07.json",
+      "expected_sha256": "dfcdc224d003651a136de65bc7de102bdf3888bedf470f61cdc79b7d9c94c02d",
+      "status": "MISSING"
+    },
+    {
+      "group": "integration",
+      "path": "data/intl_c14/audit/WORKSTREAM_A_PRE_RESULTS_SAMPLE_AMENDMENT_2026-10-07.md",
+      "expected_sha256": "b62b1b86de80734b0d40f5b8fcee417782571a79cdb34b84a52dd6d99ec883ce",
+      "observed_sha256": "b62b1b86de80734b0d40f5b8fcee417782571a79cdb34b84a52dd6d99ec883ce",
+      "expected_bytes": 3106,
+      "observed_bytes": 3106,
+      "status": "MATCH"
+    },
+    {
+      "group": "unchanged_C1_C5",
+      "path": "data/intl_c1/production/DEU/c1_audit.parquet",
+      "expected_sha256": "4181891510d29f8db26a1600d17052dd4e60c05ebd3bd6b395146aba3799dd20",
+      "status": "MISSING"
+    },
+    {
+      "group": "unchanged_C1_C5",
+      "path": "data/intl_c1/production/DEU/universe.parquet",
+      "expected_sha256": "f0652cafccc1a5f4ba6fb283ebc916be186c993cf1710b147e607b807d659695",
+      "status": "MISSING"
+    },
+    {
+      "group": "unchanged_C1_C5",
+      "path": "data/intl_c1/production/IND/c1_audit.parquet",
+      "expected_sha256": "c1dc225ddddf3a41a83144acd741b3f3f2f3170b8c7a29b2f6ab2306fd6ffdad",
+      "status": "MISSING"
+    },
+    {
+      "group": "unchanged_C1_C5",
+      "path": "data/intl_c1/production/IND/universe.parquet",
+      "expected_sha256": "dac4c9f2577cbc46e288ab1052fec2bec9185c446ee4d5ca51c57b7ba483554c",
+      "status": "MISSING"
+    },
+    {
+      "group": "unchanged_C1_C5",
+      "path": "data/intl_c1/production/JPN/c1_audit.parquet",
+      "expected_sha256": "3bf4f683827901bdd035aa94405884a21c125839227c34075e1e4db35453704b",
+      "status": "MISSING"
+    },
+    {
+      "group": "unchanged_C1_C5",
+      "path": "data/intl_c1/production/JPN/universe.parquet",
+      "expected_sha256": "aa0b91952e2662b2941b5927d9e376074849b526a7dbe4328243e467ad56d70c",
+      "status": "MISSING"
+    },
+    {
+      "group": "unchanged_C1_C5",
+      "path": "data/intl_c2/production/DEU/signal_meta.csv",
+      "expected_sha256": "c454bd19201d506678889bc29649d1e4e9437a8e1b85252e626a46655c4705db",
+      "status": "MISSING"
+    },
+    {
+      "group": "unchanged_C1_C5",
+      "path": "data/intl_c2/production/DEU/signals.parquet",
+      "expected_sha256": "232142813ea63d7c33be21016d31afab06baf5df1874cee4200f48fe129fae1c",
+      "status": "MISSING"
+    },
+    {
+      "group": "unchanged_C1_C5",
+      "path": "data/intl_c2/production/IND/signal_meta.csv",
+      "expected_sha256": "c454bd19201d506678889bc29649d1e4e9437a8e1b85252e626a46655c4705db",
+      "status": "MISSING"
+    },
+    {
+      "group": "unchanged_C1_C5",
+      "path": "data/intl_c2/production/IND/signals.parquet",
+      "expected_sha256": "274186fdced6ce3d0f3ef293267587b706e610ce2901ddc87032a2fc984f4fc3",
+      "status": "MISSING"
+    },
+    {
+      "group": "unchanged_C1_C5",
+      "path": "data/intl_c2/production/JPN/signal_meta.csv",
+      "expected_sha256": "c454bd19201d506678889bc29649d1e4e9437a8e1b85252e626a46655c4705db",
+      "status": "MISSING"
+    },
+    {
+      "group": "unchanged_C1_C5",
+      "path": "data/intl_c2/production/JPN/signals.parquet",
+      "expected_sha256": "e4dff3fe8c4ec5b508a5e5e64918d9d479130c393c40ee21a38edcceb80ea284",
+      "status": "MISSING"
+    },
+    {
+      "group": "unchanged_C1_C5",
+      "path": "data/intl_c2/production/signal_meta.csv",
+      "expected_sha256": "c454bd19201d506678889bc29649d1e4e9437a8e1b85252e626a46655c4705db",
+      "status": "MISSING"
+    },
+    {
+      "group": "unchanged_C1_C5",
+      "path": "data/intl_c4/production/DEU/targets.parquet",
+      "expected_sha256": "ba903a1a75fc04cf8659a25e1e40ae818bd218b4fae3fa5feb244ebfd344a2d2",
+      "status": "MISSING"
+    },
+    {
+      "group": "unchanged_C1_C5",
+      "path": "data/intl_c4/production/IND/targets.parquet",
+      "expected_sha256": "835b955c3e33df162f839741300f9064a21f7adc2635a99bca1cbb351094fd1f",
+      "status": "MISSING"
+    },
+    {
+      "group": "unchanged_C1_C5",
+      "path": "data/intl_c4/production/JPN/targets.parquet",
+      "expected_sha256": "d7984e5e3b2a1ff74d026f74ed0a7a28dcb762fb721045c9117165af8b6df432",
+      "status": "MISSING"
+    },
+    {
+      "group": "unchanged_C1_C5",
+      "path": "data/intl_c5/candidate_final_working/C5_FINAL_WORKING_AUDIT.json",
+      "expected_sha256": "bfcb39ec2f0a44dbd9bb2d1bb86ea1fc523e9add05f6c993ecabbdb00c2d7516",
+      "status": "MISSING"
+    },
+    {
+      "group": "unchanged_C1_C5",
+      "path": "data/intl_c5/candidate_final_working/DEU/states.parquet",
+      "expected_sha256": "97e4d943b1b3bba943297dc69944ebbe4f2a8cc4264964600b4b58d0c5863213",
+      "status": "MISSING"
+    },
+    {
+      "group": "unchanged_C1_C5",
+      "path": "data/intl_c5/candidate_final_working/IND/states.parquet",
+      "expected_sha256": "e298c690868b3cf2fa4663bc3dfe9f1e33783d6c9d484d761f0e50330e352787",
+      "status": "MISSING"
+    },
+    {
+      "group": "unchanged_C1_C5",
+      "path": "data/intl_c5/candidate_final_working/JPN/states.parquet",
+      "expected_sha256": "3ec2d05486d21166c175fab9ecb0555652d2964f6bc151079f7a5d9b80d8d8a0",
+      "status": "MISSING"
+    }
+  ]
+}

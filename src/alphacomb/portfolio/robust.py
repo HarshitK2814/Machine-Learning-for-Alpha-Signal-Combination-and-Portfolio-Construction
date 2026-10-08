@@ -23,9 +23,11 @@ import pandas as pd
 
 from ..risk.structural import RiskModel
 from .cost_terms import (cost_inputs_for, cvx_borrow_cost, cvx_trade_cost,
-                         eligible_cost_input_permnos, ineligible_held_permnos)
-from .optimizer import (OptimizationResult, OptimizerConfig, _risk_factor, book_constraints,
-                        BREACH_TOL, bound_breach, realised_violations, solve_escalating)
+                         eligible_cost_input_permnos, ineligible_held_permnos,
+                         partition_prior_book)
+from .optimizer import (FrozenSleeve, OptimizationResult, OptimizerConfig, _risk_factor,
+                        book_constraints, BREACH_TOL, bound_breach, realised_violations,
+                        solve_escalating)
 
 log = logging.getLogger(__name__)
 
@@ -43,16 +45,16 @@ def construct_robust(date, alpha: pd.Series, w_prev: pd.Series | None, risk: Ris
     import cvxpy as cp
 
     cfg = cfg or OptimizerConfig.from_files()
-    held_without_costs = ineligible_held_permnos(date, cost_inputs, w_prev)
-    if len(held_without_costs):
-        held = w_prev.copy() if w_prev is not None else pd.Series(dtype=float)
-        return OptimizationResult(
-            held,
-            "failed_hold_missing_cost",
-            diagnostics={"ineligible_held_permnos": held_without_costs.tolist()},
-        )
+    # Identical non-tradeability treatment to ``construct``; see partition_prior_book. The two
+    # paths must agree, because the uncertainty axis of the factorial is the contrast between
+    # them and any difference in how a frozen position is handled would be attributed to
+    # uncertainty.
+    _, frozen_idx, exited_idx = partition_prior_book(date, cost_inputs, w_prev)
+    sleeve = FrozenSleeve.build(frozen_idx, w_prev, risk)
     permnos = alpha.dropna().index
     permnos = eligible_cost_input_permnos(date, cost_inputs, permnos)
+    permnos = permnos.difference(sleeve.permnos, sort=False)
+    risk_full = risk
     risk = risk.align(permnos)
     n = len(permnos)
     if n < 10:
@@ -60,7 +62,8 @@ def construct_robust(date, alpha: pd.Series, w_prev: pd.Series | None, risk: Ris
 
     a = alpha.reindex(permnos).to_numpy(dtype=float)
     prev = (w_prev.reindex(permnos).fillna(0.0).to_numpy(dtype=float) if w_prev is not None else np.zeros(n))
-    ci = cost_inputs_for(date, cost_inputs, permnos, borrow_fee_proxy=cfg.borrow_fee_proxy())
+    ci = cost_inputs_for(date, cost_inputs, permnos, borrow_fee_proxy=cfg.borrow_fee_proxy(),
+                         allow_synthetic_market_imputation=getattr(cfg, "allow_synthetic_market_imputation", False))
     spread = ci["spread"].to_numpy() * cfg.cost_multiplier
     sigma_d = ci["sigma_d"].to_numpy()
     adv = ci["adv_usd"].to_numpy()
@@ -83,7 +86,8 @@ def construct_robust(date, alpha: pd.Series, w_prev: pd.Series | None, risk: Ris
 
     w = cp.Variable(n)
     dw = w - prev
-    risk_term = cp.sum_squares(L.T @ (B.T @ w)) + cp.sum(cp.multiply(d, cp.square(w)))
+    factor_vec = B.T @ w if sleeve.empty else B.T @ w + sleeve.factor_exposure
+    risk_term = cp.sum_squares(L.T @ factor_vec) + cp.sum(cp.multiply(d, cp.square(w)))
     cost_term = cvx_trade_cost(dw, spread, sigma_d, adv, cfg.aum_usd, k, cfg.commission_bps)
     borrow_term = cvx_borrow_cost(w, borrow)
     robust_term = 0
@@ -94,10 +98,11 @@ def construct_robust(date, alpha: pd.Series, w_prev: pd.Series | None, risk: Ris
         robust_term = robust_term + wasserstein_eps * cp.norm2(w)
 
     def breach_of(value):
-        return bound_breach(value, prev, adv_cap, pos_cap, cfg, risk)
+        return bound_breach(value, prev, adv_cap, pos_cap, cfg, risk, frozen=sleeve)
 
     def attempt(soft: bool):
-        cons, penalty, caps = book_constraints(w, prev, adv_cap, pos_cap, cfg, risk, soft=soft)
+        cons, penalty, caps = book_constraints(w, prev, adv_cap, pos_cap, cfg, risk, soft=soft,
+                                               frozen=sleeve)
         problem = cp.Problem(
             cp.Maximize(a @ w - 0.5 * cfg.gamma * risk_term - cost_term - borrow_term
                         - robust_term - penalty), cons)
@@ -105,22 +110,31 @@ def construct_robust(date, alpha: pd.Series, w_prev: pd.Series | None, risk: Ris
         return problem, st, sv, caps
     # Same two stages as `construct`, from the same shared builder.
     problem, status, used_solver, caps = attempt(soft=False)
-    breach = bound_breach(w.value, prev, adv_cap, pos_cap, cfg, risk) if status != "failed" else float("inf")
+    breach = (bound_breach(w.value, prev, adv_cap, pos_cap, cfg, risk, frozen=sleeve)
+              if status != "failed" else float("inf"))
     if status == "failed" or breach > BREACH_TOL:
         log.info("hard constraint set unsatisfiable on %s (status=%s, relative breach=%.3g); "
                  "retrying with breachable bounds", pd.Timestamp(date).date(), status, breach)
         problem, status, used_solver, caps = attempt(soft=True)
     if status == "failed" or w.value is None:
-        return OptimizationResult(pd.Series(prev, index=permnos), "failed_hold", diagnostics={"n_assets": n})
+        held = pd.Series(prev, index=permnos)
+        if not sleeve.empty:
+            held = pd.concat([held, sleeve.weights])
+        return OptimizationResult(held, "failed_hold",
+                                  diagnostics={"n_assets": n, "n_frozen": len(sleeve.permnos)})
 
-    weights = pd.Series(np.asarray(w.value).ravel(), index=permnos).round(10)
-    weights[weights.abs() < 1e-9] = 0.0
-    trade = weights.to_numpy() - prev
+    traded = pd.Series(np.asarray(w.value).ravel(), index=permnos).round(10)
+    traded[traded.abs() < 1e-9] = 0.0
+    trade = traded.to_numpy() - prev
+    weights = pd.concat([traded, sleeve.weights]) if not sleeve.empty else traded
     return OptimizationResult(
         weights=weights, status=status, objective=float(problem.value),
-        predicted_vol=risk.volatility(weights), turnover=float(np.abs(trade).sum() / 2),
+        predicted_vol=risk_full.align(weights.index).volatility(weights),
+        turnover=float(np.abs(trade).sum() / 2),
         diagnostics={"n_assets": n, "kappa_robust": kappa_robust, "wasserstein_eps": wasserstein_eps,
                      "gross": float(np.abs(weights).sum()), "solver": used_solver,
+                     "n_frozen": len(sleeve.permnos), "gross_frozen": sleeve.gross,
+                     "n_exited": len(exited_idx),
                      "pos_cap_relaxed": caps["pos_cap_relaxed"], **realised_violations(caps)},
     )
 
