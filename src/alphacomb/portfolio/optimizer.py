@@ -555,20 +555,26 @@ def project(date, w_prop: pd.Series, risk: RiskModel, cost_inputs: pd.DataFrame,
     weights *are* a position, and the month-to-month change in them is a trade that has to clear
     the same participation limit as anyone else's.
 
-    Measured on the promoted DEU panel before the fix, across three economic-loss cells:
+    Measured on the promoted DEU panel with ``tools/verify_trade_caps.py``, which differences
+    against the **drifted** prior book - a position's drift between month-ends is not a trade, and
+    comparing raw weights across months invents violations and misreports the frozen sleeve as
+    traded:
 
-    | cell | name-months traded | exceeding ``adv_cap`` | worst |
-    |---|---|---|---|
-    | `L-C-E-0` | 29,844 | 4,176 (14.0%) | 20.0x |
-    | `N-C-E-U` | 29,836 | 5,127 (17.2%) | 20.0x |
-    | `N-S-E-0` | 30,398 | 5,314 (17.5%) | 20.0x |
+    | cell | tradeable trades | over ``adv_cap`` | worst | cumulative excess gross |
+    |---|---|---|---|---|
+    | `N-C-E-U` before | 32,361 | **4,984 (15.4%)** | 24.4x | 0.838 |
+    | `L-C-E-0` after | 32,363 | 53 (0.16%) | 5.2x | 0.0001 |
 
-    So one trade in six could not have been executed at the participation limit the cost model
-    charges, and the excess concentrated in the least liquid names - the same shape as the
+    So roughly one trade in six could not have been executed at the participation limit the cost
+    model charges, and the excess concentrated in the least liquid names - the same shape as the
     position-cap failure recorded in ``solve_escalating``, one layer along. Because the affected
     cells are exactly the ``*-E-*`` half of the design, the error sat directly on the cost-aware
     objective axis: the economic cells were being allowed to trade in a way the prediction cells
     were not, and the difference would have been attributed to the objective.
+
+    The 53 residual trades after the fix are conic residue on caps sitting at the ``1e-6`` floor -
+    five micro-units of gross in total across 132 months - not a relaxation of the constraint,
+    which is hard in both the soft and hard formulations.
 
     The fix is to stop hand-rolling the constraint set and call the same ``book_constraints``
     builder ``construct`` uses, with the same prior book, the same frozen sleeve and the same

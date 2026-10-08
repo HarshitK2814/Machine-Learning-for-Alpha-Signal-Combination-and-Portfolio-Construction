@@ -1,8 +1,30 @@
 # Workstream B status (Harshit)
 
-Updated: 2026-10-07. Workstream A is production-promoted and its real-data
-handoff to Workstream B is complete. **No real empirical result had been run or
-inspected at handoff.**
+Updated: **2026-10-08 (evening)**. Workstream A is production-promoted and its real-data
+handoff to Workstream B is complete.
+
+**Real empirical results now exist.** The scenario grid was frozen in
+`prereg/AMENDMENT_001A_international_scenario_freeze_2026-10-08` (awaiting Maham's
+countersignature), which released frozen decision 6B's gate, and the 16-cell factorial has
+been run on the promoted German panel over the frozen 2009-2019 window.
+
+**Read `docs/NON_TRADEABLE_TREATMENT.md` and `docs/CAPACITY_CONSTRAINT_DEU.md` before
+reading any number in this file.** The first real-data run failed in three separate ways at
+the portfolio-construction layer, each acting on one axis of the design rather than on all
+cells, and all three completed successfully while writing contract-valid output. They are
+fixed (`36e839a`, 13 new tests), but any result produced before that commit is void:
+
+1. all eight prediction cells held a drifting 2009 book for 131 of 132 months;
+2. the stale-portfolio guard missed it because it matched an exact status string;
+3. the economic-loss cells were never subject to the per-name trade cap, so 14-17.5% of
+   their trades exceeded the ADV participation limit by up to 20x - on exactly the
+   cost-objective axis the paper measures.
+
+Two data facts that shape every result: C6 `adv_usd` is non-null for only 55% of DEU rows,
+so the tradeable universe is ~246 names a month rather than ~360; and at $1bn AUM the
+largest attainable gross is 0.19-0.23 against a budget of 2.0, so capacity binds long
+before the risk budget. Question 2 of `docs/handoff/18_FOR_ABSAR_...` asks Absar whether
+the ADV gap is the source data or a promotion gap; it is unanswered.
 
 ## Current Workstream-A handoff boundary
 
@@ -39,7 +61,7 @@ inspected at handoff.**
 | Stale-portfolio guard in stage 04, construction quality in stage 06 | - | Done | `--max-held-share`, `held_share` column |
 
 This section records the earlier Workstream-B development snapshot. The current
-full repository result is **290 tests passed, zero failures/errors/skips**.
+full repository result is **381 tests passed, zero failures/errors/skips**.
 
 ### The tax-aware optimiser path: broken for most of 21 September, now fixed
 
