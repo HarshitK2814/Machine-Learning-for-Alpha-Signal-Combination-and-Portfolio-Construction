@@ -62,6 +62,13 @@ def test_every_baseline_emits_the_contract_shape(panel, code):
 
     assert list(out.columns) == baselines.SCORE_COLUMNS
     assert len(out) == len(test)
+    # What the runner actually requires, and what this test asserted the wrong version of until
+    # 8 October 2026: it selects per month with `pred.loc[group.index]` and reads `unc_sd`
+    # unconditionally. A frame carrying the right column names but a fresh RangeIndex passes a
+    # shape check and then raises inside the runner, which is exactly what happened the first
+    # time a baseline was run rather than unit-tested.
+    assert out.index.equals(test.index), "the runner selects by test's index, not position"
+    assert "unc_sd" in out.columns and out["unc_sd"].isna().all()
     assert out["score"].notna().all()
     assert np.isfinite(out["score"]).all()
     assert out["permno"].to_numpy().tolist() == test["permno"].to_numpy().tolist()
@@ -170,3 +177,43 @@ def test_registered_codes_match_the_preregistration():
         "baselines.BASELINES and PLAN_002 disagree; changing the comparator set requires a new "
         "pre-registration file, not an edit"
     )
+
+
+# ------------------------------------------------------- the runner (E10-E12)
+
+def test_baseline_runs_through_the_shared_cell_runner(small_panel, tmp_path, monkeypatch):
+    """A comparator must produce contract C9 by the same route a cell does.
+
+    Document 13 requirement 5 asks for cost parity through the shared stage-04 path, and
+    requirement 3 forbids a second cost implementation. The check that matters is that the run
+    lands in C9 *and* logs a trial, because that is what proves it went through the cell runner
+    rather than around it.
+    """
+    from alphacomb.contracts import read_table
+    from alphacomb.contracts.schemas import validate
+    from alphacomb.models import CellRunConfig, run_baseline
+    from alphacomb.risk import RiskCache, StructuralRiskModel
+    import pandas as pd
+
+    monkeypatch.setenv("ALPHACOMB_OUTPUTS", str(tmp_path))
+    risk = RiskCache(StructuralRiskModel(small_panel))
+    cfg = CellRunConfig(horizon=1, first_test_year=2003, last_test_year=2003, fast=True)
+    result = run_baseline("BASE-EW", small_panel, risk, cfg)
+
+    table = read_table(result["artefact"])
+    validate(table, "predictions")
+    assert result["experiment"] == "E10-E12"
+    assert result["strategy"] == "baseline_BASE-EW"
+    assert set(pd.to_datetime(table["date"]).dt.year) == {2003}
+    trials = pd.read_csv(tmp_path / "trials.csv")
+    assert (trials["strategy"] == "baseline_BASE-EW").any(), (
+        "a baseline that does not log a trial has bypassed the shared runner")
+
+
+def test_baseline_runner_refuses_an_unregistered_comparator(small_panel):
+    from alphacomb.models import run_baseline
+    from alphacomb.risk import RiskCache, StructuralRiskModel
+
+    risk = RiskCache(StructuralRiskModel(small_panel))
+    with pytest.raises(KeyError, match="exploratory"):
+        run_baseline("BASE-NOT-REGISTERED", small_panel, risk)

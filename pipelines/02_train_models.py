@@ -41,6 +41,10 @@ def main() -> None:
     p.add_argument("--manifest", default=None, help="CSV to append run metadata to")
     p.add_argument("--benchmarks", nargs="*", default=None,
                    help="published benchmark presets to run as well (E13), e.g. gkx_nn3 gkx_gbrt")
+    p.add_argument("--baselines", nargs="*", default=None,
+                   help="pre-registered comparators to run (E10-E12): BASE-EW BASE-THEME-EW "
+                        "BASE-IC BASE-OLS BASE-RIDGE, or 'all'. They route through the same cell "
+                        "runner and stage-04 path, which is what gives cost parity.")
     p.add_argument("--after-tax-objective", default=None, metavar="REGIME",
                    help="train economic cells on net-of-cost-AND-TAX utility, e.g. taxable_us_top_bracket")
     p.add_argument("--harvest-haircut", type=float, default=1.0,
@@ -109,6 +113,28 @@ def main() -> None:
                        "horizon": a.horizon, "source": source, "fast": a.fast})
         manifest_rows.append(result)
         log.info("%s -> %s (%d rows, %.1f min)", spec.code, result["artefact"], result["rows"], result["minutes"])
+
+    baseline_codes = a.baselines or []
+    if baseline_codes == ["all"]:
+        from alphacomb.models import BASELINES
+        baseline_codes = sorted(BASELINES)
+    for code in baseline_codes:
+        from alphacomb.models import run_baseline
+
+        started = time.time()
+        run_cfg = CellRunConfig(horizon=a.horizon, first_test_year=first, last_test_year=last,
+                                fast=a.fast, seed=a.seed)
+        log.info("=== baseline %s (E10-E12) ===", code)
+        try:
+            result = run_baseline(code, bundle, risk, run_cfg, base_cfg=cfg)
+            result.update({"status": "ok", "minutes": round((time.time() - started) / 60, 2),
+                           "horizon": a.horizon, "source": source, "fast": a.fast})
+            log.info("%s -> %s (%d rows, %.1f min)", code, result["artefact"], result["rows"],
+                     result["minutes"])
+        except Exception as exc:  # pragma: no cover - keeps a long batch alive
+            log.exception("baseline %s failed: %s", code, exc)
+            result = {"cell": code, "status": "failed", "error": str(exc)}
+        manifest_rows.append(result)
 
     for name in (a.benchmarks or []):
         from alphacomb.models import run_benchmark

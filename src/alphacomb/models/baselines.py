@@ -44,7 +44,9 @@ import pandas as pd
 
 from .base import rank_ic
 
-SCORE_COLUMNS = ["date", "permno", "score"]
+#: Columns the shared cell runner consumes. ``unc_sd`` is required even though a fixed
+#: combination rule has no ensemble dispersion: the runner reads it unconditionally.
+SCORE_COLUMNS = ["date", "permno", "score", "unc_sd"]
 
 
 def _standardise_cross_section(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
@@ -62,11 +64,27 @@ def _standardise_cross_section(df: pd.DataFrame, cols: list[str]) -> pd.DataFram
 
 
 def _scores(test: pd.DataFrame, values: np.ndarray) -> pd.DataFrame:
-    return pd.DataFrame({
-        "date": test["date"].to_numpy(),
-        "permno": test["permno"].to_numpy(),
-        "score": np.asarray(values, dtype="float64"),
-    })[SCORE_COLUMNS]
+    """Prediction frame in the shape the shared cell runner consumes.
+
+    Two details are load-bearing and were wrong until 8 October 2026, when these rules were first
+    run through ``run_prediction_cell`` rather than called directly in a unit test:
+
+    * **the index must be ``test``'s index**, because the runner selects per month with
+      ``pred.loc[group.index]``. A fresh ``RangeIndex`` raises ``KeyError: None of [...] are in
+      the [index]`` the moment the design frame is not 0-based, which it never is after filtering.
+    * **``unc_sd`` must exist.** The runner reads it unconditionally. A fixed combination rule has
+      no ensemble dispersion, so it is NaN - and that is also why the uncertainty axis of the
+      factorial does not apply to a baseline.
+
+    ``RidgeCell.predict`` has always done both; these returned neither, which is the hazard of a
+    comparator that is tested but never run.
+    """
+    out = pd.DataFrame(index=test.index)
+    out["date"] = test["date"].to_numpy()
+    out["permno"] = test["permno"].to_numpy()
+    out["score"] = np.asarray(values, dtype="float64")
+    out["unc_sd"] = np.nan
+    return out
 
 
 @dataclass
@@ -263,3 +281,60 @@ def build(code: str):
             "A new comparator may be reported, but only as exploratory."
         )
     return BASELINES[code]()
+
+
+def run_baseline(code: str, bundle, risk, cfg=None, base_cfg: dict | None = None,
+                 models_cfg: dict | None = None) -> dict:
+    """Run one pre-registered baseline through the shared cell runner and write contract C9.
+
+    Deliberately the same mechanism as ``benchmarks.run_benchmark``: substitute a single fixed
+    candidate into the cell runner's candidate list, so the baseline gets the identical design
+    matrix, split calendar, lockbox assertion, validation IC, alpha scaling and trial logging that
+    every factorial cell gets. Handoff document 13 requirement 5 asks for exactly this, and
+    requirement 3 forbids a separate baseline cost path.
+
+    Without this the five comparators existed as tested classes that nothing ran, and the exhibit
+    answered "which ML ingredient contributes" while leaving "does any of it beat equal-weighting
+    net of costs" unanswered - which is the first question a referee asks.
+
+    A baseline is a static, prediction-loss rule with no uncertainty shrinkage, so it is run under
+    the ``L-S-P-0`` cell specification: the nonlinearity and state-dependence axes do not apply to
+    a fixed combination rule, and pretending otherwise would put a comparator inside the factorial.
+    """
+    from ..contracts import new_run_id, paths, splits as split_mod, write_table
+    from ..contracts.interfaces import CellSpec
+    from ..contracts.io import load_config, read_yaml
+    from .base import build_design
+    from .cells import CellRunConfig, run_prediction_cell
+    import alphacomb.models.cells as cells_module
+
+    model = build(code)                     # raises for anything not pre-registered
+    cfg = cfg or CellRunConfig()
+    base_cfg = base_cfg or load_config("base")
+    models_cfg = models_cfg or read_yaml(paths.REPO_ROOT / "configs" / "models.yaml")
+    strategy = f"baseline_{code}"
+    run_id = new_run_id(strategy)
+
+    spec = CellSpec.parse("L-S-P-0")
+    df, features = build_design(bundle, spec, horizon=cfg.horizon)
+    calendar = split_mod.generate(horizon_months=cfg.horizon, cfg=base_cfg,
+                                 first_test_year=cfg.first_test_year,
+                                 last_test_year=cfg.last_test_year)
+    df = df[df["date"] <= calendar[-1].test_end].copy()
+    split_mod.assert_not_lockbox(df["date"].unique(), base_cfg)
+    risk.warm([d for d in sorted(df["date"].unique())
+               if pd.Timestamp(d) >= calendar[0].val_start])
+
+    params = {"baseline": code, "rule": type(model).__name__}
+    original = cells_module._candidates
+    cells_module._candidates = lambda spec_, models_cfg_, features_, cfg_: [(model, params)]
+    try:
+        table = run_prediction_cell(spec, df, features, calendar, risk, cfg, base_cfg, models_cfg,
+                                    run_id, strategy)
+    finally:
+        cells_module._candidates = original
+
+    out = paths.predictions_path(strategy, run_id)
+    write_table(table, out, "predictions")
+    return {"baseline": code, "experiment": "E10-E12", "strategy": strategy, "run_id": run_id,
+            "artefact": out, "contract": "predictions", "rows": len(table)}
