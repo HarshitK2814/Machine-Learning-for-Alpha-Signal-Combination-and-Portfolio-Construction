@@ -140,6 +140,12 @@ def main(argv: list[str] | None = None) -> int:
                     help="return column to attribute (net_ret, after_tax_ret, gross_ret)")
     ap.add_argument("--out", type=Path, default=ROOT / "outputs" / "e29")
     ap.add_argument("--periods", type=int, default=12)
+    ap.add_argument("--spa-benchmark", default="baseline_BASE-EW",
+                    help="strategy to use as the Hansen SPA benchmark. Equal-weighting is the "
+                         "right default: 'does ANY configuration beat equal-weighting once the "
+                         "whole candidate set is accounted for' is the first question a referee "
+                         "asks, and SPA is the test that answers it without cherry-picking the "
+                         "best candidate. Ignored if the strategy is absent.")
     ap.add_argument("--source", default=None,
                     help="attribute only series stamped with this data_source (e.g. real_DEU). "
                          "Without it, every strategy's newest series is taken whatever its "
@@ -264,7 +270,11 @@ def main(argv: list[str] | None = None) -> int:
 
     if n_trials:
         panel = pd.concat([cells, others], axis=1)
-        rep = inference_report(panel, n_trials=n_trials)
+        bench = args.spa_benchmark if args.spa_benchmark in panel.columns else None
+        if args.spa_benchmark and bench is None:
+            print(f"note: SPA benchmark {args.spa_benchmark!r} is not in the panel; "
+                  f"SPA skipped. Present: {', '.join(sorted(others.columns)) or 'no comparators'}")
+        rep = inference_report(panel, n_trials=n_trials, benchmark=bench)
         per_strategy = rep["per_strategy"]
         per_strategy.to_csv(args.out / "e29_inference.csv", index=False)
         print(f"wrote {args.out / 'e29_inference.csv'}")
@@ -277,6 +287,16 @@ def main(argv: list[str] | None = None) -> int:
         print(f"\nsearch hurdle (E[max SR] under the null): {hurdle:.4f} annualised")
         print(f"strategies surviving deflation          : {survivors} of {len(per_strategy)}")
         # PBO and Romano-Wolf are the other two things a referee asks for.
+        if "spa" in rep:
+            spa = rep["spa"]
+            print("")
+            print(f"--- Hansen SPA vs {bench} ---")
+            print(f"  statistic {spa.statistic:.4f}   p = {spa.p_value:.4f}")
+            print("  " + ("no candidate beats the benchmark once the full set is accounted for"
+                          if spa.p_value > 0.05 else
+                          "at least one candidate genuinely beats the benchmark"))
+            for k, v in spa.detail.items():
+                print(f"    {k}: {v}")
         for key in ("pbo", "romano_wolf"):
             if key in rep:
                 print(f"\n--- {key} ---\n{rep[key]}")
