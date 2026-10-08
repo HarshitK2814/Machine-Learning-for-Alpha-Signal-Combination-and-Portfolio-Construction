@@ -64,17 +64,32 @@ def strategy_to_cell(name: str) -> str | None:
     return code
 
 
-def build_panel(files: dict[str, Path], column: str) -> tuple[pd.DataFrame, pd.DataFrame]:
-    """Return (cell panel, comparator panel), both months x strategy."""
-    cells, others = {}, {}
+def build_panel(files: dict[str, Path], column: str,
+                require_source: str | None = None) -> tuple[pd.DataFrame, pd.DataFrame, dict]:
+    """Return (cell panel, comparator panel, sources), both panels months x strategy.
+
+    ``require_source`` keeps a stale series out of a live exhibit. The returns directories
+    accumulate runs: a synthetic dress rehearsal, an older country, a one-off comparator. Each
+    strategy folder resolves independently to its own newest file, so without this filter a cell
+    that simply was not re-run would contribute its *previous* source's returns to the panel and
+    the attribution would silently mix populations. ``dev_backtest`` stamps ``data_source`` into
+    every series it writes; a series without the column predates the stamp and is treated as
+    unknown rather than assumed to match.
+    """
+    cells, others, sources = {}, {}, {}
     for name, path in files.items():
         df = pd.read_parquet(path)
         if column not in df.columns:
             continue
+        src = (str(df["data_source"].iloc[0]) if "data_source" in df.columns and len(df)
+               else "unstamped")
+        sources[name] = src
+        if require_source is not None and src != require_source:
+            continue
         series = df.set_index(pd.to_datetime(df["date"]))[column].astype("float64")
         code = strategy_to_cell(name)
         (cells if code else others)[code or name] = series
-    return pd.DataFrame(cells).sort_index(), pd.DataFrame(others).sort_index()
+    return pd.DataFrame(cells).sort_index(), pd.DataFrame(others).sort_index(), sources
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -83,20 +98,43 @@ def main(argv: list[str] | None = None) -> int:
                     help="return column to attribute (net_ret, after_tax_ret, gross_ret)")
     ap.add_argument("--out", type=Path, default=ROOT / "outputs" / "e29")
     ap.add_argument("--periods", type=int, default=12)
+    ap.add_argument("--source", default=None,
+                    help="attribute only series stamped with this data_source (e.g. real_DEU). "
+                         "Without it, every strategy's newest series is taken whatever its "
+                         "provenance, which is only safe when the whole tree was built in one go.")
     args = ap.parse_args(argv)
 
     cfg = load_config()
-    source = cfg.get("data_source", "unknown")
     files = latest_per_strategy(paths.outputs_root() / "returns")
     if not files:
         print("no C12 return series under outputs/returns - run stage 04 and the backtest first")
         return 2
 
-    cells, others = build_panel(files, args.column)
+    cells, others, sources = build_panel(files, args.column, require_source=args.source)
+    # The stamp on the exhibit is the provenance of the series actually attributed, not of
+    # configs/base.yaml. Mixing populations in one factorial is never a reportable result, so it
+    # stops the run instead of printing a caveat nobody will carry into the draft.
+    kept = set(cells.columns) | set(others.columns)
+    used = sorted({v for k, v in sources.items() if (strategy_to_cell(k) or k) in kept})
+    if len(used) > 1:
+        print("")
+        print(f"REFUSING TO ATTRIBUTE ACROSS SOURCES: {', '.join(used)}")
+        print("Each strategy folder resolves to its own newest returns file, so this means some")
+        print("cells were re-run and others were not. Re-run the stale cells, or pass --source")
+        print("to restrict the exhibit to one population.")
+        for name in sorted(sources):
+            print(f"  {name:<34} {sources[name]}")
+        return 2
+    source = used[0] if used else cfg.get("data_source", "unknown")
+    skipped = {k: v for k, v in sources.items() if v != source}
     print(f"data_source      : {source}")
     print(f"return column    : {args.column}")
     print(f"cells found      : {len(cells.columns)} of 16")
     print(f"comparators found: {len(others.columns)}")
+    if skipped:
+        print(f"excluded (other provenance): {len(skipped)}")
+        for name, src in sorted(skipped.items()):
+            print(f"  {name:<34} {src}")
     if cells.empty:
         print("no factorial cells present; nothing to attribute")
         return 2
@@ -110,7 +148,9 @@ def main(argv: list[str] | None = None) -> int:
 
     args.out.mkdir(parents=True, exist_ok=True)
     stamp = {"data_source": source, "column": args.column,
-             "is_dress_rehearsal": source != "real"}
+             "is_dress_rehearsal": not source.startswith("real"),
+             "series_provenance": sources,
+             "excluded_other_provenance": skipped}
 
     if not missing:
         report = factorial.attribution_report(cells, periods=args.periods)
