@@ -27,7 +27,7 @@ from alphacomb.tax import LotMethod, TaxConfig, after_tax_backtest, get_regime, 
 log = logging.getLogger("stage06")
 
 REPORT_COLUMNS = [
-    "strategy", "held_share", "regime", "lot_method", "months", "gross_sharpe", "net_sharpe", "after_tax_sharpe",
+    "strategy", "country", "wedge", "held_share", "regime", "lot_method", "months", "gross_sharpe", "net_sharpe", "after_tax_sharpe",
     "gross_mean_ann", "net_mean_ann", "after_tax_mean_ann", "after_tax_liq_mean_ann",
     "cost_drag_ann_bps", "tax_drag_ann_bps", "total_drag_ann_bps", "tax_share_of_gross",
     "wash_disallowed_ann_bps", "lt_share_of_gains", "turnover_mean", "max_drawdown",
@@ -62,8 +62,16 @@ def main() -> None:
     p = argparse.ArgumentParser(description="After-tax evaluation of every strategy (stage 06).")
     p.add_argument("--strategies", nargs="+", default=["all"])
     p.add_argument("--data", default=None)
-    p.add_argument("--regimes", nargs="+",
-                   default=["tax_exempt", "taxable_us_top_bracket", "trader_475f_mtm", "offshore_fund"])
+    p.add_argument("--country", default=None, choices=["DEU", "IND", "JPN"],
+                   help="evaluate the promoted international panel for one country. Implies the "
+                        "statutory regime in force there unless --regimes is given explicitly.")
+    p.add_argument("--as-of", default="2016-06-30",
+                   help="date at which the statutory regime is resolved for --country. The default "
+                        "sits inside the frozen mechanism subwindow 2014-01-01..2018-03-31, where "
+                        "all three countries are on a single constant-rate rule.")
+    p.add_argument("--regimes", nargs="+", default=None,
+                   help="investor regimes. Defaults to the statutory regime for --country, or to "
+                        "the four US investor types when no country is given.")
     p.add_argument("--lot-methods", nargs="+", default=["hifo"],
                    choices=[m.value for m in LotMethod])
     p.add_argument("--accounting", default="accrual", choices=["accrual", "year_end", "cash"])
@@ -77,7 +85,25 @@ def main() -> None:
     cfg = load_config("base")
     if a.aum is not None:
         cfg = {**cfg, "costs": {**cfg["costs"], "aum_usd_2020": a.aum}}
-    bundle = load_bundle(a.data or cfg["data_source"])
+    regimes: list = a.regimes or ["tax_exempt", "taxable_us_top_bracket", "trader_475f_mtm",
+                                  "offshore_fund"]
+    if a.country:
+        from alphacomb.contracts import intl
+        bundle = intl.load_country_bundle(a.country)
+        if a.regimes is None:
+            # The paper's treatment variable is the statutory holding-period wedge, so the default
+            # regime for a country run is the one its own law specifies, derived from the frozen
+            # C14 schedule rather than hardcoded. tax_exempt is kept alongside it as the zero-tax
+            # control that reproduces the net-of-cost number the literature reports.
+            from alphacomb.tax.statutory import statutory_regime
+            statutory = statutory_regime(a.country, a.as_of)
+            regimes = ["tax_exempt", statutory]
+            log.info("%s statutory regime at %s: %s  short=%.5f long=%.5f WEDGE=%.5f boundary=%sm",
+                     a.country, a.as_of, statutory.name, statutory.short_term_rate,
+                     statutory.long_term_rate, statutory.rate_spread, statutory.long_term_months)
+        log.info("international bundle %s: %d security-months", a.country, len(bundle.universe))
+    else:
+        bundle = load_bundle(a.data or cfg["data_source"])
 
     root = paths.outputs_root() / "weights"
     if not root.exists():
@@ -92,7 +118,7 @@ def main() -> None:
         if latest is None:
             continue
         weights = read_table(latest, "weights")
-        for regime_name in a.regimes:
+        for regime_name in regimes:
             for method_name in a.lot_methods:
                 tc = TaxConfig(regime=get_regime(regime_name), lot_method=LotMethod(method_name),
                                accounting=a.accounting, dividend_yield_annual=a.dividend_yield,
@@ -100,9 +126,15 @@ def main() -> None:
                 frame = after_tax_backtest(weights, bundle, cfg, tc, a.cost_multiplier)
                 summary = {"strategy": folder.name, **summarise_after_tax(frame)}
                 rows.append(summary)
-                log.info("%s | %s | %s: after-tax Sharpe %.3f, tax drag %.0f bps",
-                         folder.name, regime_name, method_name,
-                         summary["after_tax_sharpe"], summary["tax_drag_ann_bps"])
+                reg = get_regime(regime_name)
+                summary["regime"] = reg.name
+                summary["wedge"] = reg.rate_spread
+                summary["country"] = a.country or ""
+                log.info("%s | %s | %s: after-tax Sharpe %.3f, tax drag %.0f bps, "
+                         "lt_share %.3f, wedge %.5f",
+                         folder.name, reg.name, method_name, summary["after_tax_sharpe"],
+                         summary["tax_drag_ann_bps"], summary.get("lt_share_of_gains", float("nan")),
+                         reg.rate_spread)
                 if a.save_returns:
                     run_id = new_run_id(f"tax_{folder.name}_{regime_name}_{method_name}")
                     write_table(frame, paths.returns_path(folder.name, run_id), "returns")

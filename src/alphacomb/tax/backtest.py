@@ -40,7 +40,8 @@ import numpy as np
 import pandas as pd
 
 from ..portfolio.cost_terms import (BorrowFeeProxy, borrow_fee_proxy_from_cost_config,
-                                    cost_inputs_for, trade_cost_numpy)
+                                    cost_inputs_for, eligible_cost_input_permnos, priced_at,
+                                    trade_cost_numpy)
 from .dated import (DatedC12Patch, LossCarryforwardBook,
                     MissingDatedTaxConfiguration, RealisedTaxEvent)
 from .lots import LotMethod, TaxLotLedger
@@ -251,6 +252,10 @@ def after_tax_backtest(weights: pd.DataFrame, bundle, cfg: dict, tax_cfg: TaxCon
     k = float(costs_cfg["impact_k"]) * cost_multiplier
     commission = float(costs_cfg["commission_bps"])
     borrow_fee_proxy = borrow_fee_proxy_from_cost_config(costs_cfg)
+    # One decision for the whole run: a synthetic bundle keeps the imputation escape
+    # the generator's planted gaps rely on; a real one fails closed and uses the
+    # frozen-sleeve treatment instead.
+    _synthetic = str(getattr(bundle, "source", "")).startswith("synthetic")
     tax_year_end_month = 12
     if tax_cfg.dated_engine is not None:
         if tax_cfg.accounting != "year_end":
@@ -295,6 +300,13 @@ def after_tax_backtest(weights: pd.DataFrame, bundle, cfg: dict, tax_cfg: TaxCon
         target_w = pd.Series(group["w"].to_numpy(dtype=float), index=group["permno"].to_numpy())
         held = pd.Index([p for p in ledger.lots if abs(ledger.position(p)) > 1e-8])
         idx = target_w.index.union(held)
+        if not _synthetic:
+            # A name with no C6 row at this date has left the panel; its position was closed by
+            # the delisting return the targets table already applies, so it is not part of this
+            # month's cost base. Only for real panels: the synthetic generator plants missing
+            # market fields on purpose and routes them through the imputation escape instead, so
+            # restricting the index there would silently change the book the tests pin.
+            idx = idx.intersection(priced_at(date, bundle.cost_inputs))
         w_full = target_w.reindex(idx).fillna(0.0)
         prev_dollars = pd.Series([ledger.position(p) for p in idx], index=idx, dtype=float)
         prev_w = prev_dollars / nav if nav > 0 else prev_dollars * 0.0
@@ -321,21 +333,38 @@ def after_tax_backtest(weights: pd.DataFrame, bundle, cfg: dict, tax_cfg: TaxCon
         ledger.snapshot_statutory_references(date)
 
         # ---- trading costs ----------------------------------------------------------------
+        # Same non-tradeability treatment as tools/dev_backtest and the C11 optimiser, so the
+        # after-tax engine prices the identical book (docs/NON_TRADEABLE_TREATMENT.md). A C11
+        # book legitimately contains a frozen sleeve - names that are alive but carry no certified
+        # market inputs, and therefore were not traded - and names that have left the panel
+        # entirely. Handing either to the fail-closed cost consumer halts the run: the first on an
+        # uncertified spread, the second on a position that no longer exists.
+        cost_idx = (pd.Index(eligible_cost_input_permnos(date, bundle.cost_inputs, idx))
+                    if not _synthetic else idx)
         ci = cost_inputs_for(
             date,
             bundle.cost_inputs,
-            idx,
+            cost_idx,
             borrow_fee_proxy=borrow_fee_proxy,
             allow_synthetic_market_imputation=str(getattr(bundle, "source", "")).startswith("synthetic"),
         )
-        dw = (w_full - prev_w).to_numpy()
+        dw_full = (w_full - prev_w)
+        dw = dw_full.reindex(cost_idx).fillna(0.0).to_numpy()
         spread_arr = ci["spread"].to_numpy() * cost_multiplier
         spread_cost = float((0.5 * spread_arr * np.abs(dw)).sum() + commission / 10_000.0 * np.abs(dw).sum())
         total_trade = float(trade_cost_numpy(dw, spread_arr, ci["sigma_d"].to_numpy(),
                                              ci["adv_usd"].to_numpy(), aum, k, commission).sum())
         impact_cost = max(total_trade - spread_cost, 0.0)
-        borrow_cost = float((ci["borrow_fee"].to_numpy() / 12.0
-                             * np.clip(-w_full.to_numpy(), 0, None)).sum())
+        # Borrow accrues on every short position, frozen or not: being unable to trade a borrow
+        # does not make holding it free. The proxy is one flat rate, so it applies to the book.
+        if _synthetic:
+            borrow_cost = float((ci["borrow_fee"].to_numpy() / 12.0
+                                 * np.clip(-w_full.reindex(cost_idx).fillna(0.0).to_numpy(),
+                                           0, None)).sum())
+        else:
+            borrow_rate = (borrow_fee_proxy.annual_rate if borrow_fee_proxy is not None
+                           else float(np.nanmax(ci["borrow_fee"].to_numpy())) if len(ci) else 0.0)
+            borrow_cost = float((borrow_rate / 12.0 * np.clip(-w_full.to_numpy(), 0, None)).sum())
         transaction_tax_cost = 0.0
         if tax_cfg.dated_engine is not None:
             transaction_tax_cost = tax_cfg.dated_engine.transaction_tax(
