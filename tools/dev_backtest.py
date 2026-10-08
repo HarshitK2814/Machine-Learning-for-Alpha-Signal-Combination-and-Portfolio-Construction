@@ -23,11 +23,17 @@ import pandas as pd
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from alphacomb.contracts import load_bundle, load_config, new_run_id, paths, read_table, write_table  # noqa: E402
-from alphacomb.portfolio.cost_terms import cost_inputs_for, trade_cost_numpy  # noqa: E402
+from alphacomb.portfolio.cost_terms import (borrow_fee_proxy_from_cost_config,  # noqa: E402
+                                            cost_inputs_for, trade_cost_numpy)
 
 
 def backtest(weights: pd.DataFrame, bundle, cfg: dict, cost_multiplier: float = 1.0) -> pd.DataFrame:
     costs_cfg = cfg["costs"]
+    # C6 borrow_fee is certified all-null; the modelled proxy is injected only at the
+    # C11/experiment consumer layer (frozen decision 6B). This backtest is such a consumer, so it
+    # must load the proxy from configuration rather than leaving borrow unpriced - and the legacy
+    # 25 bp fallback stays prohibited.
+    borrow_proxy = borrow_fee_proxy_from_cost_config(costs_cfg)
     aum = float(costs_cfg["aum_usd_2020"])
     k = float(costs_cfg["impact_k"]) * cost_multiplier
     commission = float(costs_cfg["commission_bps"])
@@ -46,6 +52,7 @@ def backtest(weights: pd.DataFrame, bundle, cfg: dict, cost_multiplier: float = 
         # non-tradeable rather than imputable.
         ci = cost_inputs_for(
             date, bundle.cost_inputs, idx,
+            borrow_fee_proxy=borrow_proxy,
             allow_synthetic_market_imputation=str(getattr(bundle, "source", "")).startswith("synthetic"),
         )
         dw = (w_full - prev_full).to_numpy()
