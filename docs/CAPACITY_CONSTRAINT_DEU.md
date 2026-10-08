@@ -84,3 +84,63 @@ it is the first thing to add to the DEU exhibit, and it requires no new data.
 
 Until it is run, the economic-objective main effect should be read as "objective plus the leverage
 the objective selects", and described that way in the text.
+
+---
+
+## The consequence: the book expresses liquidity, not the forecast
+
+Added 8 October 2026, after the first two real cells cleared C12. This is the most important
+interpretive result so far and it should shape how the factorial is read.
+
+Measured on cell `L-C-P-0` over all 132 evaluation months:
+
+| diagnostic | value |
+|---|---|
+| held positions at their position cap (within 1%) | **36.2%** mean, 10.9% min, 58.6% max |
+| rank correlation of \|w\| with \|alpha\| | **-0.080** |
+| rank correlation of \|w\| with the position cap | **+0.871** |
+
+Position *size* is almost perfectly explained by the ADV participation cap and essentially
+unrelated to the alpha forecast. The optimiser is choosing signs and little else: how much to hold
+of each name has already been decided by its liquidity before the model is consulted.
+
+That resolves what otherwise looks like a contradiction in the results. The signals carry
+information - E02 reports positive mean rank IC with Newey-West t-statistics above 2 for a large
+share of the library - and yet the realised books earn almost nothing gross. The first two cells
+priced on real data:
+
+| cell | gross Sharpe | net Sharpe | gross p.a. | net p.a. | cost drag |
+|---|---|---|---|---|---|
+| `cell_L-C-P-0` | +0.138 | **-0.187** | +0.08% | -0.11% | 18.3 bp |
+| `cell_L-C-E-0` | -0.157 | **-0.568** | -0.13% | -0.48% | 34.5 bp |
+
+Gross alpha of roughly 8 basis points a year cannot survive 18 basis points of cost. But the
+reason gross alpha is 8bp rather than something worth trading is not that the forecast is empty -
+it is that the forecast is not being expressed. A book whose weights correlate +0.87 with ADV and
+-0.08 with alpha is a liquidity-weighted portfolio with alpha-determined signs.
+
+**What this means for the paper's question.** The thesis is the net-of-cost value of ML signal
+combination. On Germany at the registered baseline AUM the answer is "approximately zero, and
+negative after costs" - but the mechanism matters enormously for how that is reported:
+
+* it is **not** evidence that nonlinearity, state dependence, cost-aware objectives or uncertainty
+  shrinkage fail to add forecasting value;
+* it **is** evidence that in a capacity-constrained universe none of them can be acted on, so
+  their net-of-cost value is zero regardless of their forecasting value.
+
+That is a sharper and more interesting claim than "ML does not help", and it is exactly the kind of
+implementation-versus-forecast distinction the design was built to separate. It also predicts the
+sign of the AUM axis: at $10bn, where the attainable gross falls to 0.023, the effects should
+compress further toward zero.
+
+**A limitation to state plainly.** Amendment 001A froze capacity at AUM {1e9, 1e10}, and both
+levels are capacity-bound for this universe. The registered design may therefore have no power to
+detect the four factorial effects on Germany at all - not because the effects are absent, but
+because the constraint set dominates at both registered scenarios. Establishing that requires
+running an AUM small enough that the participation cap stops binding (on these numbers, of order
+$100m), which is **not** a registered scenario.
+
+Such a run is legitimate as a labelled diagnostic of *why* the registered effects are near zero. It
+is not legitimate as a replacement headline, and choosing an AUM because its results look better is
+precisely the specification search frozen decision 6B exists to prevent. If it is run, it is
+reported as exploratory, alongside the registered scenarios, never instead of them.
