@@ -60,7 +60,8 @@ def construct_robust(date, alpha: pd.Series, w_prev: pd.Series | None, risk: Ris
 
     a = alpha.reindex(permnos).to_numpy(dtype=float)
     prev = (w_prev.reindex(permnos).fillna(0.0).to_numpy(dtype=float) if w_prev is not None else np.zeros(n))
-    ci = cost_inputs_for(date, cost_inputs, permnos, borrow_fee_proxy=cfg.borrow_fee_proxy())
+    ci = cost_inputs_for(date, cost_inputs, permnos, borrow_fee_proxy=cfg.borrow_fee_proxy(),
+                         allow_synthetic_market_imputation=getattr(cfg, "allow_synthetic_market_imputation", False))
     spread = ci["spread"].to_numpy() * cfg.cost_multiplier
     sigma_d = ci["sigma_d"].to_numpy()
     adv = ci["adv_usd"].to_numpy()

@@ -32,6 +32,15 @@ from .uncertainty import select_kappa
 
 log = logging.getLogger(__name__)
 
+#: Uncertainty-shrinkage kappa values frozen by pre-registration amendment 001A.
+#: ``low`` = 0.5, ``high`` = 2.0. The confirmatory trial count N = 64 is computed from this
+#: two-level dimension; widening it silently would invalidate every deflated Sharpe ratio.
+CONFIRMATORY_KAPPA_GRID: tuple[float, ...] = (0.5, 2.0)
+
+#: The wider search the code shipped with before 8 October 2026. Legitimate to run, but any result
+#: it produces is exploratory and must be reported against its own, larger N.
+EXPLORATORY_KAPPA_GRID: tuple[float, ...] = (0.0, 0.5, 1.0, 2.0, 4.0)
+
 
 @dataclass
 class CellRunConfig:
@@ -41,7 +50,15 @@ class CellRunConfig:
     fast: bool = False
     seed: int = 0
     uncertainty_members: int = 5
-    kappa_grid: tuple[float, ...] = (0.0, 0.5, 1.0, 2.0, 4.0)
+    #: Uncertainty-shrinkage grid searched on validation.
+    #:
+    #: The confirmatory default is the two-value grid frozen by pre-registration amendment 001A.
+    #: PLAN_001 registered a two-level shrinkage dimension and N = 64 is computed from it; the
+    #: five-value grid this field used to default to searched 2.5x wider than the plan admits,
+    #: which would have made every reported deflated Sharpe ratio too generous - the exact failure
+    #: ``validation.preregistration`` exists to prevent. Use ``EXPLORATORY_KAPPA_GRID`` for a wider
+    #: search, and report the result as exploratory with its own, larger N.
+    kappa_grid: tuple[float, ...] = CONFIRMATORY_KAPPA_GRID
     economic_max_train_months: int = 240
     validation_months_for_kappa: int = 12
     gamma: float = 25.0

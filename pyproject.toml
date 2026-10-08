@@ -30,6 +30,9 @@ where = ["src"]
 testpaths = ["tests"]
 addopts = "-q"
 filterwarnings = ["ignore::DeprecationWarning"]
+markers = [
+    "slow: simulation studies (size/power). Run them with -m slow; they are part of the suite, not optional extras.",
+]
 
 [tool.ruff]
 line-length = 120

@@ -1,0 +1,218 @@
+{
+  "title": "Net-of-cost, after-tax attribution of ML signal combination across Germany, India and Japan: nonlinearity, state dependence, cost-aware objective and uncertainty",
+  "primary_outcome": "After-tax net return per month of a dollar-neutral long/short book, per country, under the dated C12 ledger with statutory local-currency tax and point-in-time FX; aggregated across DEU/IND/JPN by equal country weight. Evaluation window 2009-01-01..2019-12-31.",
+  "selection_rule": "Within each cell, the configuration with the highest validation rank IC on the expanding validation window ending one year before each test year. Selection uses rank IC only - never a net-of-cost, after-tax, or any other quantity that appears in a results table, and never a sensitivity-axis value.",
+  "cells": [
+    "L-S-P-0",
+    "L-S-P-U",
+    "L-S-E-0",
+    "L-S-E-U",
+    "L-C-P-0",
+    "L-C-P-U",
+    "L-C-E-0",
+    "L-C-E-U",
+    "N-S-P-0",
+    "N-S-P-U",
+    "N-S-E-0",
+    "N-S-E-U",
+    "N-C-P-0",
+    "N-C-P-U",
+    "N-C-E-0",
+    "N-C-E-U",
+    "BASE-EW",
+    "BASE-IC",
+    "BASE-OLS",
+    "BASE-RIDGE",
+    "BASE-THEME-EW"
+  ],
+  "grids": {
+    "L-S-P-0": {
+      "shrinkage": [
+        "low",
+        "high"
+      ],
+      "capacity": [
+        "small",
+        "large"
+      ]
+    },
+    "L-S-P-U": {
+      "shrinkage": [
+        "low",
+        "high"
+      ],
+      "capacity": [
+        "small",
+        "large"
+      ]
+    },
+    "L-S-E-0": {
+      "shrinkage": [
+        "low",
+        "high"
+      ],
+      "capacity": [
+        "small",
+        "large"
+      ]
+    },
+    "L-S-E-U": {
+      "shrinkage": [
+        "low",
+        "high"
+      ],
+      "capacity": [
+        "small",
+        "large"
+      ]
+    },
+    "L-C-P-0": {
+      "shrinkage": [
+        "low",
+        "high"
+      ],
+      "capacity": [
+        "small",
+        "large"
+      ]
+    },
+    "L-C-P-U": {
+      "shrinkage": [
+        "low",
+        "high"
+      ],
+      "capacity": [
+        "small",
+        "large"
+      ]
+    },
+    "L-C-E-0": {
+      "shrinkage": [
+        "low",
+        "high"
+      ],
+      "capacity": [
+        "small",
+        "large"
+      ]
+    },
+    "L-C-E-U": {
+      "shrinkage": [
+        "low",
+        "high"
+      ],
+      "capacity": [
+        "small",
+        "large"
+      ]
+    },
+    "N-S-P-0": {
+      "shrinkage": [
+        "low",
+        "high"
+      ],
+      "capacity": [
+        "small",
+        "large"
+      ]
+    },
+    "N-S-P-U": {
+      "shrinkage": [
+        "low",
+        "high"
+      ],
+      "capacity": [
+        "small",
+        "large"
+      ]
+    },
+    "N-S-E-0": {
+      "shrinkage": [
+        "low",
+        "high"
+      ],
+      "capacity": [
+        "small",
+        "large"
+      ]
+    },
+    "N-S-E-U": {
+      "shrinkage": [
+        "low",
+        "high"
+      ],
+      "capacity": [
+        "small",
+        "large"
+      ]
+    },
+    "N-C-P-0": {
+      "shrinkage": [
+        "low",
+        "high"
+      ],
+      "capacity": [
+        "small",
+        "large"
+      ]
+    },
+    "N-C-P-U": {
+      "shrinkage": [
+        "low",
+        "high"
+      ],
+      "capacity": [
+        "small",
+        "large"
+      ]
+    },
+    "N-C-E-0": {
+      "shrinkage": [
+        "low",
+        "high"
+      ],
+      "capacity": [
+        "small",
+        "large"
+      ]
+    },
+    "N-C-E-U": {
+      "shrinkage": [
+        "low",
+        "high"
+      ],
+      "capacity": [
+        "small",
+        "large"
+      ]
+    },
+    "BASE-EW": {},
+    "BASE-IC": {},
+    "BASE-OLS": {},
+    "BASE-RIDGE": {
+      "penalty": [
+        "low",
+        "high"
+      ]
+    },
+    "BASE-THEME-EW": {},
+    "default": {
+      "shrinkage": [
+        "low",
+        "high"
+      ],
+      "capacity": [
+        "small",
+        "large"
+      ]
+    }
+  },
+  "n_seeds": 1,
+  "n_refits": 11,
+  "lockbox_note": "There is no sealed lockbox in the international design. The 2009-2019 window is the whole tax-dependent evaluation sample and was frozen by Workstream A on 7 October 2026 because it is the span the C14 source record covers completely - not because of anything observed in strategy performance (WORKSTREAM_A_PRE_RESULTS_SAMPLE_AMENDMENT_2026-10-07.md). The clean mechanism subwindow 2014-01-01..2018-03-31 inherits tax state from the 2009 inception and is reported separately, not used to select.",
+  "created_utc": "2026-10-07T19:55:45.888253+00:00",
+  "notes": "Supersedes PLAN_001 (21 September 2026), which pre-registered a United States 1995-2020 panel with\na 2021-2025 lockbox. Workstream A's 7 October promotion replaced that setting with Germany, India\nand Japan and froze the tax-dependent evaluation window at 2009-2019. PLAN_001's sample no longer\nexists; its trial count cannot deflate an international Sharpe. Both plans are published and the\npaper states which one each table uses.\n\nWritten BEFORE any real-data result was inspected. At the time of writing, the repository contains\nno real-data output of any kind: frozen decision 6B requires that scenarios be fixed before results\nare inspected, and that condition is what this file discharges.\n\nThe borrow-fee axis is a MODELLED proxy, not an observation. Workstream A could not source genuine\nborrow-fee data; certified C6 borrow_fee is null and MODELLED_FLAT_BORROW_PROXY_V1 is injected only\nat the C11/experiment layer. The paper must report the full five-rate band in the main results, not\nan appendix, and must state that the short leg's cost is an assumption. If the headline conclusion\ndoes not survive 7.00% p.a., that is the finding.\n\nPre-2009 observations remain available for model training and feature construction. They may not\nseed tax lots or tax state: the dated ledger cold-starts on 2009-01-01 with no opening lots.\n\nIndia's TERM state is provisional. Workstream A's RBI 91-day evidence audit passed as evidence but\nrequires an independent production rebuild; until that lands, any robustness cut conditioned on\nTERM for India is exploratory, not confirmatory.\n",
+  "fingerprint": "cbf930cdd6344978",
+  "n_configurations": 70,
+  "n_fits": 770
+}

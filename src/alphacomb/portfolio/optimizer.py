@@ -61,6 +61,18 @@ class OptimizerConfig:
     # Large relative to the objective, whose terms are O(1e-3), so a bound is respected exactly
     # whenever the trade caps permit; it only bends when the alternative is an infeasible solve.
     violation_penalty: float = 1.0e4
+    # Permit median imputation of missing C6 market fields (spread, sigma_d, adv_usd).
+    #
+    # Must stay False for real data: handoff document 13 requirement 2 says a security-month with
+    # a missing or invalid market field is NOT tradeable, and ``cost_inputs_for`` enforces that by
+    # raising. The synthetic generator, however, plants a handful of names with missing market
+    # data on purpose, so a fail-closed consumer stops the synthetic pipeline dead - which is
+    # exactly what happened on the first run after Workstream A's cost_terms landed.
+    #
+    # Set it from the data source, never by hand: ``from_files`` reads ``data_source`` and turns
+    # it on only for synthetic. That way the development pipeline runs and the real-data path
+    # keeps failing closed, which is the behaviour the contract requires.
+    allow_synthetic_market_imputation: bool = False
 
     @staticmethod
     def from_files(cfg: dict | None = None, portfolio_cfg: dict | None = None) -> "OptimizerConfig":
@@ -80,6 +92,8 @@ class OptimizerConfig:
             tracking_error_max=float(pcfg.get("long_only_variant", {}).get("tracking_error_max", 0.04)),
             borrow_fee_proxy_name=borrow_proxy.name if borrow_proxy else None,
             borrow_fee_proxy_annual=borrow_proxy.annual_rate if borrow_proxy else None,
+            # Only the synthetic panel may impute missing market fields; real data fails closed.
+            allow_synthetic_market_imputation=(str(cfg.get("data_source", "")).lower() == "synthetic"),
         )
 
     def borrow_fee_proxy(self) -> BorrowFeeProxy | None:
@@ -361,7 +375,8 @@ def construct(date, alpha: pd.Series, w_prev: pd.Series | None, risk: RiskModel,
     a = alpha.reindex(permnos).to_numpy(dtype=float)
     prev = (w_prev.reindex(permnos).fillna(0.0).to_numpy(dtype=float)
             if w_prev is not None else np.zeros(n))
-    ci = cost_inputs_for(date, cost_inputs, permnos, borrow_fee_proxy=cfg.borrow_fee_proxy())
+    ci = cost_inputs_for(date, cost_inputs, permnos, borrow_fee_proxy=cfg.borrow_fee_proxy(),
+                         allow_synthetic_market_imputation=cfg.allow_synthetic_market_imputation)
     spread = ci["spread"].to_numpy() * cfg.cost_multiplier
     sigma_d = ci["sigma_d"].to_numpy()
     adv = ci["adv_usd"].to_numpy()
@@ -452,7 +467,8 @@ def project(date, w_prop: pd.Series, risk: RiskModel, cost_inputs: pd.DataFrame,
         return OptimizationResult(pd.Series(dtype=float), "too_few_assets")
 
     target = w_prop.reindex(permnos).to_numpy(dtype=float)
-    ci = cost_inputs_for(date, cost_inputs, permnos, borrow_fee_proxy=cfg.borrow_fee_proxy())
+    ci = cost_inputs_for(date, cost_inputs, permnos, borrow_fee_proxy=cfg.borrow_fee_proxy(),
+                         allow_synthetic_market_imputation=cfg.allow_synthetic_market_imputation)
     adv_cap = np.clip(ci["adv_usd"].to_numpy() * cfg.adv_participation_max / cfg.aum_usd, 1e-6, None)
     pos_cap = np.minimum(cfg.weight_abs_max, np.maximum(adv_cap, 1e-5))
     beta = risk.B["beta"].to_numpy(dtype=float)

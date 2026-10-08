@@ -1,0 +1,112 @@
+{
+  "status": "FROZEN_PRE_RESULTS_AWAITING_COUNTERSIGNATURE",
+  "amendment_id": "001A",
+  "amendment_date": "2026-10-08",
+  "amends": "PLAN_001_after_tax_attribution.json",
+  "parent_fingerprint": "cae8140b7e2b7ee4",
+  "parent_fingerprint_unchanged": true,
+  "confirmatory_trial_count_N": 64,
+  "trial_count_changed": false,
+  "n_refits": 11,
+  "n_fits_conservative_alternative": 704,
+  "drafted_by": "workstream_B_on_behalf_of_workstream_C",
+  "specified_by": "workstream_A",
+  "requires_countersignature": "Maham (workstream C)",
+  "real_results_inspected_before_amendment": false,
+
+  "panel_structure": {
+    "mode": "SEPARATE_PER_COUNTRY",
+    "countries": ["DEU", "IND", "JPN"],
+    "fit": "per_country",
+    "construction": "per_country",
+    "tax_ledger": "per_country",
+    "aggregation_when_single_figure_needed": "equal_country_weight",
+    "pooled_fit_variant": "EXPLORATORY_ONLY"
+  },
+
+  "evaluation_windows": {
+    "primary_after_tax": {"start": "2009-01-01", "end": "2019-12-31"},
+    "clean_mechanism_subwindow": {"start": "2014-01-01", "end": "2018-03-31"},
+    "training_feature_construction_from": "1990-01-01",
+    "tax_ledger_inception": "2009-01-01",
+    "pre_2009_may_seed_tax_lots": false,
+    "windows_usable_for_selection": false
+  },
+
+  "scenario_label_definitions": {
+    "shrinkage": {
+      "parameter": "kappa in portfolio.alpha_scaling.shrink_by_uncertainty",
+      "low": 0.5,
+      "high": 2.0,
+      "inert_in_cells_with": "U=0 (kappa identically 0)",
+      "required_code_change": "restrict CellRunConfig.kappa_grid to (0.5, 2.0) for U cells and (0.0,) for non-U cells; the shipped five-value grid is a wider search than N=64 admits"
+    },
+    "capacity": {
+      "parameter": "AUM in 2020 USD, entering square-root impact and the ADV participation cap",
+      "small": 1.0e9,
+      "large": 1.0e10,
+      "is_design_dimension_not_sensitivity": true
+    }
+  },
+
+  "borrow_fee_proxy": {
+    "model": "MODELLED_FLAT_BORROW_PROXY_V1",
+    "classification": "MODELLED_PREREGISTERED_PROXY_NOT_OBSERVED",
+    "primary_annual_rate": 0.0100,
+    "preregistered_robustness_rates": [0.0030, 0.0060, 0.0430, 0.0700],
+    "certified_C6_borrow_fee_column": "PRESERVE_NULL",
+    "legacy_25bp_fallback": "PROHIBITED",
+    "verified_unshortable_security_months": "INELIGIBLE",
+    "report_band_in": "MAIN_RESULTS_NOT_APPENDIX"
+  },
+
+  "confirmatory_robustness_outside_trial_count": {
+    "borrow_proxy": [0.0030, 0.0060, 0.0430, 0.0700],
+    "cost_multiplier": [0.5, 2.0, 3.0],
+    "cost_multiplier_primary": 1.0,
+    "universe": ["large_cap_cut"],
+    "universe_primary": "all_stocks_in_C1",
+    "subperiods": [["2009-01-01", "2013-12-31"], ["2014-01-01", "2019-12-31"]],
+    "seeds": "reported as stability diagnostic E56, never used to select"
+  },
+
+  "exploratory_must_be_labelled": [
+    "pooled_fit_separate_construct panel mode",
+    "full five-value kappa grid (0.0, 0.5, 1.0, 2.0, 4.0)",
+    "any AUM level other than the two frozen capacity levels",
+    "India TERM robustness cuts until Workstream A's independent RBI 91-day rebuild lands"
+  ],
+
+  "tax_aware_vs_tax_blind": {
+    "both_confirmatory": true,
+    "tax_blind": "optimiser excludes the tax term; C12 still accounts for tax after the fact",
+    "tax_aware": "optimiser includes the dated tax term (portfolio.tax_terms)",
+    "multiplies_trial_count": false,
+    "rationale": "construction contrast applied to the already-selected configuration"
+  },
+
+  "trial_count_convention": {
+    "deflated_sharpe_uses_N": 64,
+    "not": ["rows in outputs/trials.csv", "n_fits", "sensitivity reruns"],
+    "N_is_conservative_upper_bound": true,
+    "distinct_configuration_count": 48,
+    "distinct_count_derivation": "8 U-cells x 2 shrinkage x 2 capacity + 8 non-U cells x 1 x 2 capacity",
+    "comparators_excluded_from_N": ["BASE-EW", "BASE-THEME-EW", "BASE-IC", "BASE-OLS", "BASE-RIDGE"],
+    "comparator_exclusion_rationale": "reported unconditionally, so they do not drive selection of the reported strategy",
+    "disclosed_exception": "BASE-RIDGE selects its penalty on validation; its own deflation should use N=2"
+  },
+
+  "blockers_before_confirmatory_run": [
+    "Maham countersigns this amendment",
+    "restrict kappa_grid per scenario_label_definitions.shrinkage (CODE CHANGE, blocking)",
+    "reconcile configs/base.yaml splits to evaluation_windows (still carries superseded US settings)",
+    "only then produce C11 and send to Workstream A for C12"
+  ],
+
+  "supersedes": {
+    "file": "PLAN_002_international_after_tax.json",
+    "its_N": 70,
+    "status": "WITHDRAWN_UNUSED_NO_RESULT_PRODUCED",
+    "disagreement": "whether fixed comparators belong in the deflation count; workstream A's position (they do not) is adopted"
+  }
+}

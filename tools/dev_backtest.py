@@ -40,7 +40,14 @@ def backtest(weights: pd.DataFrame, bundle, cfg: dict, cost_multiplier: float = 
         idx = w.index.union(prev.index)
         w_full = w.reindex(idx).fillna(0.0)
         prev_full = prev.reindex(idx).fillna(0.0)
-        ci = cost_inputs_for(date, bundle.cost_inputs, idx)
+        # Match alphacomb.tax.backtest: the synthetic panel plants names with missing market
+        # fields on purpose, so a fail-closed consumer halts the development pipeline. Real data
+        # must still fail closed - handoff document 13 requirement 2 makes such a security-month
+        # non-tradeable rather than imputable.
+        ci = cost_inputs_for(
+            date, bundle.cost_inputs, idx,
+            allow_synthetic_market_imputation=str(getattr(bundle, "source", "")).startswith("synthetic"),
+        )
         dw = (w_full - prev_full).to_numpy()
         spread_cost = float((0.5 * ci["spread"].to_numpy() * cost_multiplier * np.abs(dw)).sum()
                             + commission / 10_000.0 * np.abs(dw).sum())
