@@ -60,11 +60,21 @@ def capacity_table(cost_inputs: pd.DataFrame, cfg: OptimizerConfig,
     return pd.DataFrame(rows)
 
 
-def realised_books(require_source: str | None = None) -> pd.DataFrame:
+def realised_books(country: str, aum: str = "1e9") -> pd.DataFrame:
+    """Realised books for ONE country, resolved through that run's own weights index.
+
+    This used to call paths.latest_run, which resolves by modification time across a directory
+    shared by every country - so after India's stage 04 ran, a --country DEU invocation printed
+    India's leverage under a German heading, with no visible symptom. Provenance is now explicit
+    and a missing index raises instead of guessing.
+    """
+    from alphacomb.contracts import provenance
+
+    resolved = provenance.country_weights(country, aum)
     rows = []
     for code in CELLS:
         strategy = f"cell_{code}"
-        latest = paths.latest_run("weights", strategy)
+        latest = resolved.get(strategy)
         if latest is None:
             continue
         w = pd.read_parquet(latest)
@@ -98,7 +108,14 @@ def main(argv: list[str] | None = None) -> int:
     dates = [pd.Timestamp(d) for d in args.dates]
 
     cap = capacity_table(bundle.cost_inputs, cfg, args.aum, dates)
-    books = realised_books()
+    from alphacomb.contracts.provenance import MissingProvenance
+    aum_tag = f"{args.aum[0]:.0e}".replace("e+0", "e").replace("e+", "e")
+    try:
+        books = realised_books(args.country, aum_tag)
+    except MissingProvenance as exc:
+        print()
+        print(f"cannot identify {args.country}'s books: {exc}")
+        books = pd.DataFrame()
 
     args.out.mkdir(parents=True, exist_ok=True)
     cap.to_csv(args.out / f"capacity_{args.country}.csv", index=False)
