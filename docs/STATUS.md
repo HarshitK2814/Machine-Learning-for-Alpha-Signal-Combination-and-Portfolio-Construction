@@ -3,7 +3,63 @@
 Updated: **2026-10-09 (13:50 IST)**. Workstream A is production-promoted and its real-data
 handoff to Workstream B is complete.
 
-> ## THE HEADLINE (12:25 IST) — the claim is now a sign flip, not a magnitude
+
+> ## CURRENT STATE (2026-10-09, after the finalization audit) - supersedes every block below
+>
+> Authoritative sources: `docs/FINALIZATION_AUDIT_2026-10-09.md` (what is established, withdrawn,
+> open) and `docs/PAPER_2026-10-09_FULL_ACCOUNT.md` (the full record, with the corrections in section
+> 8). **The time-stamped blocks further down are a historical record of how the day unfolded. Several
+> of their statements were later withdrawn; they are marked in place. Do not quote them.**
+>
+> **Established**
+> * At a $1bn mandate the net-of-cost Sharpe ratio of the optimised book is **not distinguishable
+>   from zero** in Germany, India or Japan (t = +0.53 / +0.82 / +0.18).
+> * The gross decile signals are real (gross SR +2.31 / +1.20 / +1.28, t = +7.14 / +3.19 / +4.11); the
+>   executable capped decile book has a negative net Sharpe (matched-book t = -2.40 / -1.81 / -2.74),
+>   with the caveat that it attains only a few percent of its target gross.
+> * **Capacity channel**: the participation constraint's effect on net performance is zero where it is
+>   slack and increases with how hard it binds. On the pipeline's own accounting of both books, at the
+>   largest mandate where the uncapped comparison book is still **solvent**: **+6.80** (Germany,
+>   $100mn), **+3.19** (India, $30mn), **+6.92** (Japan, $1bn). Japan is a pre-registered
+>   out-of-sample confirmation (D2). At the registered cost calibration there is no mandate size at
+>   which it meaningfully hurts; a materially cheaper impact calibration produces a small negative
+>   region, so this is not a claim about every calibration.
+> * **Tax**: `lt_share` is exactly 0 under both flat-rate regimes and 0.5928 in India (a statutory
+>   fact). The tax channel is two orders of magnitude below cost and capacity. On the executable
+>   decile book the flat regimes are 8-19x India's in magnitude. Drag level is ordered by turnover, not
+>   by rate (descriptive; turnover is endogenous; n = 3).
+> * **Design axes**: not detectable *at this power*. Measured on the capped **decile** book in Germany
+>   and India, 14 rungs x 3 axes: 0 of 42 significant in each. Minimum detectable effect at 80% power
+>   with 132 months is 0.25 to 0.81 Sharpe points depending on axis and market.
+>
+> **Exploratory, unreplicated, do not treat as evidence**: on the **optimised** book at $1bn, Japan's
+> *conditioning* axis is t = +2.84 (effect +0.515); p = 0.0045 unadjusted, 0.014 after Holm across the
+> three axes within Japan, 0.041 after Bonferroni across all nine axis tests. The other eight axis tests
+> are not significant. It was found by the audit, not pre-specified.
+>
+> **Withdrawn (never to be restated as findings)**: the capacity sign flip and its crossover; the
+> `crossover ~ k^-2` confirmation; German/Indian $1bn and $10bn capacity gains in Sharpe points (the
+> uncapped comparison book is insolvent there); the asymptotic-channel regularity; "taxes are
+> first-order for survival" and "Japan goes negative after tax"; the "within 1%" tax-placebo match;
+> "frontiers 10-100x below US"; "cost beats tax 5x / 53x" (all-cell averages); "capacity overwrites
+> design identifiability"; "Absar's 456 values block the result". Reasons: audit section 1.2.
+>
+> **Stopped**: the stock-level liquidity-conditioned arm (Gate 1 fails: mostly a size effect; Gate 2
+> fails: minimum detectable effect is 70-92% of the entire cost gap).
+>
+> **Open or blocked**: Maham (countersignatures; economic-arm ruling; inference sign-off); Absar's
+> 2020-2025 extension (not yet available; exposure history of the 2020 months unaudited); a finite
+> unit for the capacity channel; figures; value-weighting re-run on the compliant universe, borrow-fee
+> sweep, and robustness parity for Japan and India (all need approval).
+>
+> **Venue**: see `FINALIZATION_AUDIT` section 4 (Journal of Empirical Finance, Quantitative Finance,
+> JIFMIM; RAPS as a stretch). The earlier "JFQA primary" and "RFS a defensible stretch" notes below
+> predate the withdrawals and are superseded.
+
+> ## HISTORICAL RECORD - everything below this line is superseded where marked
+>
+> ### Block 1 (12:25-13:00 IST) - SUPERSEDED. It first asserted a sign flip (retracted 12:30) and then a
+> replacement whose $1bn German and Indian figures were later withdrawn (insolvent comparison book).
 >
 > Read `docs/RESULTS_CAPACITY_CHANNEL_2026-10-09.md` first, then `docs/AMENDMENT_001D_...`. The 06:50
 > headline below is still accurate about the tax hypothesis and is kept, but it is no longer the
@@ -19,13 +75,19 @@ handoff to Workstream B is complete.
 >
 > | | $100k | $1mn | $10mn | $100mn | **$1bn** | $10bn |
 > |---|---|---|---|---|---|---|
-> | Germany | +0.068 | +0.917 | +3.646 | +7.634 | **+8.922** (t +11.11) | +9.256 |
-> | India | +0.264 | +0.880 | +2.534 | +4.591 | **+5.693** (t +5.70) | +5.967 |
-> | **Japan** | -0.001 | +0.042 | +0.403 | +2.693 | **+6.681** (t +11.01) | +7.151 |
+> | Germany | +0.068 | +0.917 | +3.646 | +7.634 ‡ | ~~+8.922~~ † (t +11.11) | ~~+9.256~~ † |
+> | India | +0.264 | +0.880 | +2.534 | +4.591 ‡ | ~~+5.693~~ † (t +5.70) | ~~+5.967~~ † |
+> | **Japan** | -0.001 | +0.042 | +0.403 | +2.693 | +6.681 ‡ (t +11.01) | +7.151 |
+>
+> † **Withdrawn**: the uncapped comparison book is insolvent at these rungs (Germany from $300mn, India
+> from $100mn: median monthly net return -55% / -45% at $1bn), so the difference is not a performance
+> gain. ‡ Wedge-tool values, superseded by the pipeline's own accounting of both books
+> (`PAPER` section 8.9): Germany $100mn +6.80, India $30mn +3.19, Japan $1bn +6.92.
 >
 > Significant on 13/14 German, **14/14** Indian and 11/14 Japanese rungs; 8 of 8 cells under Holm
-> from $1mn (DEU/IND) and $8mn (JPN). Robust to equal vs value weighting, to `k` in {0.5, 1, 2, 3},
-> and to the coverage treatment.
+> from $1mn (DEU/IND) and $8mn (JPN). Robust to `k` in {0.5, 1, 2, 3} and to the coverage treatment;
+> the equal-vs-value-weighting check was run on the pre-fix universe only and has not been re-run on
+> the compliant one.
 >
 > **Japan is a genuine pre-registered out-of-sample confirmation** of prediction D2, declared and
 > scored by code committed before any Japanese portfolio existed.
@@ -33,7 +95,9 @@ handoff to Workstream B is complete.
 > **The unifying fact.** The channel tracks **cap slack** (shortfall of attained gross below the 2.0
 > target), not AUM per se: at ~0.01% slack it is **+-0.001 with arbitrary sign** (Germany +0.0008,
 > Japan -0.0009, same cost model); 6-7% slack gives +0.06 to +0.21; 40% slack gives +0.80. **There
-> is no scale at which the cap meaningfully hurts**, and any bootstrap "crossover" is just the point
+> is no scale at which the cap meaningfully hurts at the registered cost calibration** (a materially
+> cheaper impact calibration produces a small negative region; `RESULTS_CAPACITY_CHANNEL` section 3g),
+> and any bootstrap "crossover" is just the point
 > where it starts binding. This also explains, without adjudicating anyone, why @AHV2025 find no
 > benefit from turnover reduction: their cost model has **no AUM term**, so they sit permanently at
 > zero slack where this channel is zero by construction.
@@ -45,7 +109,7 @@ handoff to Workstream B is complete.
 > **Two pre-registered predictions failed and one passed vacuously** (`AMENDMENT_001D` section 11).
 > D3 passed on a **-0.0013 reading with p = 0.370** because I wrote a sign prediction with no
 > magnitude floor - my defect, not evidence - so I am **not** reporting the scorecard's
-> "H-FLIP CONFIRMED" line. D5 failed substantively: Japan's scaled channel at $1bn came out *above*
+> "H-FLIP CONFIRMED [withdrawn]" line. D5 failed substantively: Japan's scaled channel at $1bn came out *above*
 > Germany's (5.228 vs 4.00) where I predicted below, so **distance past the capacity frontier is not
 > a sufficient statistic** for how hard the constraint bites - Japan's 1,705-name breadth puts far
 > more positions at the cap than its nearer frontier suggests.
@@ -63,7 +127,9 @@ handoff to Workstream B is complete.
 > theoretical scaling law.** `--require-cost-inputs` is now mandatory for any capacity exhibit, and
 > coverage matching is the fourth requirement in tracker §C6.
 >
-> ## THREE-COUNTRY TAX RESULT (13:50 IST) - Japan completes the placebo design
+> ### Block 2 (13:50 IST) - THREE-COUNTRY TAX RESULT. Partly SUPERSEDED: the "kept" column and finding 3
+> ("first-order for survival") are withdrawn; the "within 1%" placebo match (stated elsewhere) is not
+> robust to the choice of book. Findings 1 and 2 stand as descriptive results.
 >
 > Japan's arm finished at 13:46, 21/21 stage-04 strategies with **zero** frozen-sleeve failures, so
 > all three jurisdictions are priced on the same signals with the lot-level engine for the first
@@ -87,6 +153,9 @@ handoff to Workstream B is complete.
 > 25x lower because it shelters gains in an exempt category. The third jurisdiction was needed to
 > separate the two orderings at all.
 >
+> **[WITHDRAWN - no country's net Sharpe is distinguishable from zero (t +0.53 / +0.82 / +0.18), so
+> there is nothing for tax to "decide"; the 98% / 14% / negative figures are arithmetic on quantities
+> each indistinguishable from zero. See `RESULTS_TAX_THREE_COUNTRY` section 4b.]**
 > **3. Taxes are second-order as a CHANNEL and first-order for SURVIVAL.** The tax channel is -0.004
 > to -0.111 Sharpe against cost channels of -7.5 to -11.9 - two orders of magnitude - yet once cost
 > and capacity have done their work the residual is small enough for tax to erase it: India keeps
@@ -96,13 +165,16 @@ handoff to Workstream B is complete.
 >
 > Caveats in that document's section 5: the withdrawn wedge dose-response stays withdrawn; turnover
 > is endogenous so finding 2 is descriptive and not identified; n = 3 with India differing on both
-> dimensions at once; and all of it is at $1bn, so the tax-drag AUM ladder is running now.
+> dimensions at once; and all of it is at $1bn [the AUM ladders have since completed for Germany
+> and Japan, 1e8 / 1e9 / 1e10].
 >
-> ## DESIGN-AXIS NULL (13:30 IST) - now thorough, and my mechanism for it is wrong
+> ### Block 3 (13:30 IST) - DESIGN-AXIS NULL. Scope clarification added: every count below is for the
+> capped / uncapped **decile-spread** books in Germany and India only; it says nothing about the
+> optimised book or Japan. See CURRENT STATE for the Japan conditioning observation.
 >
 > Tested whether the participation constraint destroys the identifiability of ML design choice,
-> which would have turned a bare null into a mechanism. 14 AUM rungs x 3 axes per book per country:
-> **Germany 0 of 42 capped / 5 of 42 uncapped; India 0 of 42 on both.** The null is far better
+> which would have turned a bare null into a mechanism. 14 AUM rungs x 3 axes per decile book per country:
+> **Germany 0 of 42 capped / 5 of 42 uncapped; India 0 of 42 on both** (decile books only). The null is far better
 > established than before (it was one test at one AUM). **The hypothesis is not supported**: India
 > shows the same null unconstrained, Germany's capped effects grow rather than shrink (the standard
 > errors grow faster, so it is lost power not shrinkage), and 5 of 42 is within multiple-testing
@@ -111,7 +183,7 @@ handoff to Workstream B is complete.
 > `docs/RESULTS_DESIGN_IDENTIFIABILITY_2026-10-09.md`.
 >
 > **Value weighting also cuts our gross decile Sharpes by ~80%** (DEU +2.763 → +0.473, IND +1.209
-> → +0.215) — Novy-Marx & Velikov's critique landing on our own numbers. Every gross Sharpe we
+> → +0.215; measured on the pre-fix signal-bearing universe, not re-run compliant) — Novy-Marx & Velikov's critique landing on our own numbers. Every gross Sharpe we
 > quote must carry it.
 >
 > **Why it matters.** The literature disagrees about this sign *in print*, and all parties are US:
@@ -120,8 +192,10 @@ handoff to Workstream B is complete.
 > Azevedo, Hoegner & Velikov (2025) find the same mitigations do **not** improve net performance.
 > All three are right about their own setting. Both fall out of
 > `net Sharpe = (alpha_eff − kappa·G^0.5)/sigma` with `kappa ∝ sqrt(AUM/ADV)`: AHV sit at
-> `kappa ≈ 0`. We recover their regime inside our own data and walk it up to where the cap is
-> worth +12.7 Sharpe points. **This closes blocker 5** (economic mechanism).
+> `kappa ≈ 0`. ~~We recover their regime inside our own data and walk it up to where the cap is
+> worth +12.7 Sharpe points. This closes blocker 5 (economic mechanism).~~ **[WITHDRAWN: the +12.7
+> was the non-compliant ladder, and the predicted sign flip was not observed. The comparative static
+> stands only as a one-page argument; blocker 5 is not closed by an observed crossover.]**
 >
 > **Three of our own claims were withdrawn today, all the same error** — a quantity computed
 > correctly and compared against the wrong benchmark:
@@ -130,15 +204,17 @@ handoff to Workstream B is complete.
 >    range. (Tracker §C8.1.)
 > 2. **"The tracker contains none of the capacity papers" — WRONG.** @ACM2023 is row 5, @AHV2023
 >    row 10. The failure was mis-rating them against the old claim, not omitting them.
-> 3. **"Costs beat taxes 5x (DEU) / 53x (IND)" — those are all-16-cell averages** including the
+> 3. **"Costs beat taxes 5x (DEU) / 53x [withdrawn] (IND)" — those are all-16-cell averages** including the
 >    broken economic arm. On prediction cells only: **2.70x** and **87.4x**. Germany's margin is
 >    one order of magnitude, not two.
 >
+> **[WITHDRAWN - survival framing; the 87% figure is arithmetic on an insignificant net Sharpe.]**
 > **Taxes, honestly, in two parts.** As a *channel magnitude* the tax channel is 0.111 Sharpe
 > points against 11–14 for cost and capacity — second-order, decisively. As a *share of what
 > survives* it is not: Germany's book nets **+0.128** and keeps **+0.017** after tax, so tax takes
 > **87%** of the remaining risk-adjusted return. Worth a paragraph, not a paper.
 >
+> **[COMPLETED - Japan reported 12:55; D1 and D2 hold, D3 passed vacuously, D4 and D5 fail; see CURRENT STATE.]**
 > **Japan is a live pre-registered test.** `AMENDMENT_001D` (declared 11:30, revised 12:06, both
 > before any Japanese portfolio existed) fixes five predictions, and
 > `tools/score_amendment_001d.py` — also committed before Japan reported — scores them
@@ -151,7 +227,7 @@ handoff to Workstream B is complete.
 > manifests and refuses to name an artefact that is not on disk. Found by checking Japan's index
 > *before* using it.
 >
-> **Venue:** JFQA primary. RFS is now a defensible stretch rather than a fantasy (the paper
+> **[SUPERSEDED by `FINALIZATION_AUDIT` section 4.]** **Venue:** JFQA primary. RFS is now a defensible stretch rather than a fantasy (the paper
 > adjudicates an RFS paper against a JF paper and their successor). Management Science stays
 > compromised by @ACM2023.
 
@@ -187,7 +263,7 @@ handoff to Workstream B is complete.
 > depended on. `docs/handoff/19_FOR_MAHAM_...` asks Maham to rule on debug-vs-flag.
 >
 > **Magnitudes reframe the claim.** Tax drag is 5.23 bps against 27.67 bps of cost in Germany,
-> and 0.45 against 24.30 in India - costs dominate 5x and 53x. India's drag is small *because*
+> and 0.45 against 24.30 in India - costs dominate 5x and 53x [withdrawn]. India's drag is small *because*
 > its wedge shelters: with LTCG exempt and 38-64% of gains long-term, most Indian gains were
 > taxed at zero, so the wedge rewards patience rather than punishing turnover.
 > Supported: *the holding-period channel is created and bounded by statute and is identically

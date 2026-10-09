@@ -145,8 +145,14 @@ this number cannot be read in isolation again.
 
 | country | mean tax drag | mean cost drag | ratio |
 |---|---|---|---|
-| DEU | 5.23 bps p.a. | 27.67 bps p.a. | **5x** |
-| IND | **0.45 bps p.a.** | 24.30 bps p.a. | **53x** |
+| DEU | 5.23 bps p.a. | 27.67 bps p.a. | ~~**5x**~~ |
+| IND | **0.45 bps p.a.** | 24.30 bps p.a. | ~~**53x**~~ |
+
+> **Corrected in the finalization audit:** these are **all-16-cell** means that include the economic-loss
+> arm, which is not a competent implementation (it trades ~1.8x faster and has negative gross Sharpe).
+> On the prediction cells only the ratios are **2.70x** (DEU), **87.4x** (IND) and **3.7x** (JPN).
+> Germany's margin is one order of magnitude, not two. The qualitative point, that costs dominate
+> taxes, stands.
 
 Transaction costs dominate taxes five to one in Germany and fifty to one in India. India's tax drag
 is small *because* its wedge is large in the sheltering direction: with LTCG exempt and 38–64% of

@@ -1,6 +1,13 @@
 # Four errors in one day, all the same shape, and the checks that catch them
 
 **Date:** 2026-10-09
+> **Update (finalization audit, Phase 1).** Errors 1-4 stand as described. Error 4 (the section 112A
+> bound) was later **resolved**: the dated engine was unit-tested end to end and none of the 456 names
+> is a binding grandfathered gain (`handoff/20`, `PAPER` section 8.7). The list has since grown and some
+> early figures here were corrected: see `PAPER` section 9 (the horse race read the non-compliant
+> ladder; the capacity numbers were differences against an insolvent book; the tax-placebo match was a
+> property of one book).
+
 **Why this exists.** Today produced four errors in which a quantity was **computed correctly** and
 then **compared against, or constructed under, the wrong thing**. Three were caught by me, one by a
 reconciliation that failed; none reached a referee, but one of them survived two robustness checks
@@ -17,7 +24,7 @@ and would have been the paper's headline. The pipeline is not the risk in this p
 | # | what was computed | what it was compared against or built under | why it was wrong | how it was caught |
 |---|---|---|---|---|
 | 1 | Capacity frontiers $55mn / $106mn / $413mn | @KS2004's $2–5bn momentum and $50–170bn size/value | Those are **low-turnover** strategies. @NMV2016's **high-turnover** US capacities are $0.18–0.53bn — our range | Reading @NMV2016 Table 7 in full text |
-| 2 | "Cost drag beats tax drag 5x (DEU) / 53x (IND)" | all 16 cells averaged | Includes the **economic arm**, known not to be a competent implementation, which trades 1.8x faster. Prediction cells alone: **2.70x / 87.4x** | Building the horse race and splitting by arm |
+| 2 | "Cost drag beats tax drag 5x (DEU) / 53x [withdrawn] (IND)" | all 16 cells averaged | Includes the **economic arm**, known not to be a competent implementation, which trades 1.8x faster. Prediction cells alone: **2.70x / 87.4x** | Building the horse race and splitting by arm |
 | 3 | Capacity channel, Germany **−0.811 at $100k, t = −6.10** | formed on the **signal-bearing** cross-section (~382 names) | Document 13 req 2 makes uncertified security-months non-tradeable. The **investable** universe is ~246. Uncovered names were charged **zero cost** uncapped and given **cap = 0** capped. Sign reverses to **+0.062** | Asking whether the tool obeyed the project's own non-tradeability rule |
 | 4 | §112A bounds, "bit-identical, so the 456 missing values cannot matter" | bound files varying **absolute** `fmv` and `close` together | The engine uses `close × (fmv/close)`. **The ratio was 1.0 in both bounds.** The two runs were the same run | Asking whether the affected names are ever actually held — 422 are |
 

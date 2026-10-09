@@ -1,10 +1,28 @@
-# Taxes across three statutory regimes: second-order as a channel, first-order for survival, and ordered by turnover rather than by the rate
+# Taxes across three statutory regimes: a small channel, ordered by statute type and by turnover (the "first-order for survival" framing is withdrawn)
 
 **Date:** 2026-10-09, 13:50 IST
 **Status:** Japan's arm completed at 13:46 (21/21 strategies, **zero** frozen-sleeve failures), so
 this is the first time all three jurisdictions have been priced on the same signals with the
 lot-level engine.
 **Audience:** referee-facing.
+
+> **CORRECTED in the finalization audit (Phase 1).** This document was written in stages and its
+> early sections were never reconciled with its later ones. Read it with these corrections:
+> 1. **Withdrawn**: "first-order for survival", "Japan goes negative after tax" and every "share of
+>    net SR kept" figure (98% / 14% / negative). No country's net Sharpe is distinguishable from
+>    zero (t +0.53 / +0.82 / +0.18), so there is nothing for tax to decide (§4b).
+> 2. **Withdrawn**: the "within 1%" match between the German and Japanese tax channels (§4b.1). It was a
+>    property of the optimised book: on the executable decile book the placebos are -0.070 and -0.170
+>    (a factor of 2.4 apart) and India is -0.009 with t = -2.14 (`PAPER` §8.9). What survives is the
+>    ordering of magnitudes by statute type (flat regimes 8-19x India's) and the exact `lt_share`
+>    contrast.
+> 3. **Completed**: Japan's AUM ladder (tax channel -0.116 / -0.106 / -0.077 at $100mn / $1bn / $10bn;
+>    after-tax Sharpe negative at all three, but pre-tax net Sharpe is already negative at two of
+>    three). Germany's tax channel is roughly flat across the ladder; Japan's shrinks by about a third
+>    at $10bn, so "you cannot grow out of it" holds for Germany and only partly for Japan
+>    (`PAPER` §12.2). India's ladder has not been run.
+> 4. Everything in §1-§4 is the **optimised book**; the one-book comparison with cost and capacity is in
+>    `PAPER` §8.9.
 
 ---
 
@@ -16,9 +34,12 @@ regime, HIFO lot selection, 2009-2019.
 
 | | statutory short rate | **lt_share of gains** | monthly turnover | tax drag (bps p.a.) | cost drag (bps p.a.) | SR net | **SR after tax** | share of net SR kept |
 |---|---|---|---|---|---|---|---|---|
-| **Germany** | 26.375% | **0.0000** | 0.0135 | 6.38 | 17.21 | +0.128 | **+0.018** | **+14%** |
-| **India** | 15.000% | **0.5928** | 0.0067 | 0.11 | 9.96 | +0.205 | **+0.201** | **+98%** |
-| **Japan** | 20.315% | **0.0000** | 0.0290 | 11.49 | 42.31 | +0.057 | **−0.049** | **negative** |
+| **Germany** | 26.375% | **0.0000** | 0.0135 | 6.38 | 17.21 | +0.128 | +0.018 | ~~+14%~~ |
+| **India** | 15.000% | **0.5928** | 0.0067 | 0.11 | 9.96 | +0.205 | +0.201 | ~~+98%~~ |
+| **Japan** | 20.315% | **0.0000** | 0.0290 | 11.49 | 42.31 | +0.057 | −0.049 | ~~negative~~ |
+
+The last column is **withdrawn** (struck through): each net and after-tax Sharpe in it is
+indistinguishable from zero, so the ratios are arithmetic on noise (§4b).
 
 Three findings, in increasing order of how much they change the paper.
 
@@ -60,24 +81,33 @@ taxed, and turnover sets *how much* of it you pay.** That is a sharper statement
 `RESULTS_WEDGE_TEST.md`, and it needed the third jurisdiction to be visible at all — with two
 countries the rate and turnover orderings could not be separated.
 
-## 4. Taxes are second-order as a channel and first-order for survival
+## 4. Taxes are second-order as a channel ~~and first-order for survival~~ [second half WITHDRAWN]
+
+> **Only the first half of this section stands.** The bullets below that say India keeps 98%, Germany
+> 14% and Japan "keeps nothing", and the boxed formulation that tax "decides whether the strategy is
+> viable", are withdrawn: see §4b. They are retained so that the reasoning that was abandoned is on
+> the record.
 
 This is the part that changes how the paper should talk about tax, and the three-country data makes
 it unavoidable.
 
 **As a channel magnitude, taxes lose decisively.** At $1bn the tax channel is −0.106 (Japan),
-−0.111 (Germany), −0.004 (India) Sharpe points, against cost channels of −7.5 to −11.9 and capacity
-channels of +3.6 to +8.9. Two orders of magnitude. The tax-aware-investing literature
+−0.111 (Germany), −0.004 (India) Sharpe points on the optimised book. On the one-book ladder at the
+largest solvent rung (`PAPER` §8.9) the cost channels are −5.2 to −9.6 and the capacity channels
++3.2 to +6.9. Two orders of magnitude. The tax-aware-investing literature
 (Sialm-Sosner, Israel-Moskowitz, Huang 2019) is addressing a second-order friction at institutional
 scale in these markets.
 
-**As a share of what survives, taxes are decisive in two of three jurisdictions.** Once cost and
-capacity have done their work the residual is small enough that the tax channel consumes it:
+**[WITHDRAWN - see §4b. The lead sentence and the three bullets below are arithmetic on net Sharpes
+that are each indistinguishable from zero; they are kept struck through as the record.]**
 
-* **India keeps 98%** of its net Sharpe (+0.205 to +0.201). Taxes genuinely do not matter there.
-* **Germany keeps 14%** (+0.128 to +0.018).
-* **Japan keeps nothing — the book goes negative** (+0.057 to **−0.049**). A strategy that is
-  marginally viable before tax is **not viable after it**.
+~~**As a share of what survives, taxes are decisive in two of three jurisdictions.** Once cost and
+capacity have done their work the residual is small enough that the tax channel consumes it:~~
+
+* ~~**India keeps 98%** of its net Sharpe (+0.205 to +0.201). Taxes genuinely do not matter there.~~
+* ~~**Germany keeps 14%** (+0.128 to +0.018).~~
+* ~~**Japan keeps nothing — the book goes negative** (+0.057 to **−0.049**). A strategy that is
+  marginally viable before tax is **not viable after it**.~~
 
 So "taxes are second-order" is true about the *channel* and false about the *investor*. Both
 statements are in the data and the paper must carry both. The honest formulation:
@@ -119,9 +149,11 @@ The "kept share" column is non-monotone (39% / 14% / 34%) and should not be read
 it tracks the denominator, net Sharpe, which happens to be lowest at $1bn (+0.128) and recovers at
 $10bn (+0.186). The scale-invariant quantity is the tax channel itself.
 
-**Still open:** the same ladder for India and Japan. Japan matters most, because its $1bn book is
-the one that goes negative after tax, and if its tax channel is likewise scale-invariant then no
-mandate size rescues it.
+**Status of the ladders.** Japan's has since been run: tax channel -0.116 / -0.106 / -0.077 at
+$100mn / $1bn / $10bn, so unlike Germany's it is *not* scale-invariant (about a third smaller at
+$10bn). India's ladder has not been run. The earlier hope that a scale-invariant Japanese channel
+would mean "no mandate size rescues it" is moot: Japan's pre-tax net Sharpe is already negative
+at two of three rungs and insignificant at $1bn, so tax is not what decides its viability.
 
 ## 4b. Inference on the tax channel — and the "survival" framing does not survive it
 
@@ -188,14 +220,16 @@ the statutory claim appearing in the inference rather than only in the point est
 
 Two independent flat-rate jurisdictions with a significant tax channel; one wedge-bearing
 jurisdiction without one. The magnitudes are near-identical in the two placebos (−0.1363 and
-−0.1373, within 1%) and an order of magnitude smaller in the treatment (−0.0054). **That is the
-cleanest inferential result in the project**, it is the pre-registered direction, and it does not
-depend on any portfolio being profitable.
+−0.1373, within 1% [withdrawn] **on the optimised book only**) and an order of magnitude smaller in the
+treatment (−0.0054). ~~That is the cleanest inferential result in the project.~~ **[Softened: the
+precision of that match does not survive a change of book; on the executable decile book the
+placebos are -0.070 and -0.170 and India is -0.009, t = -2.14. See `PAPER` §8.9.]** The direction
+is the pre-registered one and the contrast does not depend on any portfolio being profitable.
 
 What it says: **the capital-gains statute determines whether taxes measurably erode a
 machine-learning equity strategy's risk-adjusted performance** — not the rate (Germany's is 30%
-above Japan's and the channels match to 1%), but whether the law provides a long-term category at
-all.
+above Japan's and the channels are the same size on the optimised book, 2.4x apart on the decile
+book), but whether the law provides a long-term category at all.
 
 What it does **not** say: that taxes decide viability. Viability is not established anywhere (point
 i), so there is nothing for taxes to decide.

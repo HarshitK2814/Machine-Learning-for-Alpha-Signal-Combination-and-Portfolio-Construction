@@ -1,5 +1,12 @@
 # Candidate reframing: the signal is real, the portfolio cannot express it
 
+> **SUPERSEDED IN PART (finalization audit, Phase 1).** This document predates later corrections and is
+> kept as a record of the reasoning at the time. Do not quote its numbers. In particular: cost-over-tax
+> ratios of 5x / 53x were all-cell averages (prediction cells: 2.70x / 87.4x / 3.7x JPN); capacity
+> figures at $1bn for Germany and India compare against an insolvent uncapped book; and no sign flip,
+> crossover or "taxes decide survival" claim survives. Current state: `STATUS.md` (CURRENT STATE block)
+> and `FINALIZATION_AUDIT_2026-10-09.md` section 1.
+
 **Date:** 2026-10-09, 03:00 IST
 **Status:** a proposal, not a result claim. The framing of the paper is a team decision, and this is
 me putting the evidence in one place because every strand of tonight's work converged on it.
@@ -91,7 +98,7 @@ The mechanism is simply scale relative to market depth: $1bn against a median AD
 ### 3d. Everything else is second-order to it
 
 * **Taxes.** Tax drag 5.23 bps (Germany) and **0.45 bps** (India) against cost drag of 27.67 and
-  24.30. Costs dominate taxes **5x** and **53x**. The statutory holding-period wedge — which we
+  24.30. Costs dominate taxes **5x** and **53x** [withdrawn]. The statutory holding-period wedge — which we
   built an entire cross-country identification around — moves one to two orders of magnitude less
   than the friction that is already there.
 * **Loss function.** The economic-loss arm cannot even *represent* the feasible book: it is forced

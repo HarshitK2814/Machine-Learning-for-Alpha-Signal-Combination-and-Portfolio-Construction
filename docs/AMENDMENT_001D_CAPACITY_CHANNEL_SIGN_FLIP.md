@@ -57,8 +57,8 @@
 >
 > | | mean of per-cell Sharpe diffs | **composite portfolio** |
 > |---|---|---|
-> | Germany, channel at $1bn | +8.77 | **+11.06**, t = +12.27 |
-> | Germany, crossover | between $3mn and $4mn | **$3.79mn, 95% CI [$1.88mn, $7.07mn]** |
+> | Germany, channel at $1bn | +8.77 [withdrawn] | **+11.06**, t = +12.27 |
+> | Germany, crossover | between $3mn and $4mn | **$3.79mn [withdrawn], 95% CI [$1.88mn, $7.07mn]** |
 > | India, channel at $1k | −0.0039 | **+0.0035**, t = +0.13, p = 0.89 |
 > | India, crossover | "between $1k and $3k" | **none in $1k..$10bn**; 50.8% of bootstrap draws show no sign change |
 >
@@ -205,7 +205,7 @@ Four facts, all exploratory, all on the sample that generated them:
 2. **Germany's channel changes sign, and both tails are significant.** Significantly **negative** at
    $100k, $300k and $1mn (t = −6.10, −5.99, −4.01; 8 of 8 cells surviving Holm at the first two) and
    significantly **positive** from $8mn upward (t = +2.30 rising to +12.99). The crossover is
-   **$3.79mn, 95% bootstrap CI [$1.88mn, $7.07mn]**, with **0%** of 2,000 replications failing to
+   **$3.79mn [withdrawn], 95% bootstrap CI [$1.88mn, $7.07mn]**, with **0%** of 2,000 replications failing to
    show a sign change. This is Azevedo et al.'s regime and Novy-Marx & Velikov's regime in the same
    dataset, separated by a factor of about 10 in mandate size.
 3. **India's channel does not change sign.** It is positive at every rung, insignificantly so below
@@ -213,7 +213,7 @@ Four facts, all exploratory, all on the sample that generated them:
    anywhere in $1k..$10bn. India is a market where the participation cap helps at every mandate size
    an investor could actually run. **The flip is therefore not universal**, which is a result in its
    own right and is why prediction D3 below had to be rewritten.
-4. **A candidate regularity.** The asymptotic channel scaled by the composite gross Sharpe agrees
+4. **A candidate regularity.** The asymptotic channel [withdrawn] scaled by the composite gross Sharpe agrees
    across the two markets: Germany +12.6546/2.763 = **4.58**; India +5.8220/1.209 = **4.82**. With
    n = 2 this is weak and is pre-registered as a secondary prediction only.
 
@@ -307,6 +307,12 @@ Checked immediately before writing this document:
   endpoints are recovered as limiting cases of one expression, and the crossover is not a fixed
   multiple of the capacity frontier.**
 
+> **Note added in the finalization audit.** The $1bn figures quoted in this section (+8.05 Germany,
+> +4.51 India, and the table below) compare against an uncapped book that is insolvent at those
+> rungs (`PAPER` §8.8) and are not interpretable as performance gains; the qualitative statement of
+> what survives (positive, monotone in cap slack, zero where slack) is unchanged. The record of what
+> was predicted and what happened in sections 1-9 and 11 is left as written.
+
 ## 10. What survives the retraction (added 2026-10-09, 12:31 IST)
 
 On the **compliant** universe — investable names only, `--require-cost-inputs`, which is what
@@ -365,10 +371,10 @@ output, in full:**
 | D1 | **PASS** | largest change between adjacent rungs +0.0102, i.e. no decrease (tolerance −0.05) |
 | D2 | **PASS** | channel at $1bn **+6.6813**, t = +11.01, p < 0.0001 |
 | D3 | **PASS** | antecedent true (gross Sharpe +1.278 > India's +1.209); a negative channel exists in $1k..$1mn |
-| D4 | FAIL | asymptotic ratio 7.1511/1.278 = **5.596**, just outside the band [3.5, 5.5] |
+| D4 | FAIL | asymptotic ratio [withdrawn] 7.1511/1.278 = **5.596**, just outside the band [3.5, 5.5] |
 | D5 | FAIL | channel at $1bn / gross = **5.228**, needed < 4.00 (Germany's value) |
 
-Its verdict line reads **"H-FLIP CONFIRMED on the pre-registered sample."**
+Its verdict line reads **"H-FLIP CONFIRMED [withdrawn] on the pre-registered sample."**
 
 **I am not reporting that, and the reason is a defect in my own pre-registration rather than
 anything about Japan.**

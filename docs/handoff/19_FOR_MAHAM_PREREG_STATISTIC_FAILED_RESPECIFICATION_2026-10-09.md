@@ -138,8 +138,11 @@ judgement I should not make alone.
 
 | country | mean tax drag | mean cost drag | ratio |
 |---|---|---|---|
-| DEU | 5.23 bps p.a. | 27.67 bps p.a. | 5x |
-| IND | **0.45 bps p.a.** | 24.30 bps p.a. | **53x** |
+| DEU | 5.23 bps p.a. | 27.67 bps p.a. | ~~5x~~ |
+| IND | **0.45 bps p.a.** | 24.30 bps p.a. | ~~**53x**~~ |
+
+> **Corrected later the same day:** all-16-cell means including the economic arm. On prediction cells
+> the ratios are 2.70x (DEU) and 87.4x (IND); see `PAPER` §8.4.
 
 Transaction costs dominate taxes five to one in Germany and fifty to one in India. India's tax drag
 is small *because* its wedge is large in the sheltering direction — LTCG exempt, with 38–64% of

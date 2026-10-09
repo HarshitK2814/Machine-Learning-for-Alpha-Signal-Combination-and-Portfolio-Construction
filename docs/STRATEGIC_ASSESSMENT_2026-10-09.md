@@ -1,6 +1,13 @@
 # Where this paper actually stands, against the goal we set in September
 
 **Date:** 2026-10-09
+
+> **SUPERSEDED IN PART (finalization audit, Phase 1).** This assessment was written before most of the
+> day's retractions and its framing is historical. Its capacity sign flip and crossover, the "+8.77 at
+> $1bn" and "+10.40 asymptote" figures, and "costs beat taxes 5x / 53x" are **withdrawn** (the sign flip
+> was a cost-input coverage artefact; the $1bn German and Indian comparison books are insolvent; 5x/53x
+> were all-cell averages including the economic arm). Occurrences below carry an inline `[withdrawn]`
+> tag. Current state: `STATUS.md` (CURRENT STATE block) and `PAPER_2026-10-09_FULL_ACCOUNT.md` section 8.
 **Written because:** a day of work produced a new headline, and before building further on it I went
 back to `research/03_Research_Gaps/PUBLICATION_READINESS_AUDIT.md` and
 `research/02_Journal_Strategy/Journal_Strategy.md` to check it against what we originally set out to
@@ -36,7 +43,7 @@ placebos written into law. It is currently framed as an extension. **It should b
 separately ill-defined; the post-hoc replacement was a between-arm artefact
 (`docs/RESULTS_WEDGE_TEST.md` §2, §5). What survives of it is a statutory fact — the holding-period
 channel exists only where the law creates a boundary — and a magnitude finding that kills it as a
-headline: **costs beat taxes 5x in Germany and 53x in India.**
+headline: **costs beat taxes 5x in Germany and 53x [withdrawn] in India.**
 
 The capacity finding that replaced it has a *different kind* of identification, and on its own terms
 a good one:
@@ -130,7 +137,7 @@ to a paper they published two years ago.
    AUM** on the German and Indian scores, the capacity channel is **monotone increasing in AUM** and
    **crosses zero**: Germany between **$3mn and $4mn**, India between **$1k and $3k**. Below the
    crossover the participation cap **destroys** net Sharpe (Germany −0.69 at $100k); above it the cap
-   **creates** net Sharpe (+8.77 at $1bn, asymptote **+10.40**). That matters because the literature
+   **creates** net Sharpe (+8.77 [withdrawn] at $1bn, asymptote **+10.40**). That matters because the literature
    disagrees about this sign in print: @NMV2016 (RFS) and @KS2004 (JF) find turnover reduction and
    liquidity tilting help — @KS2004 get a **5,000x** break-even range from the tilt alone — while
    @AHV2025 find the same mitigations do **not** improve net performance, because post-decimalisation
@@ -145,7 +152,7 @@ to a paper they published two years ago.
    Japanese portfolio existed.
 3. **Taxes ruled out as second-order, with a real tax engine rather than an assumption.** Lot-level
    HIFO, three genuine statutory regimes, a dated engine spanning a real reform. Cost drag beats tax
-   drag **5x** (Germany) and **53x** (India). The tax-aware-investing literature
+   drag **5x** (Germany) and **53x** [withdrawn] (India). The tax-aware-investing literature
    (Sialm-Sosner, Israel-Moskowitz, Huang 2019) is second-order at institutional scale in these
    markets. **Nobody has both machines on non-US data**, which is why nobody has said this.
 4. **The design-axis null.** With the broken economic arm removed, no factorial axis is detectable
@@ -252,12 +259,12 @@ headline that the data has already refused twice.
 Everything above §4 was written against abstracts and search summaries. I then obtained the full
 texts. Three things happened, in this order, and the order matters.
 
-**One claim died.** "Our frontiers are 10–100x below US estimates" compared our high-turnover books
+**One claim died.** "Our frontiers are 10–100x [withdrawn] below US estimates" compared our high-turnover books
 against low-turnover US strategies. @NMV2016 reports $0.18–0.53bn for *its* high-turnover
 strategies, in the US. Turnover-matched, Japan is inside the US range. That was the lead item in
 §4, and it is gone. **The non-US frontiers are no longer a contribution.**
 
-**One claim was understated.** The "+8.77 Sharpe points" was one point on a curve. The curve runs
+**One claim was understated.** The "+8.77 [withdrawn] Sharpe points" was one point on a curve. The curve runs
 nine decades, is monotone, and **crosses zero** — which means the participation cap sometimes
 *hurts*, something neither §4 nor `AMENDMENT_001C` anticipated. That is a strictly stronger result
 than a positive sign, because a sign that flips has a mechanism and a positive sign is just a fact.

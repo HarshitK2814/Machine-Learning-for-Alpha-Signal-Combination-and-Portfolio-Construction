@@ -1,5 +1,12 @@
 # The practitioner gap: what a $100bn industry is arguing about, and what we can settle
 
+> **SUPERSEDED IN PART (finalization audit, Phase 1).** This document predates later corrections and is
+> kept as a record of the reasoning at the time. Do not quote its numbers. In particular: cost-over-tax
+> ratios of 5x / 53x were all-cell averages (prediction cells: 2.70x / 87.4x / 3.7x JPN); capacity
+> figures at $1bn for Germany and India compare against an insolvent uncapped book; and no sign flip,
+> crossover or "taxes decide survival" claim survives. Current state: `STATUS.md` (CURRENT STATE block)
+> and `FINALIZATION_AUDIT_2026-10-09.md` section 1.
+
 **21 September 2026.** Status: instrument built and validated, first results in, **dispute not
 resolved** — and the reason we cannot resolve it yet is stated in section 5 rather than buried.
 

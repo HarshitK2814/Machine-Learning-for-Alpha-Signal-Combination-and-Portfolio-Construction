@@ -31,7 +31,7 @@ reported**.
 
 > The effect of an ADV participation constraint on net risk-adjusted performance is **monotone in
 > mandate size**, and **in Germany it changes sign**: the constraint **destroys** 0.81 Sharpe points
-> at a $100k mandate and **creates** 11.06 at $1bn, crossing zero at **$3.79mn (95% CI
+> at a $100k mandate and **creates** 11.06 at $1bn, crossing zero at **$3.79mn [withdrawn] (95% CI
 > $1.88mn–$7.07mn)**, with both tails significant at 5% under a paired test with Holm correction
 > across eight cells.
 
@@ -88,7 +88,7 @@ tested with the paired Ledoit-Wolf studentized stationary bootstrap (2,000 repli
 | $1mn | +0.406 | +1.028 | **−0.622** | 0.155 | **−4.01** | 0.0005 | 3/8 |
 | $2mn | +0.252 | +0.595 | −0.343 | 0.184 | −1.87 | 0.072 | 1/8 |
 | $3mn | +0.120 | +0.265 | −0.145 | 0.204 | −0.71 | 0.495 | 0/8 |
-| **$3.79mn** | | | **0 (crossover)** | | | | |
+| **$3.79mn** [withdrawn] | | | **0 (crossover)** | | | | |
 | $4mn | +0.022 | −0.012 | +0.033 | 0.227 | +0.15 | 0.892 | 0/8 |
 | $8mn | −0.171 | −0.849 | **+0.678** | 0.294 | **+2.30** | 0.029 | 1/8 |
 | $10mn | −0.234 | −1.179 | **+0.945** | 0.319 | **+2.96** | 0.008 | 3/8 |
@@ -142,7 +142,7 @@ labelled a hypothesis throughout.
 
 ### 3d. A candidate regularity
 
-The asymptotic channel scaled by the composite gross Sharpe: Germany 12.655/2.763 = **4.58**, India
+The asymptotic channel [withdrawn] scaled by the composite gross Sharpe: Germany 12.655/2.763 = **4.58**, India
 5.822/1.209 = **4.82**. Agreement within 5% on n = 2. Pre-registered as a secondary prediction
 (D4) only; it should not be leaned on.
 
@@ -164,10 +164,10 @@ Sharpe we quote has to carry this.
 | channel, bottom rung | **−0.811** | −0.179 | +0.004 | −0.002 |
 | t | **−6.10** | −1.65 | +0.13 | −0.06 |
 | p | **0.0000** | 0.117 | 0.893 | 0.959 |
-| crossover | **$3.79mn** | $1.11mn | none | $107k |
+| crossover | **$3.79mn** [withdrawn] | $1.11mn | none | $107k |
 | 95% CI | [$1.88mn, $7.07mn] | [$0.18mn, $3.94mn] | — | [$0.10mn, $1.06mn] |
 | draws with no sign change | **0.0%** | 2.1% | 50.8% | 51.8% |
-| channel at $1bn | **+11.06** (t +12.27) | **+4.15** (t +10.21) | **+5.55** (t +5.66) | **+4.73** (t +5.61) |
+| channel at $1bn | **+11.06** [withdrawn] (t +12.27) | **+4.15** (t +10.21) | **+5.55** (t +5.66) | **+4.73** (t +5.61) |
 
 Read honestly:
 
@@ -208,7 +208,7 @@ channel, `k` swept over a six-fold range:
 | k | crossover | crossover × k² | min channel below $1mn | channel at $1bn |
 |---|---|---|---|---|
 | 0.5 | **$16.56mn** | 4.14mn | −0.909 | +8.62 |
-| **1.0** | **$3.79mn** | **3.79mn** | −0.811 | +11.06 |
+| **1.0** | **$3.79mn** | **3.79mn** | −0.811 | +11.06 [withdrawn] |
 | 2.0 | **$1.06mn** | 4.24mn | −0.802 | +11.84 |
 | 3.0 | **$0.55mn** | 4.97mn | −0.791 | +11.76 |
 
@@ -227,7 +227,7 @@ Three things follow, and they matter more than the point estimate did.
 
 So section 6's warning that `k` was "the largest unquantified sensitivity" is **discharged**: the
 qualitative claim is robust to `k`, and the quantitative claim about the crossover's location
-should be quoted as **$3.79mn at `k = 1`, moving as `k^(−2)`**, with the CI in section 3a
+should be quoted as **$3.79mn [withdrawn] at `k = 1`, moving as `k^(−2)`**, with the CI in section 3a
 conditional on `k = 1`. A referee who prefers `k = 2` gets $1.06mn and the same paper.
 
 Data: `outputs/signal_vs_portfolio/impact_k_sensitivity_DEU.csv`.
@@ -241,7 +241,7 @@ below the other two.
 | channel (Sharpe points, $1bn) | Germany | India |
 |---|---|---|
 | cost (gross -> net uncapped) | **−14.40** | **−7.38** |
-| capacity (net uncapped -> net capped) | **+11.06** | **+5.55** |
+| capacity (net uncapped -> net capped) | **+11.06** [withdrawn] | **+5.55** |
 | tax (net -> after tax, optimised book) | **−0.111** | **−0.004** |
 
 | annualised bps, optimised book, $1bn, prediction cells | Germany | India |
@@ -252,7 +252,7 @@ below the other two.
 
 ### 4a. Two corrections this exhibit forced
 
-**The published "costs beat taxes 5x in Germany and 53x in India" are all-16-cell averages** that
+**The published "costs beat taxes 5x in Germany and 53x [withdrawn] in India" are all-16-cell averages** that
 include the economic arm, which is not a competent implementation
 (`docs/ECONOMIC_ARM_CAPABILITY_GAP.md`) and over-trades at the wrong gross. On the prediction cells
 alone — the only cells whose scores carry signal, and the only cells 001C and 001D concern — the

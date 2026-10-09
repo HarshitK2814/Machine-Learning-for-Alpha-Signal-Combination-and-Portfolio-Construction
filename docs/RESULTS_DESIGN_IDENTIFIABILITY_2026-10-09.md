@@ -2,8 +2,16 @@
 
 **Date:** 2026-10-09, 13:30 IST
 **Status:** exploratory, Germany and India. Japan pending its stage-04 run.
+**Scope correction (finalization audit, Phase 1).** Every count in this document is for the **capped
+and uncapped decile-spread books in Germany and India**. It is not a statement about the optimised
+book or about Japan. On the **optimised** book at $1bn, Japan's *conditioning* axis is t = +2.84
+(effect +0.515; p = 0.0045 unadjusted, 0.014 after Holm within Japan, 0.041 after Bonferroni across
+the nine axis tests; `RESULTS_GATE2_POWER` and `PAPER` §6.4). It is exploratory, was not
+pre-specified, rests on one AUM and is unreplicated: disclosed, not claimed. "Executable" below
+means the *capped decile* book.
+
 **Short version:** the design-axis null holds at **every** mandate size from $100k to $10bn, in both
-markets, on the executable book — 0 of 42 axis-rungs significant in each. The hypothesis that the
+markets, on the capped decile book — 0 of 42 axis-rungs significant in each. The hypothesis that the
 participation constraint is what destroys identifiability is **not supported**: India shows the same
 null on the *unconstrained* book too.
 

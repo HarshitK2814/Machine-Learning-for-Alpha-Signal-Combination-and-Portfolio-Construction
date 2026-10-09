@@ -1,4 +1,4 @@
-# The ADV participation constraint creates risk-adjusted performance, and the effect grows with mandate size
+# The ADV participation constraint's effect on net performance grows with how hard it binds (measured against an uncapped comparison book that becomes insolvent at scale)
 
 **Date:** 2026-10-09, 12:35 IST
 **Supersedes:** `docs/RESULTS_SIGN_FLIP_2026-10-09.md`, whose central claim — a sign flip with a
@@ -8,23 +8,40 @@ document is kept as the record; §6 here explains what happened and why it matte
 confirmation** of the positive channel (§3c, `AMENDMENT_001D` D2), reported 12:55 IST.
 **Audience:** referee-facing. Every number is reproducible from §7.
 
+> **CORRECTED in the finalization audit (Phase 1), after this document was first written.**
+> 1. The **uncapped comparison book is insolvent** at the rungs marked † below (Germany from $300mn,
+>    India from $100mn; median monthly net return -55% / -45% at $1bn; Japan never). A Sharpe
+>    difference against a bankrupt book is not a performance gain. Quote only unmarked rungs. Reasons
+>    and evidence: `PAPER_2026-10-09_FULL_ACCOUNT.md` §8.8.
+> 2. The wedge-tool values in the tables are **superseded** by the pipeline's own accounting of both
+>    books (§8.9 of the same file): +6.80 (Germany $100mn), +3.19 (India $30mn), +6.92 (Japan $1bn).
+> 3. The **"share of what survives" and "tax removes 87%"** passages of §4 are withdrawn: no country's
+>    net Sharpe is distinguishable from zero, so there is nothing for tax to decide
+>    (`RESULTS_TAX_THREE_COUNTRY` §4b).
+> 4. The "cleanest statement of the result" language in §3b applies to the solvent rungs only.
+> 5. The title and §1 previously said the constraint "creates" performance. The defensible statement
+>    is a **difference against an infeasible comparison book**, whose value lies in the dose-response in
+>    how hard the cap binds and in the solvent-rung magnitudes, not in a headline Sharpe gain.
+
 ---
 
 ## 1. The claim
 
 > For an institutional investor in a mid-size equity market, the ADV participation constraint's
 > effect on net risk-adjusted performance is **zero while the constraint does not bind, and
-> monotonically positive in how much it binds**. Across three markets it reaches **+8.92**
-> (Germany), **+5.69** (India) and **+6.68** (Japan) Sharpe points at a $1bn mandate, from
-> ±0.001 where the cap is slack. It pays because it suppresses turnover faster than it suppresses
+> monotonically positive in how much it binds**. Measured on the pipeline's own accounting of both
+> books at the largest mandate where the uncapped comparison book is still solvent, it reaches
+> **+6.80** (Germany, $100mn), **+3.19** (India, $30mn) and **+6.92** (Japan, $1bn) Sharpe points,
+> from ±0.001 where the cap is slack; beyond those mandates the German and Indian comparison books
+> are insolvent and larger figures are not performance gains (`PAPER` §8.8). It pays because it suppresses turnover faster than it suppresses
 > signal. **At the registered cost calibration there is no scale at which it meaningfully
 > hurts** (see §3g for the calibration dependence). The tax channel, measured with a
 > lot-level engine across three statutory regimes, is **two to three orders of magnitude smaller**
 > than either the cost or the capacity channel.
 
 Japan is a **pre-registered out-of-sample confirmation** (`AMENDMENT_001D` D2, declared and scored
-by committed code before any Japanese portfolio existed): +6.68 at $1bn, t = +11.01, 8 of 8 cells
-surviving Holm from $8mn upward.
+by committed code before any Japanese portfolio existed): +6.68 at $1bn on the wedge tool (t = +11.01;
++6.92 on the pipeline's accounting), 8 of 8 cells surviving Holm from $8mn upward.
 
 **What this is not.** It is not a sign flip, not an economically meaningful crossover, and not an
 adjudication of the published disagreement about whether turnover reduction helps. The only
@@ -70,12 +87,16 @@ replications, block 6.
 | $10mn | −0.361 | −4.007 | **+3.646** | 0.517 | +7.05 | 0.0000 | **8** |
 | $30mn | −0.468 | −6.210 | **+5.742** | 0.664 | +8.65 | 0.0000 | **8** |
 | $100mn | −0.471 | −8.105 | **+7.634** | 0.748 | +10.21 | 0.0000 | **8** |
-| $300mn | −0.611 | −9.083 | **+8.471** | 0.794 | +10.66 | 0.0000 | **8** |
-| **$1bn** | **−0.675** | **−9.597** | **+8.922** | 0.803 | **+11.11** | 0.0000 | **8** |
-| $10bn | −0.675 | −9.931 | **+9.256** | 0.810 | +11.43 | 0.0000 | **8** |
+| $300mn | −0.611 | −9.083 | +8.471 † | 0.794 | +10.66 | 0.0000 | **8** |
+| **$1bn** | −0.675 | −9.597 † | +8.922 † | 0.803 | +11.11 | 0.0000 | **8** |
+| $10bn | −0.675 | −9.931 † | +9.256 † | 0.810 | +11.43 | 0.0000 | **8** |
 
 **Significant at 5% on 13 of 14 rungs; 8 of 8 cells survive Holm at every rung from $1mn upward.**
 **No crossover: 94.1% of replications show no sign change anywhere in $100k..$10bn.**
+
+† Uncapped comparison book insolvent (Germany from $300mn): not interpretable as a performance gain.
+Over the 11 solvent rungs, 10 of 11 are significant. Wedge-tool values; the pipeline's accounting at
+the largest solvent rung ($100mn) is +6.80.
 
 ### 3b. India — the same shape, and cleaner
 
@@ -91,13 +112,17 @@ replications, block 6.
 | $8mn | −0.654 | −2.968 | **+2.314** | 0.488 | +4.74 | 0.0010 | **8** |
 | $10mn | −0.686 | −3.221 | **+2.534** | 0.530 | +4.78 | 0.0025 | **8** |
 | $30mn | −0.767 | −4.411 | **+3.644** | 0.729 | +5.00 | 0.0130 | 6 |
-| $100mn | −0.814 | −5.405 | **+4.591** | 0.865 | +5.31 | 0.0075 | 6 |
-| $300mn | −0.634 | −5.969 | **+5.335** | 0.972 | +5.49 | 0.0055 | 7 |
-| **$1bn** | **−0.623** | **−6.315** | **+5.693** | 0.998 | **+5.70** | 0.0035 | 7 |
-| $10bn | −0.623 | −6.589 | **+5.967** | 1.015 | +5.88 | 0.0025 | 7 |
+| $100mn | −0.814 | −5.405 † | +4.591 † | 0.865 | +5.31 | 0.0075 | 6 |
+| $300mn | −0.634 | −5.969 † | +5.335 † | 0.972 | +5.49 | 0.0055 | 7 |
+| **$1bn** | −0.623 | −6.315 † | +5.693 † | 0.998 | +5.70 | 0.0035 | 7 |
+| $10bn | −0.623 | −6.589 † | +5.967 † | 1.015 | +5.88 | 0.0025 | 7 |
 
-**Significant at 5% on all 14 rungs**, 7–8 of 8 cells surviving Holm at every rung. **100% of
-replications show no sign change** — India is the cleanest statement of the result in the study.
+**Significant at 5% on all 14 rungs** (10 of 10 solvent rungs), 7–8 of 8 cells surviving Holm at every
+rung. **100% of replications show no sign change** — on the solvent rungs ($100k-$30mn) India is the
+cleanest statement of the result in the study.
+
+† Uncapped comparison book insolvent (India from $100mn): not interpretable as a performance gain.
+Wedge-tool values; the pipeline's accounting at the largest solvent rung ($30mn) is +3.19.
 
 Monotone, positive throughout, the same shape as Germany at roughly two-thirds the magnitude,
 consistent with India's weaker signal (composite gross decile Sharpe **+1.197** against Germany's
@@ -170,7 +195,7 @@ slack, where this channel is zero by construction.
 
 | dimension | tested | survives |
 |---|---|---|
-| **weighting** | equal vs value-weighted deciles | **yes** — positive and significant at scale in both markets under both (t = +5.6 to +12.3 at $1bn) |
+| **weighting** | equal vs value-weighted deciles | **unconfirmed on the compliant universe.** Positive and significant at scale under both on the *pre-fix* universe (t = +5.6 to +12.3 at $1bn, where the German and Indian comparison books are insolvent); the compliant re-run has not been done (`PAPER` §12.3) |
 | **impact coefficient** | `k ∈ {0.5, 1, 2, 3}` (k=1 is Grinold-Kahn), on the compliant universe | **yes** — positive at scale at every k, magnitudes rising with k as the mechanism requires. See §3d: only at `k = 0.5` is there any negative region at all, and it is −0.014 |
 | **impact curvature** | Kyle-linear (`exponent 2.0`) level-matched against our square-root contract - the law @NMV2016 argue for against ours | **yes** - positive at every rung in both markets, +7.74 / +3.64 at $1bn (§3g) |
 | **cost-input coverage** | signal-bearing vs investable universe | **yes for the positive channel.** This is what killed the retracted sign flip, so it is the check that matters — see §6 |
@@ -232,15 +257,20 @@ the naive one is not a fair test:
 
 | | Germany $100k | $1mn | $3mn | $1bn | $10bn |
 |---|---|---|---|---|---|
-| **1.5, k=1 (contract)** | +0.062 | +0.795 | +1.653 | +8.922 | +9.256 |
+| **1.5, k=1 (contract)** | +0.062 | +0.795 | +1.653 | +8.922 † | +9.256 † |
 | **2.0, k=1 (uncalibrated)** | **−0.054** | **−0.160** | **−0.193** | +5.618 | +7.600 |
 | **2.0, level-matched (k=4.88)** | **+0.087** | **+0.879** | **+1.729** | **+7.740** | **+8.103** |
 
 | | India $100k | $1mn | $3mn | $1bn | $10bn |
 |---|---|---|---|---|---|
-| **1.5, k=1 (contract)** | +0.211 | +0.751 | +1.332 | +5.693 | +5.967 |
+| **1.5, k=1 (contract)** | +0.211 | +0.751 | +1.332 | +5.693 † | +5.967 † |
 | **2.0, k=1 (uncalibrated)** | +0.079 | +0.058 | +0.079 | +3.016 | +3.660 |
 | **2.0, level-matched (k=3.74)** | +0.182 | +0.560 | +0.955 | +3.643 | +3.837 |
+
+† Under the contract cost model the uncapped book is insolvent at these German and Indian rungs. Solvency
+was assessed **only under the contract cost model**, not under the sensitivity cost models, so the
+$1bn and $10bn entries in every row should be read the same way until it is assessed. The
+informative columns are $100k-$3mn.
 
 **Why two runs.** For portfolio weights, `|dw| < 1`, so raising the exponent from 1.5 to 2.0 at the
 same coefficient makes impact **uniformly cheaper** — it changes the cost *level* as well as its
@@ -270,9 +300,13 @@ Capacity against cost against tax, same signals. **Capacity >> cost >> tax in bo
 
 | channel (Sharpe points, $1bn) | Germany | India |
 |---|---|---|
-| cost (gross → net uncapped) | −11.90 | −7.51 |
-| **capacity** (net uncapped → net capped) | **+8.92** | **+5.69** |
+| cost (gross → net uncapped) | −11.90 † | −7.51 † |
+| **capacity** (net uncapped → net capped) | +8.92 † | +5.69 † |
 | tax (net → after tax, optimised book) | **−0.111** | **−0.004** |
+
+† Both legs use the insolvent uncapped book at $1bn: not quotable. The like-for-like ladder at the largest
+solvent rung (`PAPER` §8.9): Germany $100mn cost -9.62 / capacity +6.80 / tax (capped book) -0.098;
+India $30mn -5.18 / +3.19 / -0.005; Japan $1bn -9.02 / +6.92 / -0.170.
 
 | annualised bps, optimised book, $1bn, prediction cells | Germany | India |
 |---|---|---|
@@ -281,18 +315,21 @@ Capacity against cost against tax, same signals. **Capacity >> cost >> tax in bo
 | **cost / tax** | **2.70x** | **87.4x** |
 
 **Two corrections this exhibit forced, both standing.** The published "costs beat taxes 5x in
-Germany and 53x in India" are **all-16-cell** averages including the economic arm, which is not a
+Germany and 53x [withdrawn] in India" are **all-16-cell** averages including the economic arm, which is not a
 competent implementation; on prediction cells the ratios are **2.70x** and **87.4x**, so Germany's
-margin is one order of magnitude, not two. And "taxes are second-order" splits in two: true as a
-**channel magnitude** (0.111 against 8.9–11.6), false as a **share of what survives** — Germany's
-book nets +0.128 and keeps **+0.017** after tax, so tax removes **87%** of the remaining
-risk-adjusted return.
+margin is one order of magnitude, not two. ~~And "taxes are second-order" splits in two: true as a
+channel magnitude, false as a share of what survives: Germany's book nets +0.128 and keeps +0.017
+after tax, so tax removes 87% of the remaining risk-adjusted return.~~ **[WITHDRAWN: the "share of
+what survives" half. Germany's +0.128 is itself indistinguishable from zero (t = +0.53), so there is
+nothing for tax to remove or to decide. What stands is the channel-magnitude half: the tax channel is
+two orders of magnitude below cost and capacity. See `RESULTS_TAX_THREE_COUNTRY` §4b.]**
 
 **Limitation, stated not buried.** Cost and capacity drags are measured on the decile-spread book,
 the only book with an uncapped counterfactual; tax drag on the optimised book, because the
 lot-level engine runs on realised weights. Two books, so this compares orders of magnitude, not a
 decomposition that sums. The bias favours the tax channel (measured on the lower-turnover book) and
-it still loses.
+it still loses. **Partly superseded:** matched-book accounting (`PAPER` §8.9) now puts cost,
+capacity and tax on one book at the largest solvent rung of each market.
 
 ## 5. What is ours and what is not
 

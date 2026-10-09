@@ -12,7 +12,7 @@ Workstream B (Harshit) · drafted for internal use and for Absar (workstream A, 
 This is written in the shape of a paper, but it is **not** a submission draft. It is the full
 record: what we set out to do, what the literature already owns, exactly what we built, every
 result that survived, **every result that did not and why**, and what remains. Section 8 is the
-honest ledger of seven retractions, three of them today. Section 12 is what is left to do, why each
+honest ledger of nine retractions and corrections (8.1-8.9), seven of them arising today. Section 12 is what is left to do, why each
 item matters, and how each could change the paper.
 
 Numbers are stated with the sample and specification they come from. Where a quantity has been
@@ -52,8 +52,8 @@ Four results survive.
    not interpretable as performance gains. Japan is a **pre-registered out-of-sample
    confirmation**. The effect is zero where
    the constraint is slack and there is no mandate size at which it meaningfully hurts, at the
-   registered cost calibration. It survives value-weighting, a six-fold sweep of the impact
-   coefficient, a level-matched switch to the Kyle-linear impact law our closest competitor
+   registered cost calibration. It survives a six-fold sweep of the impact
+   coefficient (value-weighting was run on the PRE-FIX signal-bearing universe only; the compliant re-run (§12.3) has not been done, so robustness to weighting is unconfirmed on the universe the headline uses), a level-matched switch to the Kyle-linear impact law our closest competitor
    prefers, and familywise correction across cells.
 
    **What the improvement improves must be stated plainly, because the magnitude invites
@@ -83,10 +83,17 @@ Four results survive.
    independent placebos, one treatment. Given the wedge, the drag *level* is ordered by **turnover,
    not by the rate**: Japan's rate is 23% lower than Germany's and its drag is 80% higher, because
    it turns over 2.1× as fast.
-4. **No machine-learning design axis is detectable on an executable book at any mandate size** —
-   0 of 42 axis-rungs in Germany and 0 of 42 in India, across five orders of magnitude of AUM, with
-   paired HAC inference and Holm correction — although the signals carry information coefficients
-   with t up to +10.4.
+4. **No machine-learning design axis is detectable at this power.** On the **capped decile-spread
+   book in Germany and India**, 0 of 42 axis-rungs (14 AUM rungs x 3 axes) are significant in each
+   market, with paired HAC inference and Holm correction. The minimum detectable effect at 80% power
+   with 132 months is 0.25-0.81 Sharpe points depending on axis and market, so the null excludes only
+   effects of roughly a quarter of a Sharpe point or more. **Scope limits:** it was not measured for
+   Japan or on the optimised book at every rung. In a single-AUM check on the **optimised** book at
+   $1bn, Japan's *conditioning* axis is t = +2.84 (effect +0.515; p = 0.0045 unadjusted, 0.014 after
+   Holm within Japan, 0.041 after Bonferroni across the nine axis tests) and the other eight axis
+   tests are not significant. That observation is **exploratory, not pre-specified and unreplicated:
+   it is disclosed, not claimed** (§6.4). The signals themselves carry information coefficients with
+   t up to +10.4.
 
 A fifth result is methodological and arose from our own failure. A **35-percentage-point asymmetry
 in cost-input coverage** between two panels of the same study manufactured a highly significant
@@ -131,7 +138,7 @@ the one in §1: a measurement of where ML alpha goes, with the tax machinery ser
 instrument that *rules the tax channel out as a channel* while showing it is nevertheless decisive
 for survival.
 
-We state this history because three of the seven retractions in §8 happened in a single day, and
+We state this history because seven of the nine entries in §8 happened in a single day, and
 because the shape of the errors (§9) is itself one of the paper's contributions.
 
 ### 2.3 Contributions, stated against what is already published
@@ -421,11 +428,17 @@ block 6.
 | $1mn | **+0.917** | +3.98 | **+0.880** | +4.40 | +0.042 | +2.72 |
 | $3mn | **+1.890** | +5.53 | **+1.536** | +4.66 | **+0.132** | +3.84 |
 | $10mn | **+3.646** | +7.05 | **+2.534** | +4.78 | **+0.403** | +6.41 |
-| $100mn | **+7.634** | +10.21 | **+4.591** | +5.31 | **+2.693** | +10.40 |
-| **$1bn** | **+8.922** | **+11.11** | **+5.693** | **+5.70** | **+6.681** | **+11.01** |
-| $10bn | **+9.256** | +11.43 | **+5.967** | +5.88 | **+7.151** | +7.06 |
+| $100mn | **+7.634** | +10.21 | +4.591 † | +5.31 | **+2.693** | +10.40 |
+| **$1bn** | +8.922 † | +11.11 | +5.693 † | +5.70 | **+6.681** | **+11.01** |
+| $10bn | +9.256 † | +11.43 | +5.967 † | +5.88 | **+7.151** | +7.06 |
 
-* Significant at 5%: **13 of 14** German rungs, **14 of 14** Indian, **11 of 14** Japanese.
+* Significant at 5% over all rungs: 13 of 14 German, 14 of 14 Indian, 11 of 14 Japanese. **Over
+  solvent rungs only: 10 of 11 German, 10 of 10 Indian, 11 of 14 Japanese** (committed solvency table).
+* † **Not interpretable as performance gains**: the uncapped comparison book is insolvent at these
+  rungs (Germany from $300mn, India from $100mn; Japan never), see §8.8. The pipeline's own accounting
+  of both books gives, at the largest solvent rung, Germany $100mn **+6.80**, India $30mn **+3.19**,
+  Japan $1bn **+6.92** (§8.9), which supersede the wedge-tool values in this table for those rungs.
+  The t statistics and Holm counts below include † rungs.
 * **8 of 8 cells survive Holm** from $1mn (DEU), $300k–$10mn (IND, 8/8) and $8mn (JPN) upward.
 * Composite gross decile Sharpe: Germany **+2.305**, India **+1.197**, Japan **+1.278**.
 
@@ -461,16 +474,23 @@ term**, so they sit permanently at zero slack, where this channel is zero by con
 
 | | gross decile Sharpe | channel at $1bn | t |
 |---|---|---|---|
-| Germany, equal-weighted | +2.763 | +11.06 | +12.27 |
-| Germany, **value-weighted** | **+0.473** | **+4.15** | **+10.21** |
-| India, equal-weighted | +1.209 | +5.55 | +5.66 |
-| India, **value-weighted** | **+0.215** | **+4.73** | **+5.61** |
+| Germany, equal-weighted ‡ | +2.763 | ~~+11.06~~ ‡ | +12.27 |
+| Germany, **value-weighted** ‡ | **+0.473** | ~~+4.15~~ ‡ | **+10.21** |
+| India, equal-weighted ‡ | +1.209 | ~~+5.55~~ ‡ | +5.66 |
+| India, **value-weighted** ‡ | **+0.215** | ~~+4.73~~ ‡ | **+5.61** |
+
+‡ **Pre-fix signal-bearing universe** (the coverage-artefact ladder, §8.3), and the $1bn German and
+Indian uncapped comparison books are insolvent under the contract cost model (§8.8; solvency was not
+assessed for the value-weighted book). The channel entries are **withdrawn as quotable gains**. The
+gross decile Sharpes are on the same pre-fix universe (the compliant equal-weighted values are
++2.305 / +1.197 / +1.278).
 
 **Value weighting cuts the gross decile Sharpe by about 80%.** That is @NMV2016's critique of
 equal-weighted anomaly results landing on **our own** gross numbers, and every gross Sharpe we
 quote must carry it. The channel itself survives: positive and strongly significant at scale under
-both schemes, in both markets. (These are on the signal-bearing ladder, measured before the
-coverage fix; the qualitative conclusion is unchanged but they should be re-run compliant — §12.)
+both schemes, in both markets. **[Unconfirmed on the compliant universe.** These are on the
+signal-bearing ladder, measured before the coverage fix; the qualitative conclusion is probably
+unchanged but is not established until the compliant re-run (§12.3) is done.**]**
 
 #### 6.2.4 Impact coefficient and curvature
 
@@ -494,17 +514,22 @@ isolates curvature: `k' = 4.88` (Germany), `3.74` (India).
 
 | Germany | $100k | $1mn | $3mn | $1bn | $10bn |
 |---|---|---|---|---|---|
-| 1.5, k=1 (contract) | +0.062 | +0.795 | +1.653 | +8.922 | +9.256 |
+| 1.5, k=1 (contract) | +0.062 | +0.795 | +1.653 | +8.922 † | +9.256 † |
 | 2.0, k=1 (uncalibrated) | **−0.054** | **−0.160** | **−0.193** | +5.618 | +7.600 |
 | **2.0, level-matched** | **+0.087** | **+0.879** | **+1.729** | **+7.740** | **+8.103** |
 
 | India | $100k | $1mn | $1bn | $10bn |
 |---|---|---|---|---|
-| 1.5, k=1 | +0.211 | +0.751 | +5.693 | +5.967 |
+| 1.5, k=1 | +0.211 | +0.751 | +5.693 † | +5.967 † |
 | 2.0, k=1 | +0.079 | +0.058 | +3.016 | +3.660 |
 | **2.0, level-matched** | **+0.182** | **+0.560** | **+3.643** | **+3.837** |
 
-**The channel is robust to curvature.** A referee preferring Kyle-linear impact gets the same
+† Under the contract cost model the uncapped comparison book is insolvent at these German and Indian
+rungs (§8.8). Solvency was assessed **only under the contract cost model**, not under the sensitivity
+cost models, so the $1bn and $10bn entries in every row should be read the same way until it is
+assessed. The informative columns are $100k-$3mn.
+
+**The channel is robust to curvature** (at the columns where the comparison is interpretable). A referee preferring Kyle-linear impact gets the same
 paper. The negative region in the uncalibrated row is a **level** artefact and vanishes when the
 level is restored — but it is also what the comparative static predicts, so the honest statement is
 that the sign at small mandates depends on the cost **calibration**, and ours is Grinold-Kahn.
@@ -608,7 +633,7 @@ drag is **flat at −0.11 to −0.16**. The cap cuts the tax bill by cutting tra
 return in the same motion. A $10bn fund looks almost untaxed at 0.94 bps and is not, in the units
 that matter. `lt_share` is 0.0000 at all three rungs, as the statutory argument requires.
 
-### 6.4 ML design choice is not detectable on an executable book
+### 6.4 ML design choice is not detectable at this power (decile books, Germany and India)
 
 Three axes (representation, conditioning, uncertainty) on the 8 prediction cells; at each AUM rung
 the equal-weighted composite of the 4 cells at each level, tested with the same paired bootstrap,
@@ -619,9 +644,26 @@ Holm-corrected across axes.
 | **Germany** | **0 of 42** | 5 of 42 |
 | **India** | **0 of 42** | **0 of 42** |
 
-14 AUM rungs × 3 axes per book per country. The null was previously one test on one book at one
-AUM; it is now 42 per book per country across five orders of magnitude with paired HAC inference and
-familywise correction, and it does not break anywhere on the executable book in either market.
+14 AUM rungs × 3 axes per decile book per country. **Scope: the capped and uncapped decile-spread
+books, Germany and India only.** The null was previously one test on one book at one AUM; it is now 42
+per book per country across five orders of magnitude with paired HAC inference and familywise
+correction, and it does not break anywhere on the capped decile book in either market.
+
+**The optimised book, Japan, and one exploratory observation.** The same three contrasts were computed
+on the **optimised** book at $1bn in all three markets (`tools/gate2_power.py`), effect (paired SE, t):
+
+| | representation | conditioning | uncertainty |
+|---|---|---|---|
+| Germany | +0.134 (0.289, +0.46) | -0.177 (0.152, -1.17) | +0.159 (0.089, +1.80) |
+| India | +0.007 (0.279, +0.03) | -0.263 (0.285, -0.92) | +0.154 (0.101, +1.54) |
+| Japan | -0.418 (0.249, -1.68) | **+0.515 (0.182, +2.84)** | +0.125 (0.092, +1.35) |
+
+Japan's conditioning contrast is the only one of nine that is significant: p = 0.0045 unadjusted, 0.014
+after Holm across the three axes within Japan, 0.041 after Bonferroni across all nine. It is
+**exploratory, was not pre-specified, was found during an audit, rests on a single AUM, and is
+unreplicated**; it is disclosed here and must not be cited as evidence that conditioning helps.
+Minimum detectable effect at 80% power with 132 months: 0.25-0.28 (uncertainty), 0.43-0.80
+(conditioning), 0.70-0.81 (representation) Sharpe points.
 
 **The mechanism we hoped for is not supported** (§8.6). Caveat that limits the null's reach: 8
 cells and 132 months is low power for a 3-factor design, and the standard errors rather than the
@@ -634,9 +676,14 @@ Compliant ladder, $1bn, prediction cells.
 
 | channel, Sharpe points | Germany | India |
 |---|---|---|
-| cost (gross → net uncapped) | **−11.90** | **−7.51** |
-| **capacity** (net uncapped → net capped) | **+8.92** | **+5.69** |
+| cost (gross → net uncapped) | −11.90 † | −7.51 † |
+| **capacity** (net uncapped → net capped) | +8.92 † | +5.69 † |
 | tax (net → after tax, optimised book) | **−0.111** | **−0.004** |
+
+† Both legs use the **insolvent** uncapped comparison book at $1bn (§8.8), so these German and Indian
+cost and capacity entries are not quotable. The like-for-like ladder at the largest **solvent** rung is
+in §8.9: Germany $100mn cost -9.62 / capacity +6.80 / tax (capped book) -0.098; India $30mn -5.18 /
++3.19 / -0.005; Japan $1bn -9.02 / +6.92 / -0.170.
 
 | annualised bps, optimised book | Germany | India | Japan |
 |---|---|---|---|
@@ -678,7 +725,7 @@ that the comparative static is a one-page argument rather than a derived model.
 
 ## 8. Retractions and corrections, in full
 
-Seven. Three today. Each is in the git history with the evidence.
+Nine entries (8.1-8.9); seven arose today. Each is in the git history with the evidence.
 
 ### 8.1 The pre-registered tax-wedge statistic — WITHDRAWN (earlier)
 
@@ -768,7 +815,7 @@ against it:
 3. **Germany's 5 of 42 is within multiple-testing expectation** (~2 expected; four of the five are
    one axis at adjacent, highly correlated rungs, so roughly two independent observations).
 
-### 8.7 The §112A bounding exercise — INVALID TWICE, still unresolved
+### 8.7 The §112A bounding exercise — INVALID TWICE, then RESOLVED
 
 Intended to discharge Absar's dependency: re-run the event study with the 456 missing reference
 values at both tax extremes; if the bounds agree, the missing data cannot change the conclusion.
@@ -840,7 +887,7 @@ unaffected, and Japan is the cleanest case because its counterfactual is feasibl
 +5.69 / +5.97) as quotable Sharpe-point gains. They are arithmetic on a bankrupt counterfactual.
 Quote the largest solvent rung per market, and flag the rest.
 
-**Consequence for two earlier claims.** (i) The "asymptotic channel" (+10.4 Germany, +4.6 India) and
+**Consequence for two earlier claims.** (i) The "asymptotic channel [withdrawn]" (+10.4 Germany, +4.6 India) and
 the cross-market regularity built on it (D4: 4.58 vs 4.82) were produced by **Sharpe saturation**:
 the uncapped Sharpe plateaus (−9.60 at $1bn, −9.93 at $10bn) while the cost it contains rises
 threefold, because mean and standard deviation of the return series scale together. It is not an
@@ -887,7 +934,7 @@ horse-race limitation of §6.5 for the solvent rungs.
    (t −1.83), India −0.801 (t −2.28), Japan −0.828 (t −2.74) at the solvent rungs. This is the
    signal-to-portfolio wedge on a single book. The caveat of §6.2.5 stands: that book attains only a
    few percent of its target gross, so its Sharpe is a ratio of small numbers.
-3. **The tax-channel "match within 1%" was a property of the optimised book, not of the statutes.**
+3. **The tax-channel "match within 1% [withdrawn]" was a property of the optimised book, not of the statutes.**
    On the optimised book Germany and Japan gave −0.1363 and −0.1373. On the executable decile book
    they are **−0.070 (t −3.55) and −0.170 (t −3.67)** at $1bn, a factor of **2.4** apart, and India
    is **−0.009 with t = −2.14**, i.e. borderline significant where the optimised book gave
@@ -902,7 +949,7 @@ horse-race limitation of §6.5 for the solvent rungs.
 
 ## 9. The shape of the errors
 
-Six of the seven retractions, plus three infrastructure bugs, share one shape: **a quantity computed
+Six of the nine entries in §8 (8.3, 8.4, 8.5, 8.7, 8.8, 8.9), plus three infrastructure bugs, share one shape: **a quantity computed
 correctly, then compared against or constructed under the wrong thing.** The pipeline is not this
 project's risk. The framing of the comparison is.
 
@@ -959,7 +1006,7 @@ three hours §8.3 consumed.
 | D1 monotone | **PASS** | largest adjacent change +0.0102 (no decrease) |
 | D2 positive at $1bn | **PASS** | **+6.6813, t = +11.01, p < 0.0001** |
 | D3 negative region exists | **PASS** | gross Sharpe +1.278 > India's +1.209; a negative channel exists below $1mn |
-| D4 asymptotic ratio in [3.5, 5.5] | FAIL | 7.1511/1.278 = **5.596** |
+| D4 asymptotic ratio [withdrawn] in [3.5, 5.5] | FAIL | 7.1511/1.278 = **5.596** |
 | D5 scaled channel at $1bn < 4.00 | FAIL | **5.228** |
 
 Its verdict line reads "H-FLIP CONFIRMED". **We do not report that.** D3's pass is vacuous (C7):
@@ -1036,7 +1083,7 @@ non-viable book more negative; they do not turn a viable one non-viable.
 claim "you cannot grow out of the tax channel" holds for Germany and only partly for Japan, and
 §6.3.4 should say so.
 
-### 12.3 Re-run the value-weighting check on the compliant ladder
+### 12.3 Re-run the value-weighting check on the compliant ladder **[NOT DONE - needs approval]**
 
 **Why.** §6.2.3's figures were measured **before** the coverage fix, on the signal-bearing universe.
 The conclusion (channel survives value-weighting) is very likely unchanged, but the numbers quoted
@@ -1045,7 +1092,7 @@ are from the defective universe and must not be published as they stand.
 **How it changes the paper.** Probably not at all, but it is a published-number correctness issue of
 exactly the kind §9 catalogues, and leaving it would be inconsistent with C2.
 
-### 12.4 Inference on the design-axis null, and a power calculation
+### 12.4 Inference on the design-axis null, and a power calculation **[PARTLY DONE: minimum detectable effects derived from the committed paired SEs (audit §1.4); Gate 2 covers a new arm]**
 
 **Why.** §6.4 reports 0 of 42 but no **minimum detectable effect**. A null without a power statement
 is weak evidence of absence, and @CHK2024/@LAL2025 have 100× our design count.
@@ -1054,7 +1101,7 @@ is weak evidence of absence, and @CHK2024/@LAL2025 have 100× our design count.
 undetectable on an executable book at this power", which is publishable as a bound. Without one it
 is an absence of evidence and a referee will say so.
 
-### 12.5 Capacity frontier as a share of market capitalisation
+### 12.5 Capacity frontier as a share of market capitalisation **[NOT DONE]**
 
 **Why.** @KS2004 reports $5bn as **0.043% of NYSE capitalisation** — that is the comparable
 statistic across eras and countries, and we report only dollars. §10 C4 requires it.
@@ -1063,14 +1110,14 @@ statistic across eras and countries, and we report only dollars. §10 C4 require
 comparison legitimate after §8.5. It may restore a weaker version of the withdrawn claim, or
 confirm it should stay withdrawn. Cheap: market cap is in C1 `me`.
 
-### 12.6 Read @ACM2023 in full text
+### 12.6 Read @ACM2023 in full text **[NOT DONE; also JKMP final, Nechvátalová, Dai et al., Moehle et al. remain abstract-level]**
 
 **Why.** It is the closest competitor, it is in Management Science, and our row is still
 abstract-level. We do not know precisely what it does and does not claim.
 
 **How it changes the paper.** Could sharpen or puncture §2.3. Required before submission regardless.
 
-### 12.7 Borrow-fee sensitivity for the capacity channel
+### 12.7 Borrow-fee sensitivity for the capacity channel **[NOT DONE - needs approval]**
 
 **Why.** Borrow is a modelled 1% flat proxy, and the config carries sensitivity rates up to 7%. A
 long/short book at gross 2.0 pays borrow on the whole short side, so a 7× borrow rate is not a small
@@ -1079,7 +1126,7 @@ perturbation.
 **How it changes the paper.** If the capacity channel is sensitive to borrow, the headline needs a
 band. The sweep is cheap and has not been run.
 
-### 12.8 Japan's optimised-book capacity dose-response
+### 12.8 Japan's optimised-book capacity dose-response **[NOT DONE - needs approval; the diagnostic exists for Germany only, and realised_books_JPN/IND.csv are empty stubs]**
 
 **Why.** The weight-cross-section diagnostics (`corr(|w|, adv_cap)` +0.555 → +0.854,
 `corr(w, alpha)` +0.497 → +0.321) exist for Germany only. Japan's book now exists.
@@ -1108,25 +1155,6 @@ them remains desirable for completeness and nothing waits on them.
 outstanding is either our own compute (§12.2–12.8) or Maham's judgement on work already done
 (§12.9), and none of §12.9 blocks a result — it blocks sign-off.
 
-### 12.12 Restate the capacity channel in a unit that survives an insolvent comparison book **[new]**
-
-**Why.** §8.8: Sharpe points are ill-posed once the uncapped leg is bankrupt, and the uncapped
-Sharpe saturates rather than measuring cost. Quote-able alternatives that stay finite: cost avoided
-as a share of gross alpha; net return in basis points; terminal wealth with explicit ruin.
-
-**How it changes the paper.** It replaces the headline unit. The qualitative result survives (it is
-confirmed on solvent rungs and in Japan throughout), but a referee will ask for exactly this, and
-the unit decides whether the number is believable. Cheap: every input exists in the monthly dumps.
-
-### 12.13 Matched-book accounting and the two new literature rows **[in progress]**
-
-Decile weights saved (`--dump-weights`) and run through `after_tax_backtest` on one book
-(`tools/exp_matched_book_accounting.py`); the tracker gains **Dai-Lei-Liu-Yang (Management Science
-2026, "Optimal Tax Timing with Transaction Costs")** and **Moehle-Kochenderfer-Boyd-Ang (JOTA 2021,
-"Tax-Aware Portfolio Construction via Convex Optimization")**, both confirmed at abstract level only.
-The second means a tax-lot-aware convex optimiser is prior art, so ours is a tool and not a
-contribution.
-
 ### 12.11 Not worth doing
 
 * **A properly calibrated Kyle replication.** §6.2.4's level-matched run already answers the
@@ -1138,6 +1166,25 @@ contribution.
   methods section, but building a paper on our own bug is a weak foundation and a referee would say
   so. It is a section, not a thesis.
 
+### 12.12 Restate the capacity channel in a unit that survives an insolvent comparison book **[NOT DONE - audit task P0-2; the definition must be fixed before any value is computed]**
+
+**Why.** §8.8: Sharpe points are ill-posed once the uncapped leg is bankrupt, and the uncapped
+Sharpe saturates rather than measuring cost. Quote-able alternatives that stay finite: cost avoided
+as a share of gross alpha; net return in basis points; terminal wealth with explicit ruin.
+
+**How it changes the paper.** It replaces the headline unit. The qualitative result survives (it is
+confirmed on solvent rungs and in Japan throughout), but a referee will ask for exactly this, and
+the unit decides whether the number is believable. Cheap: every input exists in the monthly dumps.
+
+### 12.13 Matched-book accounting and the two new literature rows **[DONE: see §8.9 and tracker C7/C8]**
+
+Decile weights saved (`--dump-weights`) and run through `after_tax_backtest` on one book
+(`tools/exp_matched_book_accounting.py`); the tracker gains **Dai-Lei-Liu-Yang (Management Science
+2026, "Optimal Tax Timing with Transaction Costs")** and **Moehle-Kochenderfer-Boyd-Ang (JOTA 2021,
+"Tax-Aware Portfolio Construction via Convex Optimization")**, both confirmed at abstract level only.
+The second means a tax-lot-aware convex optimiser is prior art, so ours is a tool and not a
+contribution.
+
 ---
 
 ## 13. Venue assessment, honestly
@@ -1145,7 +1192,10 @@ contribution.
 The September strategy named **JFQA and Management Science (Finance)** as primary (fit 9, difficulty
 4), with RFS/JF/JFE as a stretch conditional on "a general lesson about why ML **adds** value".
 
-**Current judgement: JFQA primary.**
+**Judgement at the time of writing: JFQA primary. SUPERSEDED** by `FINALIZATION_AUDIT_2026-10-09.md`
+section 4 (Journal of Empirical Finance first, Quantitative Finance second, JIFMIM third, Review of
+Asset Pricing Studies not a default), which was set after the withdrawals in §8 and uses the
+publishers' official scope pages. The bullets below are kept as the earlier reasoning.
 
 * **Management Science is compromised** by having published @ACM2023.
 * **Not JF/JFE/RFS.** Our lesson is about why ML alpha *fails to arrive*, and the direction of the
@@ -1165,7 +1215,7 @@ The blocker status against the September audit:
 | 2 | no inference | Fatal | **Resolved** — deflated Sharpe, PBO, Romano-Wolf, SPA, HAC, plus the new paired Sharpe test |
 | 3 | no identification | Fatal | **Changed.** The designed tax identification failed (§8.1). What identifies the capacity result is that AUM is set exogenously and market depth varies without our choosing it; §6.3.1 has a genuine statutory instrument |
 | 4 | contested contribution | Severe | **Narrowed and honest.** §2.3 and §2.4 |
-| 5 | no mechanism | Severe | **Closed** — §7, with the caveat that it is a one-page comparative static |
+| 5 | no mechanism | Severe | **Not closed by evidence.** §7 is a one-page comparative static; its predicted small-AUM sign change was not observed at the registered calibration, so it explains the monotone dose-response but has no independent confirmation |
 | 6 | dead components | Moderate | Resolved (demoted) |
 
 ---
@@ -1186,8 +1236,8 @@ python tools/verify_bound_is_live.py --inputs A B --outputs X Y --derived NUM/DE
 python tools/repair_source_index.py --country JPN
 ```
 
-**Test suite: 458 tests, 0 failures** (438 pre-existing + 12 `test_sharpe_difference` + 8
-`test_cost_input_coverage_rule`).
+**Test suite: 464 tests, 0 failures** (re-run for the finalization audit; 438 pre-existing +
+12 `test_sharpe_difference` + 8 `test_cost_input_coverage_rule` + 6 `test_112a_reference_threading`).
 
 ### 14.1 Document index
 
@@ -1219,10 +1269,11 @@ channels can be measured and two of them are significant. A **binding ADV partic
 improves** risk-adjusted performance by **+6.8 / +3.2 / +6.9** Sharpe points at the largest mandate
 where the uncapped comparison book is still solvent ($100mn Germany, $30mn India, $1bn Japan) — and
 beyond that the German and Indian uncapped books are bankrupt, so larger figures are not
-performance gains — so the constraint rescues the strategy from disaster rather than into profit,
-and the improvement is zero where the constraint is slack,
+performance gains. The constraint rescues the strategy from disaster rather than into profit. The
+effect is zero where the constraint is slack,
 monotone in how hard it binds, confirmed out of sample in Japan against a pre-registered prediction,
-and robust to weighting, impact curvature, the impact coefficient and cost-input coverage. The
+and robust to impact curvature, the impact coefficient and cost-input coverage (the weighting check
+is unconfirmed on the compliant universe, §12.3). The
 **tax channel** is two orders of magnitude smaller but **significant in exactly the two
 jurisdictions whose statute provides no long-term category** — Germany −0.1363 (t = −4.67) and
 Japan −0.1373 (t = −4.99) on the optimised book — and **insignificant** under India's long-term
@@ -1230,8 +1281,10 @@ exemption (−0.0054, t = −1.93). That contrast is not robust to the choice of
 executable decile book the flat regimes are 8–19× larger than India, but India is
 borderline-significant and the two placebos differ by 2.4× (§8.9), so only the magnitude ordering
 by statute type should be quoted. No
-machine-learning **design axis** is detectable on an executable book at any mandate size (0 of 42
-in each of two markets), though the signals carry information coefficients with t up to +10.4. The
+machine-learning **design axis** is detectable at this power on the capped decile book in Germany and
+India (0 of 42 in each; minimum detectable effect 0.25-0.81 Sharpe points), with one exploratory,
+unreplicated exception on the optimised book (Japan's conditioning axis, t = +2.84, p = 0.041 after
+Bonferroni across nine tests), though the signals carry information coefficients with t up to +10.4. The
 paper's most uncomfortable contribution is that a 35-percentage-point cost-input coverage asymmetry
 between two of its own panels manufactured a t = −6.10, monotone, theoretically coherent
 cross-country contrast that survived two robustness checks before being caught — a warning the

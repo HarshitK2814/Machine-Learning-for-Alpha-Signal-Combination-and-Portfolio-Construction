@@ -157,7 +157,7 @@ SSRN blocks automated download); its row is still abstract-level and is flagged 
 | # | Paper | Status | What it actually does (full text) | Overlap | Differentiation | Threat | Checked |
 |---|---|---|---|---|---|---|---|
 | C1 | @KS2004 Korajczyk & Sadka, "Are Momentum Profits Robust to Trading Costs?" | **JF 2004**, 59(3) 1039 | Break-even fund size for momentum under price impact. Impact from Breen-Hodrick-Korajczyk (**exponential, convex**) and Glosten-Harris (**linear**), scaled by *shares outstanding / market cap*, estimated on intraday data. EW/VW plus a derived **liquidity-weighted** strategy. Break-even where alpha = 0: **$4.5-5.0bn**; where *significance* disappears: **$1.1-2.0bn**. All figures stated **relative to Dec-1999 market cap**, = 0.043% of NYSE cap | **High.** Their break-even fund size is the closest published object to our capacity frontier | **Different construct** (see C2) - theirs is where *profit* vanishes, ours where the *mandate becomes infeasible* at target gross. Also: ours is concave (sqrt) impact, theirs convex/linear; ours scaled by **ADV**, theirs by **market cap**; ours non-US | **High** | Oct 2026 |
-| C2 | @NMV2016 Novy-Marx & Velikov, "A Taxonomy of Anomalies and their Trading Costs" | **RFS 2016** | 23 anomalies net of effective spreads; capacity from **Kyle's lambda (linear)** price impact; capacity defined as new capital before the *latest-executing marginal* trader is unprofitable, **one-sided**, stated at Dec-2012. Buy/hold spread (enter on decile, exit on quintile) is the most effective mitigation. Capacities: size **$20-169bn**, gross profitability **$125-131bn**, value **$21-51bn**, momentum **$5.2-5.8bn**, PEAD **$0.8-3.0bn**, **high-frequency combo $0.38-0.44bn**, industry relative reversal **$0.18-0.53bn** | **Severe.** Their high-turnover capacities are **$180-530mn** - the same range as our $55/106/413mn | **This kills the "10-100x below US" claim** (C8.1). Surviving differences: definition, impact law, non-US, and that their mitigation is a *design choice* while ours is an *exogenous constraint* | **Severe** | Oct 2026 |
+| C2 | @NMV2016 Novy-Marx & Velikov, "A Taxonomy of Anomalies and their Trading Costs" | **RFS 2016** | 23 anomalies net of effective spreads; capacity from **Kyle's lambda (linear)** price impact; capacity defined as new capital before the *latest-executing marginal* trader is unprofitable, **one-sided**, stated at Dec-2012. Buy/hold spread (enter on decile, exit on quintile) is the most effective mitigation. Capacities: size **$20-169bn**, gross profitability **$125-131bn**, value **$21-51bn**, momentum **$5.2-5.8bn**, PEAD **$0.8-3.0bn**, **high-frequency combo $0.38-0.44bn**, industry relative reversal **$0.18-0.53bn** | **Severe.** Their high-turnover capacities are **$180-530mn** - the same range as our $55/106/413mn | **This killed the "10-100x below US" claim, now WITHDRAWN** (C8.1). Surviving differences: definition, impact law, non-US, and that their mitigation is a *design choice* while ours is an *exogenous constraint* | **Severe** | Oct 2026 |
 | C3 | @AHV2025 Azevedo, Hoegner & Velikov, "The Expected Returns on Machine-Learning Strategies" | SSRN 4702406 (Nov 2023, rev. Jun 2025); AFA programme | ML anomaly combination (OLS-Huber, ENET, FFNN, **LSTM**, ensemble) on ~320 Chen-Zimmermann anomalies, net of Chen-Velikov effective spreads, post-publication decay, post-decimalisation. Net returns to **1.42%/month (t=3.99)** for LSTM1; FF6 net alpha **1.20% (t=3.46)**; one-sided turnover **60-70%**; costs only **20-25 bps/month**. Tests NMV's mitigations (H2/H3/H4 holding periods, QUINTILE, BHS, universe filters): **turnover and costs fall but net performance does not improve** - the gross-return loss more than offsets the cost saving. Only H2 marginally helps | **Severe, and it is the live counterparty to our capacity channel** | They are a **marginal trader with no price impact** - costs are effective spreads, invariant to AUM. We are an **AUM-indexed trader** with square-root impact. Section C3 argues this is exactly why their sign is negative and ours positive | **Severe** | Oct 2026 |
 | C4 | @GP2013 Garleanu & Pedersen, "Dynamic Trading with Predictable Returns and Transaction Costs" and capacity follow-ons | JF 2013 and follow-ons | Optimal trading toward a moving aim portfolio under quadratic costs; capacity expressed as dollar volatility sustainable at a target Sharpe; **Sharpe falls in invested capital** | High on the mechanism (costs vs signal decay trade-off) | They solve for the optimal *policy* given costs; we hold the policy fixed and vary the *constraint*. Their Sharpe-falls-in-scale is the opposite sign to our constrained book's Sharpe-rises-in-scale, which is the fact to explain | **High** | Oct 2026 |
 | C5 | @CV2023 Chen & Velikov, "Zeroing in on the Expected Returns of Anomalies" | **JFQA 2023**, 58(3) 968 | Net expected returns of anomalies after data-mining and cost corrections; strongest anomalies net **~10bp** at best | Moderate - sets the bar for what "survives" means | We do not claim new anomalies; we measure where an existing signal's value goes | Moderate | Oct 2026 |
@@ -208,18 +208,27 @@ cost term as `G^0.5`. Tightening therefore helps **iff** `kappa` is large relati
 spreads only, no AUM in the cost function at all), so for them mitigation can only destroy alpha.
 We operate at large `kappa`, so for us it creates value.
 
+> **WITHDRAWN (finalization audit, Phase 1): this subsection's prediction and table.** The table was
+> measured on the signal-bearing universe (the coverage artefact, `PAPER` §8.3), and the predicted
+> small-AUM sign change was **not observed** on the compliant universe at the registered calibration.
+> The $1bn and $10bn rows compare against an uncapped book that is insolvent. Kept only as the record
+> of what was claimed. The mechanism expression above is a comparative static; it is **not** confirmed
+> by an observed crossover.
+
 **Our measured capacity channel is monotone in AUM, which is the dose-response this predicts:**
 
 | AUM | Germany cost channel | Germany **capacity channel** |
 |---|---|---|
 | $100mn | -7.65 | **+4.97** |
-| $1bn | -11.56 | **+8.77** |
-| $10bn | -12.80 | **+10.02** |
+| $1bn | -11.56 | **+8.77** [withdrawn] |
+| $10bn | -12.80 | **+10.02** [withdrawn] |
 
-(India at $1bn: cost -5.85, capacity **+4.41**.) The prediction that follows, and the reason for
-`AMENDMENT_001D`, is that the capacity channel must **fall toward zero and turn negative** as AUM
+(India at $1bn: cost -5.85, capacity **+4.41**.) ~~The prediction that follows, and the reason for
+`AMENDMENT_001D`, is that the capacity channel must fall toward zero and turn negative as AUM
 drops far below the frontier - recovering @AHV2025's sign inside our own framework. That is the
-crossover, and locating it is what makes this a mechanism rather than a measurement.
+crossover, and locating it is what makes this a mechanism rather than a measurement.~~ **[Not
+observed: on the compliant universe the channel decays to zero from above and never crosses, down to a
+$1,000 mandate.]**
 
 ## C4. Claims we must NOT make (capacity additions)
 
@@ -239,11 +248,15 @@ crossover, and locating it is what makes this a mechanism rather than a measurem
 ## C5. What survives as ours, stated against the full texts
 
 1. **The implementability frontier as a distinct object** (C2), reported for three non-US markets.
-2. **The sign of the turnover-reduction effect flips with scale, and we locate the crossover** (C3).
-   This adjudicates a live @NMV2016-vs-@AHV2025 disagreement instead of joining one side.
+2. ~~**The sign of the turnover-reduction effect flips with scale, and we locate the crossover** (C3).
+   This adjudicates a live @NMV2016-vs-@AHV2025 disagreement instead of joining one side.~~
+   **WITHDRAWN: no crossover exists on the compliant universe; we corroborate @NMV2016 and @KS2004
+   and are silent on @AHV2025, whose regime we never observe.**
 3. **Taxes measured and ruled out as second-order with a real lot-level engine across three
    statutory regimes.** None of C1-C6 contains a tax engine; @NMV2016 and @AHV2025 do not mention
-   tax at all. Cost drag beats tax drag 5x (DEU) and 53x (IND).
+   tax at all. ~~Cost drag beats tax drag 5x (DEU) and 53x (IND).~~ [Those were all-16-cell averages
+   including the broken economic arm; on prediction cells the ratios are 2.70x (DEU), 87.4x (IND) and
+   3.7x (JPN).]
 4. **Three frictions priced in one framework on one set of signals.** C1-C6 each do one.
 
 ## C6. Comparisons that must be made turnover- and units-matched

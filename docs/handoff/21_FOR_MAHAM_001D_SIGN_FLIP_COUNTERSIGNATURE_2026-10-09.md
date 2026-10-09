@@ -1,6 +1,27 @@
 # For Maham (workstream C): the claim has changed twice today. Four amendments need countersigning, and the newest one is already retracted.
 
-> ## UPDATE at 12:35 IST — READ THIS BEFORE ANYTHING ELSE
+> ## CORRECTION (finalization audit, Phase 1) - the figures quoted below were later withdrawn
+>
+> This handoff was written before three findings, and it asks you to sign off on numbers that no
+> longer stand. Read these first; the sections below are otherwise kept as written.
+>
+> 1. **$1bn German and Indian capacity figures (+8.92, +5.69) are withdrawn.** The uncapped comparison
+>    book is **insolvent** there (median monthly net return -55% / -45%; the tax backtest exhausts NAV
+>    after 1 of 132 months). On the pipeline's own accounting of both books, at the largest solvent
+>    rung: **+6.80** (Germany $100mn), **+3.19** (India $30mn), **+6.92** (Japan $1bn). Japan is
+>    solvent throughout.
+> 2. **"No design axis is detectable on an executable book (0 of 42)" is scoped to the capped decile
+>    book in Germany and India.** On the optimised book at $1bn, Japan's *conditioning* axis is
+>    t = +2.84 (p = 0.0045; 0.014 Holm within Japan; 0.041 Bonferroni across nine). Exploratory and
+>    unreplicated; please treat it as something to be replicated, not as a finding.
+> 3. **The tax-channel "match within 1%" and "taxes decide survival" are withdrawn** (`PAPER` §8.9,
+>    `RESULTS_TAX_THREE_COUNTRY` §4b).
+> 4. **Added to what I need from you** (these are the P1 items of `FINALIZATION_AUDIT`): sign-off on
+>    `sharpe_difference_test` (the influence-function annualisation), Holm versus a max-statistic
+>    bootstrap, the studentised-versus-percentile question, the economic-arm ruling, and the
+>    countersignatures. Nothing in the first three corrections changes what you were asked.
+
+> ## UPDATE at 12:35 IST — READ THIS BEFORE ANYTHING ELSE (superseded in part by the correction above)
 >
 > **I retracted 001D's hypothesis at 12:30, before Japan reported. The sign flip was a cost-input
 > coverage artefact.** So **ask B below is moot** — you no longer need to rule on whether my 12:06
@@ -35,7 +56,8 @@
 >
 > **The surviving result** is in `docs/RESULTS_CAPACITY_CHANNEL_2026-10-09.md`: on the investable
 > universe the capacity channel is **positive at every rung in both markets** and monotone in AUM —
-> Germany +0.068 at $100k to **+8.92** at $1bn (t = +11.11), India +0.264 to **+5.69** (t = +5.70),
+> Germany +0.068 at $100k to ~~+8.92 at $1bn~~ [insolvent comparison; see correction] (t = +11.11), India
+> +0.264 to ~~+5.69~~ [insolvent comparison] (t = +5.70),
 > significant on 13 of 14 and 14 of 14 rungs respectively, 8 of 8 cells under Holm from $1mn. **No
 > crossover anywhere** (94.1% / 100% of replications show no sign change). Because we never observe
 > the regime where the cap hurts, we **cannot** adjudicate Novy-Marx-Velikov versus
@@ -72,7 +94,7 @@ full text showed the ground is occupied — Avramov, Cheng & Metzker (Management
 What we have instead is narrower and, I think, better:
 
 > The effect of the ADV participation constraint on net Sharpe is **monotone in mandate size and
-> changes sign**. Germany: **−0.81** Sharpe points at a $100k mandate, **+11.06** at $1bn, crossing
+> changes sign**. Germany: **−0.81** Sharpe points at a $100k mandate, **+11.06** [withdrawn] at $1bn, crossing
 > zero at **$3.79mn (95% CI $1.88mn–$7.07mn)**.
 
 It matters because **the literature disagrees about this sign in print**: Novy-Marx & Velikov
@@ -99,8 +121,8 @@ equal-weighted portfolio of the 8 prediction cells — and the two statistics di
 
 | | mean of per-cell Sharpe diffs | composite |
 |---|---|---|
-| Germany at $1bn | +8.77 | **+11.06**, t = +12.27 |
-| Germany crossover | $3–4mn | **$3.79mn [1.88, 7.07]** |
+| Germany at $1bn | +8.77 [withdrawn] | **+11.06**, t = +12.27 |
+| Germany crossover | $3–4mn | **$3.79mn [withdrawn] [1.88, 7.07]** |
 | India at $1k | **−0.0039** | **+0.0035**, t = +0.13, p = 0.89 |
 | India crossover | "between $1k and $3k" | **none detectable** |
 
@@ -211,7 +233,7 @@ composite inference says otherwise:
 | channel at the bottom rung | **−0.811** | −0.179 | +0.004 | −0.002 |
 | t | **−6.10** | **−1.65** | +0.13 | −0.06 |
 | p | **0.0000** | **0.117** | 0.893 | 0.959 |
-| crossover point estimate | **$3.79mn** | $1.11mn | none | $107k |
+| crossover point estimate | **$3.79mn** [withdrawn] | $1.11mn | none | $107k |
 | draws with no sign change | **0.0%** | 2.1% | 50.8% | **51.8%** |
 
 **The negative region is statistically established in exactly one place: Germany under equal
