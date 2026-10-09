@@ -17,7 +17,8 @@ confirmation** of the positive channel (§3c, `AMENDMENT_001D` D2), reported 12:
 > monotonically positive in how much it binds**. Across three markets it reaches **+8.92**
 > (Germany), **+5.69** (India) and **+6.68** (Japan) Sharpe points at a $1bn mandate, from
 > ±0.001 where the cap is slack. It pays because it suppresses turnover faster than it suppresses
-> signal. **There is no scale at which it meaningfully hurts.** The tax channel, measured with a
+> signal. **At the registered cost calibration there is no scale at which it meaningfully
+> hurts** (see SS3g for the calibration dependence). The tax channel, measured with a
 > lot-level engine across three statutory regimes, is **two to three orders of magnitude smaller**
 > than either the cost or the capacity channel.
 
@@ -153,7 +154,8 @@ the 2.0 target):
 | Germany | $1mn | 40.5% | +0.7954 |
 
 > **The constraint's effect on net Sharpe is zero when it does not bind, and monotonically positive
-> in how much it binds. There is no scale at which it meaningfully hurts.**
+> in how much it binds. At the registered calibration there is no scale at which it meaningfully
+> hurts** - though SS3g shows that a materially cheaper impact calibration would create one.
 
 At ~0.01% slack the channel is ±0.001 and its **sign is arbitrary** — Germany +0.0008 against
 Japan −0.0009 on the same cost model. Those are not two regimes, they are noise around zero. Any
@@ -170,6 +172,7 @@ slack, where this channel is zero by construction.
 |---|---|---|
 | **weighting** | equal vs value-weighted deciles | **yes** — positive and significant at scale in both markets under both (t = +5.6 to +12.3 at $1bn) |
 | **impact coefficient** | `k ∈ {0.5, 1, 2, 3}` (k=1 is Grinold-Kahn), on the compliant universe | **yes** — positive at scale at every k, magnitudes rising with k as the mechanism requires. See §3d: only at `k = 0.5` is there any negative region at all, and it is −0.014 |
+| **impact curvature** | Kyle-linear (`exponent 2.0`) level-matched against our square-root contract - the law @NMV2016 argue for against ours | **yes** - positive at every rung in both markets, +7.74 / +3.64 at $1bn (SS3g) |
 | **cost-input coverage** | signal-bearing vs investable universe | **yes for the positive channel.** This is what killed the retracted sign flip, so it is the check that matters — see §6 |
 | **cells** | 8 prediction cells, Holm-corrected | **yes** — 8 of 8 from $1mn upward |
 
@@ -213,6 +216,53 @@ with it.
 What survives of the `k` analysis is only the monotone and unsurprising part: the channel's
 magnitude rises with `k` at every AUM, as a larger cost coefficient must make cost avoidance worth
 more. The sign does not turn over anywhere an institution would operate.
+
+### 3g. Impact curvature — the one modelling choice our closest competitor disputes
+
+@NMV2016 use a **Kyle-linear** price impact, so their cost is linear in invested dollars, their
+capacity is a single break-even point, and their "SR/$B" column is a constant slope. **Their
+footnote 9 argues explicitly against concave impact functions on endogeneity grounds** — and
+concave (square-root) impact is exactly our frozen contract. @KS2004 take the opposite side,
+stating that concave true impact would make their convex-impact results conservative. So the
+curvature of our cost law is contested by the paper closest to ours, and a referee who owns
+@NMV2016 will raise it.
+
+Total cost under our contract is `∝ Q^1.5`; Kyle-linear impact gives `∝ Q^2`. Two runs, because
+the naive one is not a fair test:
+
+| | Germany $100k | $1mn | $3mn | $1bn | $10bn |
+|---|---|---|---|---|---|
+| **1.5, k=1 (contract)** | +0.062 | +0.795 | +1.653 | +8.922 | +9.256 |
+| **2.0, k=1 (uncalibrated)** | **−0.054** | **−0.160** | **−0.193** | +5.618 | +7.600 |
+| **2.0, level-matched (k=4.88)** | **+0.087** | **+0.879** | **+1.729** | **+7.740** | **+8.103** |
+
+| | India $100k | $1mn | $3mn | $1bn | $10bn |
+|---|---|---|---|---|---|
+| **1.5, k=1 (contract)** | +0.211 | +0.751 | +1.332 | +5.693 | +5.967 |
+| **2.0, k=1 (uncalibrated)** | +0.079 | +0.058 | +0.079 | +3.016 | +3.660 |
+| **2.0, level-matched (k=3.74)** | +0.182 | +0.560 | +0.955 | +3.643 | +3.837 |
+
+**Why two runs.** For portfolio weights, `|dw| < 1`, so raising the exponent from 1.5 to 2.0 at the
+same coefficient makes impact **uniformly cheaper** — it changes the cost *level* as well as its
+curvature, and a cheaper cost model flatters nothing but does weaken the thing the cap is paying
+for. The level-matched run fixes that: `k' = Σ c·dw^1.5 / Σ c·dw²` on the uncapped book at $1bn
+preserves **aggregate impact cost** while changing only curvature, giving `k' = 4.88` (Germany) and
+`3.74` (India).
+
+**Two conclusions, and they separate cleanly.**
+
+1. **The positive channel is robust to curvature.** Level-matched, both markets are positive at
+   every rung and monotone, reaching +7.74 (Germany) and +3.64 (India) at $1bn. **A referee
+   preferring Kyle-linear impact gets the same paper.**
+2. **The sign at small mandates depends on the cost *level*, not its curvature.** The negative
+   region in the uncalibrated row ($100k–$3mn in Germany) disappears once the level is restored, so
+   it was a level artefact. But it is also exactly what §2 predicts: the cap pays only when there
+   is cost worth avoiding, so a materially cheaper calibration than Grinold-Kahn `k = 1` would
+   produce a region where it does not pay. **That region is a property of the cost calibration, and
+   we should say so rather than claim the cap can never hurt.**
+
+Point 2 qualifies §1 and §3d: "no scale at which it meaningfully hurts" holds **at the registered
+calibration**, over $1k–$10bn, in all three markets. It is not a claim about every calibration.
 
 ## 4. The friction horse race
 
