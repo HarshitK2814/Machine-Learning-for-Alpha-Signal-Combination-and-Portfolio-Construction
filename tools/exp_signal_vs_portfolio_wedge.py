@@ -101,7 +101,8 @@ def run(country: str, aum: float, n_groups: int, gross: float,
         cells: list[str], impact_k: float | None = None,
         weighting: str = "ew",
         require_cost_inputs: bool = False,
-        impact_exponent: float = 1.5) -> tuple[pd.DataFrame, pd.DataFrame]:
+        impact_exponent: float = 1.5,
+        weights_dir: Path | None = None) -> tuple[pd.DataFrame, pd.DataFrame]:
     from alphacomb.contracts import intl, paths, read_table
     from alphacomb.portfolio.cost_terms import trade_cost_numpy
 
@@ -159,6 +160,7 @@ def run(country: str, aum: float, n_groups: int, gross: float,
             log.info(msg)
             print(msg)
         monthly, prev_u, prev_c, prev_inputs = [], None, None, None
+        wrows_u, wrows_c = [], []
         for date, g in d.groupby("date"):
             g = g.set_index("permno")
             w = decile_weights(g["score"], n_groups, gross,
@@ -224,11 +226,23 @@ def run(country: str, aum: float, n_groups: int, gross: float,
                 feas.append({"cell": cell, "date": date,
                              "median_x_cap": float(np.median(mult)),
                              "p95_x_cap": float(np.quantile(mult, 0.95))})
+            if weights_dir is not None:
+                nzu, nzc = wu != 0, wc != 0
+                wrows_u.append(pd.DataFrame({'date': date, 'permno': w.index[nzu],
+                                             'w': wu[nzu]}))
+                wrows_c.append(pd.DataFrame({'date': date, 'permno': w.index[nzc],
+                                             'w': wc[nzc]}))
             prev_u = pd.Series(wu, index=w.index)
             prev_c = pd.Series(wc, index=w.index)
             prev_inputs = g.reindex(w.index)[["spread", "sigma_d", "adv_usd"]]
         if not monthly:
             continue
+        if weights_dir is not None and wrows_u:
+            tagc = cell.removeprefix('cell_')
+            for book, rws in (('uncapped', wrows_u), ('capped', wrows_c)):
+                d_ = weights_dir / f'{book}_{tagc}.parquet'
+                d_.parent.mkdir(parents=True, exist_ok=True)
+                pd.concat(rws, ignore_index=True).to_parquet(d_, index=False)
         m = pd.DataFrame(monthly)
         mm = m.copy()
         mm["cell"] = cell.removeprefix("cell_")
@@ -272,6 +286,11 @@ def main(argv: list[str] | None = None) -> int:
                          "vw = value-weighted by market cap. Novy-Marx & Velikov (RFS 2016) hold "
                          "that equal-weighted anomaly results mislead net of costs, so vw is the "
                          "robustness check that matters for the capacity channel")
+    ap.add_argument("--dump-weights", action="store_true",
+                    help="save the capped and uncapped decile weight histories under "
+                         "outputs/decile_weights/<country>/<tag>/aum_<AUM>/ so the SAME "
+                         "after_tax_backtest can price them. This is what puts cost, "
+                         "capacity and tax on one book (matched-book accounting)")
     ap.add_argument("--impact-exponent", type=float, default=1.5,
                     help="power on the traded fraction in the impact term. 1.5 is the frozen "
                          "contract (square-root per-unit impact). 2.0 is Kyle-linear impact, which "
@@ -301,7 +320,10 @@ def main(argv: list[str] | None = None) -> int:
         res, feas, mon = run(args.country, aum, args.groups, args.gross, P_CELLS,
                              impact_k=args.impact_k, weighting=args.weighting,
                              require_cost_inputs=args.require_cost_inputs,
-                             impact_exponent=args.impact_exponent)
+                             impact_exponent=args.impact_exponent,
+                             weights_dir=(args.out.parent / 'decile_weights' / args.country
+                                          / (args.tag or 'default') / f'aum_{aum:.0e}'
+                                          if args.dump_weights else None))
         if res.empty:
             print(f"  AUM {aum:.0e}: no cells resolved")
             continue

@@ -43,9 +43,13 @@ strategy.
 Four results survive.
 
 1. **The ADV participation constraint improves net risk-adjusted performance, and the improvement
-   is monotone in how hard the constraint binds.** At a $1bn mandate the capacity channel is
-   **+8.92** (Germany, t = +11.11), **+5.69** (India, t = +5.70) and **+6.68** (Japan, t = +11.01)
-   Sharpe points. Japan is a **pre-registered out-of-sample confirmation**. The effect is zero where
+   is monotone in how hard the constraint binds.** Measured at the largest mandate where the
+   uncapped comparison book is still solvent (§8.8), the capacity channel is **+7.63** (Germany,
+   $100mn, t = +10.21), **+3.64** (India, $30mn, t = +5.00) and **+6.68** (Japan, $1bn,
+   t = +11.01) Sharpe points; Japan's comparison book is solvent through $10bn. Beyond those rungs
+   the German and Indian uncapped books are bankrupt, and the larger figures quoted elsewhere are
+   not interpretable as performance gains. Japan is a **pre-registered out-of-sample
+   confirmation**. The effect is zero where
    the constraint is slack and there is no mandate size at which it meaningfully hurts, at the
    registered cost calibration. It survives value-weighting, a six-fold sweep of the impact
    coefficient, a level-matched switch to the Kyle-linear impact law our closest competitor
@@ -800,6 +804,47 @@ in the binding set before escalating.
 
 ---
 
+### 8.8 The $1bn capacity numbers for Germany and India are differences against an insolvent book — CORRECTED
+
+Found while running the decile weights through the tax engine. `after_tax_backtest` stopped after
+**one month** on the uncapped books, because it halts when NAV reaches zero. That is the engine
+correctly refusing to continue a bankrupt account, and it exposed that the uncapped Sharpe the
+capacity channel is measured against is computed on a return series no investor could have had.
+
+Uncapped decile book, composite of the 8 prediction cells, compliant universe
+(`outputs/signal_vs_portfolio/uncapped_solvency.csv`):
+
+| | solvent up to | channel at that rung | at $1bn |
+|---|---|---|---|
+| **Germany** | **$100mn** | **+7.63** (t +10.21) | **median monthly net return −54.7%; 7.9% of cell-months below −100%; 7 composite months below −100%** |
+| **India** | **$30mn** | **+3.64** (t +5.00) | **median −44.6%; 11.2% of cell-months below −100%; 11 composite months** |
+| **Japan** | **every rung through $10bn** | **+6.68 at $1bn** (t +11.01) | median −7.9%, no month below −100% |
+
+At $10bn, 93.7% (Germany) and 80.1% (India) of cell-months are below −100%. A monthly return below
+−100% is impossible for a real account. The cumulative product of (1+r) is exactly zero in Germany
+and India at $1bn.
+
+**What stands.** The effect is large and significant on **solvent** rungs: Germany +7.63 at $100mn,
+India +3.64 at $30mn, Japan +6.68 at $1bn and +7.15 at $10bn with no insolvency anywhere. The
+direction, the monotonicity in how hard the cap binds, and Japan's pre-registered confirmation are
+unaffected, and Japan is the cleanest case because its counterfactual is feasible throughout.
+
+**What is withdrawn.** The German and Indian **$1bn and $10bn** figures (+8.92 / +9.26 and
++5.69 / +5.97) as quotable Sharpe-point gains. They are arithmetic on a bankrupt counterfactual.
+Quote the largest solvent rung per market, and flag the rest.
+
+**Consequence for two earlier claims.** (i) The "asymptotic channel" (+10.4 Germany, +4.6 India) and
+the cross-market regularity built on it (D4: 4.58 vs 4.82) were produced by **Sharpe saturation**:
+the uncapped Sharpe plateaus (−9.60 at $1bn, −9.93 at $10bn) while the cost it contains rises
+threefold, because mean and standard deviation of the return series scale together. It is not an
+economic limit. D4 is withdrawn as a regularity. (ii) The **units audit** the team's reviewer asked
+for was warranted: the headline magnitude was a ratio statistic on a degenerate series.
+
+**What it means for the paper.** Sharpe points are the wrong unit for the capacity channel once the
+uncapped leg is insolvent. A better-posed quantity is the **cost avoided as a share of gross alpha**
+or the net return in basis points, both of which stay finite. That reformulation is open work
+(§12.12).
+
 ## 9. The shape of the errors
 
 Six of the seven retractions, plus three infrastructure bugs, share one shape: **a quantity computed
@@ -1010,6 +1055,25 @@ them remains desirable for completeness and nothing waits on them.
 outstanding is either our own compute (§12.2–12.8) or Maham's judgement on work already done
 (§12.9), and none of §12.9 blocks a result — it blocks sign-off.
 
+### 12.12 Restate the capacity channel in a unit that survives an insolvent comparison book **[new]**
+
+**Why.** §8.8: Sharpe points are ill-posed once the uncapped leg is bankrupt, and the uncapped
+Sharpe saturates rather than measuring cost. Quote-able alternatives that stay finite: cost avoided
+as a share of gross alpha; net return in basis points; terminal wealth with explicit ruin.
+
+**How it changes the paper.** It replaces the headline unit. The qualitative result survives (it is
+confirmed on solvent rungs and in Japan throughout), but a referee will ask for exactly this, and
+the unit decides whether the number is believable. Cheap: every input exists in the monthly dumps.
+
+### 12.13 Matched-book accounting and the two new literature rows **[in progress]**
+
+Decile weights saved (`--dump-weights`) and run through `after_tax_backtest` on one book
+(`tools/exp_matched_book_accounting.py`); the tracker gains **Dai-Lei-Liu-Yang (Management Science
+2026, "Optimal Tax Timing with Transaction Costs")** and **Moehle-Kochenderfer-Boyd-Ang (JOTA 2021,
+"Tax-Aware Portfolio Construction via Convex Optimization")**, both confirmed at abstract level only.
+The second means a tax-lot-aware convex optimiser is prior art, so ours is a tool and not a
+contribution.
+
 ### 12.11 Not worth doing
 
 * **A properly calibrated Kyle replication.** §6.2.4's level-matched run already answers the
@@ -1099,9 +1163,11 @@ At a $1bn mandate in Germany, India or Japan, a machine-learning equity strategy
 Sharpe ratio is **not statistically distinguishable from zero** (t = +0.53, +0.82, +0.18), which
 corroborates Avramov, Cheng & Metzker in markets they did not study. Against that backdrop three
 channels can be measured and two of them are significant. A **binding ADV participation constraint
-improves** risk-adjusted performance by **+8.9 / +5.7 / +6.7** Sharpe points at $1bn — Germany's
-decile book moves from −9.60 uncapped to −0.675 capped, so the constraint rescues the strategy from
-disaster rather than into profit — and the improvement is zero where the constraint is slack,
+improves** risk-adjusted performance by **+7.6 / +3.6 / +6.7** Sharpe points at the largest mandate
+where the uncapped comparison book is still solvent ($100mn Germany, $30mn India, $1bn Japan) — and
+beyond that the German and Indian uncapped books are bankrupt, so larger figures are not
+performance gains — so the constraint rescues the strategy from disaster rather than into profit,
+and the improvement is zero where the constraint is slack,
 monotone in how hard it binds, confirmed out of sample in Japan against a pre-registered prediction,
 and robust to weighting, impact curvature, the impact coefficient and cost-input coverage. The
 **tax channel** is two orders of magnitude smaller but **significant in exactly the two
