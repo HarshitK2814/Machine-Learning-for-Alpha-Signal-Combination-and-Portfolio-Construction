@@ -89,6 +89,40 @@ statements are in the data and the paper must carry both. The honest formulation
 **This also retires the magnitude argument for dropping the tax machinery.** The ledger is not
 decoration: it is what shows the Japanese book is unviable, which no cost model alone would reveal.
 
+## 4a. You cannot grow out of the tax channel: the bill falls 25x, the Sharpe drag does not
+
+The `$1bn only` caveat below is now closed for Germany. Running stage 06 on the existing books at
+$100mn, $1bn and $10bn (prediction cells, taxable regime):
+
+| AUM | turnover | cost bps | **tax bps** | SR gross | SR net | SR after tax | **tax channel** | kept |
+|---|---|---|---|---|---|---|---|---|
+| **$100mn** | 0.0522 | 60.47 | **23.28** | +0.654 | +0.255 | +0.100 | **−0.155** | 39% |
+| **$1bn** | 0.0135 | 17.21 | **6.38** | +0.423 | +0.128 | +0.018 | **−0.111** | 14% |
+| **$10bn** | 0.0017 | 2.20 | **0.94** | +0.469 | +0.186 | +0.063 | **−0.122** | 34% |
+
+**The tax bill collapses with scale and the risk-adjusted drag does not.** Tax drag falls **25-fold**
+(23.28 to 0.94 bps) as the participation cap suppresses turnover **31-fold** (0.0522 to 0.0017) —
+and yet the tax channel in Sharpe points is approximately **flat at −0.11 to −0.16** across two
+orders of magnitude of mandate size.
+
+The reason is the same mechanism as everywhere else in this paper: the cap suppresses the tax bill
+by suppressing trading, but it suppresses gross return in the same motion, so the *ratio* is
+preserved. **An investor cannot escape the tax channel by growing.** That is worth saying because
+the bps figures alone would suggest the opposite — a large fund looks almost untaxed at 0.94 bps,
+and is not, in the units that matter.
+
+`lt_share_of_gains` is **0.0000 at all three mandate sizes**, as §2 requires: the statutory fact is
+invariant to scale, because no amount of trading can create a long-term category that the law does
+not provide.
+
+The "kept share" column is non-monotone (39% / 14% / 34%) and should not be read as a scale effect:
+it tracks the denominator, net Sharpe, which happens to be lowest at $1bn (+0.128) and recovers at
+$10bn (+0.186). The scale-invariant quantity is the tax channel itself.
+
+**Still open:** the same ladder for India and Japan. Japan matters most, because its $1bn book is
+the one that goes negative after tax, and if its tax channel is likewise scale-invariant then no
+mandate size rescues it.
+
 ## 5. What this does not establish
 
 * **Not a dose-response in the wedge.** The pre-registered claim that the friction penalty is
