@@ -32,6 +32,14 @@ frozen 132-month window (2009-2019), with a lot-level tax engine, a square-root 
 model indexed to assets under management, and a full constraint set including an ADV participation
 cap.
 
+**The framing fact, which conditions everything below:** at a $1bn mandate **no country's
+net-of-cost Sharpe is statistically distinguishable from zero** (t = +0.53 Germany, +0.82 India,
++0.18 Japan). Machine-learning alpha, implemented at institutional scale in these three markets
+under a realistic AUM-indexed cost model, is **not demonstrably positive**. That corroborates
+@ACM2023 in markets they did not study, and it is the backdrop against which the four results below
+must be read: they are statements about **channels and differences**, not about a profitable
+strategy.
+
 Four results survive.
 
 1. **The ADV participation constraint improves net risk-adjusted performance, and the improvement
@@ -42,6 +50,14 @@ Four results survive.
    registered cost calibration. It survives value-weighting, a six-fold sweep of the impact
    coefficient, a level-matched switch to the Kyle-linear impact law our closest competitor
    prefers, and familywise correction across cells.
+
+   **What the improvement improves must be stated plainly, because the magnitude invites
+   misreading.** The capped book is not good; it is **not catastrophic**. Germany's decile book at
+   $1bn goes from a net Sharpe of **−9.597 uncapped to −0.675 capped** — the constraint rescues the
+   strategy from disaster, not into profit. On the **optimised** book the level is +0.128, which
+   finding 2 shows is **not distinguishable from zero**. So the capacity channel is a large, robust,
+   significant **difference between two books, neither of which is significantly profitable**. That
+   is the finding; "+8.9 Sharpe points" quoted alone is not.
 2. **No strategy is distinguishable from zero net of costs, and the capital-gains statute decides
    whether taxes then measurably erode it further.** At $1bn no country's net Sharpe is
    significant (t = +0.53 Germany, +0.82 India, +0.18 Japan). The **tax channel**, however, is
@@ -1057,18 +1073,23 @@ python tools/repair_source_index.py --country JPN
 
 ## 15. One-paragraph summary
 
-A binding ADV participation constraint **improves** the net risk-adjusted performance of a
-machine-learning equity strategy, by **+8.9 / +5.7 / +6.7** Sharpe points at a $1bn mandate in
-Germany, India and Japan, because it suppresses turnover faster than it suppresses signal; the
-effect is zero where the constraint is slack, monotone in how hard it binds, and robust to
-weighting, impact curvature, the impact coefficient and cost-input coverage, with Japan confirming
-it out of sample against a pre-registered prediction. Taxes are two orders of magnitude smaller than
-costs or capacity as a channel, and yet decide survival in two of three jurisdictions — Japan's book
-goes negative after tax and no mandate size rescues it, because the tax bill falls 25-fold with
-scale while the risk-adjusted drag does not. The statutory wedge, not the tax rate, determines
-whether a holding-period channel can exist at all, confirmed on two independent flat-rate placebos.
-And no machine-learning design axis is detectable on an executable book at any mandate size, though
-the signals plainly carry information. The paper's most uncomfortable contribution is that a
-35-point cost-input coverage asymmetry between two of its own panels manufactured a t = −6.10,
-monotone, theoretically coherent cross-country contrast that survived two robustness checks before
-being caught, which is a warning the international asset-pricing literature should probably hear.
+At a $1bn mandate in Germany, India or Japan, a machine-learning equity strategy's net-of-cost
+Sharpe ratio is **not statistically distinguishable from zero** (t = +0.53, +0.82, +0.18), which
+corroborates Avramov, Cheng & Metzker in markets they did not study. Against that backdrop three
+channels can be measured and two of them are significant. A **binding ADV participation constraint
+improves** risk-adjusted performance by **+8.9 / +5.7 / +6.7** Sharpe points at $1bn — Germany's
+decile book moves from −9.60 uncapped to −0.675 capped, so the constraint rescues the strategy from
+disaster rather than into profit — and the improvement is zero where the constraint is slack,
+monotone in how hard it binds, confirmed out of sample in Japan against a pre-registered prediction,
+and robust to weighting, impact curvature, the impact coefficient and cost-input coverage. The
+**tax channel** is two orders of magnitude smaller but **significant in exactly the two
+jurisdictions whose statute provides no long-term category** — Germany −0.1363 (t = −4.67) and
+Japan −0.1373 (t = −4.99), matching to within 1% at rates 30% apart — and **insignificant** under
+India's long-term exemption (−0.0054, t = −1.93): two placebos behaving, one treatment, in the
+pre-registered direction, and no portfolio needing to be profitable for the contrast to hold. No
+machine-learning **design axis** is detectable on an executable book at any mandate size (0 of 42
+in each of two markets), though the signals carry information coefficients with t up to +10.4. The
+paper's most uncomfortable contribution is that a 35-percentage-point cost-input coverage asymmetry
+between two of its own panels manufactured a t = −6.10, monotone, theoretically coherent
+cross-country contrast that survived two robustness checks before being caught — a warning the
+international asset-pricing literature should probably hear.
