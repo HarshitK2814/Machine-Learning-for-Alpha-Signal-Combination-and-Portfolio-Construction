@@ -127,6 +127,11 @@ def main() -> None:
     p.add_argument("--gamma", type=float, default=None, help="risk aversion (default: configs/portfolio.yaml)")
     p.add_argument("--cost-multiplier", type=float, default=1.0, help="cost sensitivity (E31)")
     p.add_argument("--aum", type=float, default=None, help="AUM in 2020 dollars (E30/E32)")
+    p.add_argument("--gross-max", type=float, default=None,
+                   help="override the gross budget. Needed to compare two AUM arms at MATCHED "
+                        "leverage: net Sharpe falls with gross mechanically (impact is |dw|^1.5), "
+                        "so arms at different realised gross are not comparable, and post-hoc "
+                        "rescaling cannot fix it when the book carries a frozen sleeve.")
     p.add_argument("--long-only", action="store_true")
     p.add_argument("--tax-aware", action="store_true",
                    help="put the tax consequence of each trade in the optimiser objective")
@@ -165,6 +170,8 @@ def main() -> None:
         updates["gamma"] = a.gamma
     if a.aum is not None:
         updates["aum_usd"] = a.aum
+    if a.gross_max is not None:
+        updates["gross_max"] = a.gross_max
     opt = OptimizerConfig(**{**opt.__dict__, **updates})
 
     available = country_sources(a.country) if a.country else {}
@@ -229,7 +236,7 @@ def main() -> None:
         index_dir = paths.outputs_root() / "weights_index"
         index_dir.mkdir(parents=True, exist_ok=True)
         tag = f"{opt.aum_usd:.0e}".replace("e+0", "e").replace("e+", "e")
-        index = index_dir / f"{a.country}_{tag}.csv"
+        index = index_dir / f"{a.country}_{tag}{a.suffix}.csv"
         manifest[["country", "aum", "strategy", "run_id", "weights"]].to_csv(index, index=False)
         print(f"weights index: {index}")
 

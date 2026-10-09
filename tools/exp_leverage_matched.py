@@ -47,9 +47,19 @@ sys.path.insert(0, str(ROOT / "src"))
 CELLS = [f"cell_{a}-{b}-{c}-{d}" for a in "LN" for b in "SC" for c in "PE" for d in "0U"]
 
 
-def rescale_arm(country: str, aum: float, target: float, suffix: str) -> list[str]:
-    """Write a leverage-matched copy of each cell's book. Returns the new strategy names."""
+def rescale_arm(country: str, aum: float, target: float, suffix: str,
+                cost_inputs: pd.DataFrame) -> list[str]:
+    """Write a leverage-matched copy of each cell's book. Returns the new strategy names.
+
+    **The frozen sleeve must not be rescaled.** A position in a name with no certified market
+    inputs that month cannot be traded at all, only carried, so changing its weight by any amount
+    is a trade that cannot be priced. A first version of this scaled the whole book uniformly and
+    the backtest refused it outright - "87 unpriceable names moved by 2.04e-05 (budget 1.6e-05);
+    a frozen position must be carried, not traded". Correct here, so only the tradeable part is
+    scaled and the frozen weights are carried through untouched.
+    """
     from alphacomb.contracts import new_run_id, paths, provenance, read_table, write_table
+    from alphacomb.portfolio.cost_terms import eligible_cost_input_permnos
 
     tag = f"{aum:.0e}".replace("e+0", "e").replace("e+", "e")
     resolved = provenance.country_weights(country, tag)
@@ -62,14 +72,28 @@ def rescale_arm(country: str, aum: float, target: float, suffix: str) -> list[st
         wcol = "w" if "w" in w.columns else ("weight" if "weight" in w.columns else w.columns[-1])
         w = w.copy()
         w["date"] = pd.to_datetime(w["date"])
-        gross = w.groupby("date")[wcol].transform(lambda x: float(np.abs(x).sum()))
-        # Refuse to scale a month UP: it could breach a participation or position cap that the
-        # original book was sitting against, and the result would not be an attainable portfolio.
-        if (gross < target - 1e-12).any():
-            worst = float(gross.min())
-            skipped.append(f"{cell} (min monthly gross {worst:.4f} < target {target:.4f})")
+
+        pieces, refuse = [], None
+        for date, g in w.groupby("date"):
+            g = g.copy()
+            held = pd.Index(g.loc[np.abs(g[wcol]) > 1e-12, "permno"])
+            tradeable = eligible_cost_input_permnos(date, cost_inputs, held)
+            is_tradeable = g["permno"].isin(set(tradeable))
+            frozen_gross = float(np.abs(g.loc[~is_tradeable, wcol]).sum())
+            trade_gross = float(np.abs(g.loc[is_tradeable, wcol]).sum())
+            room = target - frozen_gross
+            # Refuse to scale a month UP: it could breach a participation or position cap the book
+            # was already sitting against, and the result would not be an attainable portfolio.
+            if room <= 0 or trade_gross < room - 1e-12:
+                refuse = (f"{cell} ({date.date()}: tradeable gross {trade_gross:.5f} cannot reach "
+                          f"{room:.5f} after a frozen sleeve of {frozen_gross:.5f})")
+                break
+            g.loc[is_tradeable, wcol] = g.loc[is_tradeable, wcol] * (room / trade_gross)
+            pieces.append(g)
+        if refuse is not None:
+            skipped.append(refuse)
             continue
-        w[wcol] = w[wcol] * (target / gross)
+        w = pd.concat(pieces, ignore_index=True)
         name = f"{cell}{suffix}"
         run_id = new_run_id(f"pf_{name}")
         out = paths.weights_path(name, run_id)
@@ -98,8 +122,11 @@ def main(argv: list[str] | None = None) -> int:
                     help="default: the smallest mean gross across the arms, so nothing scales up")
     args = ap.parse_args(argv)
 
-    from alphacomb.contracts import provenance, read_table
+    from alphacomb.contracts import intl, provenance, read_table
     from alphacomb.contracts.provenance import MissingProvenance
+
+    bundle = intl.load_country_bundle(args.country)
+    cost_inputs = bundle.cost_inputs
 
     # Pick a target no arm has to scale up to reach.
     if args.target_gross is None:
@@ -130,7 +157,7 @@ def main(argv: list[str] | None = None) -> int:
     for aum in sorted(args.aum):
         tag = f"{aum:.0e}".replace("e+0", "e").replace("e+", "e")
         try:
-            names = rescale_arm(args.country, aum, args.target_gross, f"_lm{tag}")
+            names = rescale_arm(args.country, aum, args.target_gross, f"_lm{tag}", cost_inputs)
         except MissingProvenance as exc:
             print(f"  skipping {tag}: {exc}")
             continue
