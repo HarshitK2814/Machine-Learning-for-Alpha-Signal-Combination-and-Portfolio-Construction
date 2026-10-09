@@ -187,8 +187,26 @@ def main() -> None:
                          "kind": kind, "artefact": artefact, "rows": r.get("rows")})
         if rows:
             index = index_dir / f"{a.country}.csv"
-            pd.DataFrame(rows).to_csv(index, index=False)
-            print(f"source index: {index}")
+            fresh = pd.DataFrame(rows)
+            # MERGE, never overwrite. One country's cells are routinely trained by more than one
+            # invocation - a split --manifest, a resumed run, a single cell re-run at a different
+            # setting - and each invocation only knows about its own strategies. Overwriting here
+            # left Japan's index holding 7 rows from the second of two runs, with none of the eight
+            # prediction cells the pre-registered predictions are about, and stage 04 would then
+            # have built a book from whatever subset happened to finish last.
+            if index.exists():
+                try:
+                    prior = pd.read_csv(index)
+                    fresh = pd.concat([prior, fresh], ignore_index=True)
+                except Exception as exc:  # noqa: BLE001 - a corrupt index must be loud
+                    log.warning("could not read existing source index %s (%s); "
+                                "writing this run's rows only", index, exc)
+            # This run's rows win for any strategy it retrained, so keep='last'.
+            before = len(fresh)
+            fresh = fresh.drop_duplicates(subset=["country", "strategy", "kind"], keep="last")
+            fresh.to_csv(index, index=False)
+            print(f"source index: {index} ({len(rows)} from this run, {len(fresh)} total, "
+                  f"{before - len(fresh)} superseded)")
     out = Path(a.manifest) if a.manifest else paths.outputs_root() / "manifest_models.csv"
     out.parent.mkdir(parents=True, exist_ok=True)
     append_manifest(manifest, out)
