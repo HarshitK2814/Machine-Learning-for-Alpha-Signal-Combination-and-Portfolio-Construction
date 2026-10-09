@@ -65,7 +65,10 @@ impact at scale, so for them it creates value. Both findings follow from one exp
 ## 3. The exploratory evidence (Germany and India)
 
 Measured on the decile-spread portfolios built from the same stage-02 scores, across nine decades of
-AUM. Full ladder: `outputs/signal_vs_portfolio/capacity_channel_ladder.csv` (34 rows).
+AUM. Full ladder: `outputs/signal_vs_portfolio/capacity_channel_ladder.csv` (34 rows), committed
+verbatim at **`docs/attachments/CAPACITY_CHANNEL_LADDER_2026-10-09.csv`** because `outputs/` is
+gitignored and a pre-registration whose exploratory evidence is not version-controlled is worth
+little.
 
 **Capacity channel** = (net Sharpe, participation-capped) - (net Sharpe, uncapped).
 
