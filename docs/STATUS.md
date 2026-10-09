@@ -1,6 +1,6 @@
 # Workstream B status (Harshit)
 
-Updated: **2026-10-09 (13:00 IST)**. Workstream A is production-promoted and its real-data
+Updated: **2026-10-09 (13:50 IST)**. Workstream A is production-promoted and its real-data
 handoff to Workstream B is complete.
 
 > ## THE HEADLINE (12:25 IST) — the claim is now a sign flip, not a magnitude
@@ -62,6 +62,53 @@ handoff to Workstream B is complete.
 > mechanism's own `crossover ∝ k^−2` prediction to within 15%. **A wrong result reproduced a
 > theoretical scaling law.** `--require-cost-inputs` is now mandatory for any capacity exhibit, and
 > coverage matching is the fourth requirement in tracker §C6.
+>
+> ## THREE-COUNTRY TAX RESULT (13:50 IST) - Japan completes the placebo design
+>
+> Japan's arm finished at 13:46, 21/21 stage-04 strategies with **zero** frozen-sleeve failures, so
+> all three jurisdictions are priced on the same signals with the lot-level engine for the first
+> time. Full write-up: `docs/RESULTS_TAX_THREE_COUNTRY_2026-10-09.md`. Prediction cells, $1bn:
+>
+> | | rate | **lt_share** | turnover | tax bps | SR net | **SR after tax** | kept |
+> |---|---|---|---|---|---|---|---|
+> | Germany | 26.375% | **0.0000** | 0.0135 | 6.38 | +0.128 | **+0.018** | 14% |
+> | India | 15.000% | **0.5928** | 0.0067 | 0.11 | +0.205 | **+0.201** | 98% |
+> | Japan | 20.315% | **0.0000** | 0.0290 | 11.49 | +0.057 | **-0.049** | **negative** |
+>
+> **1. Japan is a second independent flat-rate placebo and it reproduces Germany's exact zero.**
+> `lt_share` is identically 0.0000 in both flat regimes against 0.5928 in India. The three rates all
+> differ, so a tax-LEVEL story cannot produce that. This is the one pre-registered tax claim that
+> survived, now confirmed out of sample.
+>
+> **2. Drag is ordered by TURNOVER, not by the rate.** By rate DEU > JPN > IND; by tax drag and by
+> turnover both **JPN > DEU > IND**. Germany's rate is 30% higher than Japan's yet Japan's drag is
+> 80% higher, because Japan turns over **2.1x** as fast. Normalised, tax drag per unit turnover is
+> 473 (DEU) and 396 (JPN) - the two flat regimes, close as they should be - against 17 for India,
+> 25x lower because it shelters gains in an exempt category. The third jurisdiction was needed to
+> separate the two orderings at all.
+>
+> **3. Taxes are second-order as a CHANNEL and first-order for SURVIVAL.** The tax channel is -0.004
+> to -0.111 Sharpe against cost channels of -7.5 to -11.9 - two orders of magnitude - yet once cost
+> and capacity have done their work the residual is small enough for tax to erase it: India keeps
+> 98%, Germany 14%, **Japan goes negative**. A strategy marginally viable before tax is not viable
+> after it. **That retires the magnitude argument for dropping the tax machinery**: the ledger is
+> what shows the Japanese book is unviable, which no cost model alone would reveal.
+>
+> Caveats in that document's section 5: the withdrawn wedge dose-response stays withdrawn; turnover
+> is endogenous so finding 2 is descriptive and not identified; n = 3 with India differing on both
+> dimensions at once; and all of it is at $1bn, so the tax-drag AUM ladder is running now.
+>
+> ## DESIGN-AXIS NULL (13:30 IST) - now thorough, and my mechanism for it is wrong
+>
+> Tested whether the participation constraint destroys the identifiability of ML design choice,
+> which would have turned a bare null into a mechanism. 14 AUM rungs x 3 axes per book per country:
+> **Germany 0 of 42 capped / 5 of 42 uncapped; India 0 of 42 on both.** The null is far better
+> established than before (it was one test at one AUM). **The hypothesis is not supported**: India
+> shows the same null unconstrained, Germany's capped effects grow rather than shrink (the standard
+> errors grow faster, so it is lost power not shrinkage), and 5 of 42 is within multiple-testing
+> expectation. Caveat: 8 cells and 132 months is low power, so the honest framing is "not detectable
+> at this power" - @CHK2024 use 1,056 designs and @LAL2025 5,376 against our 8.
+> `docs/RESULTS_DESIGN_IDENTIFIABILITY_2026-10-09.md`.
 >
 > **Value weighting also cuts our gross decile Sharpes by ~80%** (DEU +2.763 → +0.473, IND +1.209
 > → +0.215) — Novy-Marx & Velikov's critique landing on our own numbers. Every gross Sharpe we
