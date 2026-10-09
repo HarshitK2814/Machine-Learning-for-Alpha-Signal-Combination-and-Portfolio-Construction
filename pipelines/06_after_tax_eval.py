@@ -84,6 +84,11 @@ def main() -> None:
     p.add_argument("--aum", type=float, default=None, help="override AUM (cost and impact scale)")
     p.add_argument("--max-names", type=int, default=None,
                    help="cap each month to the N largest names by market cap (amendment 001B; slack for DEU/IND, binds on JPN)")
+    p.add_argument("--weights-aum", default=None,
+                   help="resolve weights through outputs/weights_index/<COUNTRY>_<this>.csv "
+                        "instead of by modification time. Stage 06 reads outputs/weights/, which "
+                        "is shared across countries and AUM arms, so without this it silently "
+                        "evaluates whichever arm ran stage 04 most recently.")
     p.add_argument("--save-returns", action="store_true", help="write the full monthly C12 tables")
     p.add_argument("--dated", action="store_true",
                    help="resolve the tax rule on each event's own date through the frozen C14 "
@@ -143,14 +148,29 @@ def main() -> None:
     if not root.exists():
         raise SystemExit("no weights found; run pipelines/04_construct_portfolios.py first")
     wanted = None if a.strategies == ["all"] else set(a.strategies)
+    pinned: dict[str, Path] = {}
+    if a.weights_aum:
+        from alphacomb.contracts import provenance
+
+        if not a.country:
+            raise SystemExit("--weights-aum requires --country")
+        pinned = provenance.country_weights(a.country, a.weights_aum)
+        log.info("weights pinned via weights_index/%s_%s.csv: %d strategies",
+                 a.country, a.weights_aum, len(pinned))
+    elif a.country:
+        log.warning("resolving weights by MODIFICATION TIME. outputs/weights/ is shared across "
+                    "countries and AUM arms, so if any other arm has run stage 04 since %s's, "
+                    "these numbers describe that arm. Pass --weights-aum to pin them.", a.country)
 
     rows = []
-    for folder in sorted(root.iterdir()):
-        if wanted and folder.name not in wanted:
+    names = sorted(pinned) if pinned else [f.name for f in sorted(root.iterdir())]
+    for name in names:
+        if wanted and name not in wanted:
             continue
-        latest = paths.latest_run("weights", folder.name)
+        latest = pinned.get(name) if pinned else paths.latest_run("weights", name)
         if latest is None:
             continue
+        folder = root / name
         weights = read_table(latest, "weights")
         for regime_name in regimes:
             for method_name in a.lot_methods:
