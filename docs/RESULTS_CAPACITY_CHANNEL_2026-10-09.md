@@ -4,25 +4,33 @@
 **Supersedes:** `docs/RESULTS_SIGN_FLIP_2026-10-09.md`, whose central claim — a sign flip with a
 measurable crossover — **was retracted the same day as a cost-input coverage artefact.** That
 document is kept as the record; §6 here explains what happened and why it matters methodologically.
-**Status:** exploratory on Germany and India. Japan's stage 02 is on its final cell and **has not
-reported**.
+**Status:** exploratory on Germany and India; **Japan is a pre-registered out-of-sample
+confirmation** of the positive channel (§3c, `AMENDMENT_001D` D2), reported 12:55 IST.
 **Audience:** referee-facing. Every number is reproducible from §7.
 
 ---
 
 ## 1. The claim
 
-> For an institutional investor in a mid-size equity market, the ADV participation constraint
-> **improves** net risk-adjusted performance at every mandate size we can measure, and the
-> improvement **grows monotonically with AUM**: from +0.07 Sharpe points at a $100k mandate to
-> **+8.92** at $1bn in Germany, and +0.26 to **+5.69** in India. It does so because it suppresses
-> turnover faster than it suppresses signal. The tax channel, measured with a lot-level engine
-> across three statutory regimes, is **two to three orders of magnitude smaller** than either the
-> cost or the capacity channel.
+> For an institutional investor in a mid-size equity market, the ADV participation constraint's
+> effect on net risk-adjusted performance is **zero while the constraint does not bind, and
+> monotonically positive in how much it binds**. Across three markets it reaches **+8.92**
+> (Germany), **+5.69** (India) and **+6.68** (Japan) Sharpe points at a $1bn mandate, from
+> ±0.001 where the cap is slack. It pays because it suppresses turnover faster than it suppresses
+> signal. **There is no scale at which it meaningfully hurts.** The tax channel, measured with a
+> lot-level engine across three statutory regimes, is **two to three orders of magnitude smaller**
+> than either the cost or the capacity channel.
 
-**What this is not.** It is not a sign flip, not a crossover, and not an adjudication of the
-disagreement in the literature about whether turnover reduction helps. We **never observe** the
-regime in which the constraint hurts, so we cannot speak to it. See §6.
+Japan is a **pre-registered out-of-sample confirmation** (`AMENDMENT_001D` D2, declared and scored
+by committed code before any Japanese portfolio existed): +6.68 at $1bn, t = +11.01, 8 of 8 cells
+surviving Holm from $8mn upward.
+
+**What this is not.** It is not a sign flip, not an economically meaningful crossover, and not an
+adjudication of the published disagreement about whether turnover reduction helps. The only
+negative readings anywhere in the compliant data are **±0.001 at ~0.01% cap slack, with arbitrary
+sign** — Germany +0.0008 against Japan −0.0009 on the same cost model (§3d). Those are noise around
+zero, not a regime. An earlier draft of this project claimed a sign flip with a measurable
+crossover; it was a cost-input coverage artefact and is retracted in §6.
 
 ## 2. The mechanism
 
@@ -94,7 +102,69 @@ Monotone, positive throughout, the same shape as Germany at roughly two-thirds t
 consistent with India's weaker signal (composite gross decile Sharpe **+1.197** against Germany's
 **+2.305**, both on the investable universe).
 
-### 3c. Robustness
+### 3c. Japan — the pre-registered out-of-sample confirmation
+
+Japan's coverage is **99.8%**, so it was never exposed to §6's artefact. Its arm was declared in
+`AMENDMENT_001D` and scored by `tools/score_amendment_001d.py`, both committed **before any
+Japanese portfolio existed**.
+
+| AUM | **channel** | HAC se | t | p | Holm 5% (of 8) |
+|---|---|---|---|---|---|
+| $100k | **−0.0013** | 0.0012 | −1.14 | 0.370 | 0 |
+| $300k | +0.0088 | 0.0059 | +1.48 | 0.184 | 0 |
+| $1mn | +0.0416 | 0.0153 | +2.72 | 0.052 | 0 |
+| $2mn | +0.0821 | 0.0239 | +3.43 | 0.021 | 0 |
+| $3mn | +0.1317 | 0.0343 | +3.84 | 0.010 | 0 |
+| $6mn | +0.2433 | 0.0515 | +4.72 | 0.005 | 1 |
+| $8mn | +0.3274 | 0.0576 | +5.68 | 0.002 | **8** |
+| $10mn | +0.4033 | 0.0629 | +6.41 | 0.001 | **8** |
+| $30mn | +1.0297 | 0.1191 | +8.64 | 0.0000 | **8** |
+| $100mn | +2.6933 | 0.2591 | +10.40 | 0.0000 | **8** |
+| $300mn | +4.9600 | 0.3701 | +13.40 | 0.0000 | **8** |
+| **$1bn** | **+6.6813** | 0.6071 | **+11.01** | 0.0000 | **8** |
+| $10bn | +7.1511 | 1.0123 | +7.06 | 0.0000 | **8** |
+
+**Pre-registered prediction D2 — the channel is significantly positive at $1bn — is confirmed**,
+with 11 of 14 rungs significant and 8 of 8 cells surviving Holm from $8mn upward. Composite gross
+decile Sharpe +1.278.
+
+**Two pre-registered predictions failed and one passed vacuously; all three are reported in
+`AMENDMENT_001D` §11.** In short: **D3 passed on a −0.0013 reading with p = 0.370**, because I wrote
+a sign prediction with no magnitude floor — a defect in my pre-registration, not evidence. **D5
+failed substantively**: I predicted Japan's scaled channel at $1bn would be below Germany's because
+$1bn is only 2.4x past Japan's $413mn frontier, and it came out *higher* (5.228 vs 4.00). Distance
+past the frontier is **not** a sufficient statistic for how hard the constraint bites — Japan's
+1,705-name breadth means far more positions hit the cap, leaving attained gross at 0.162 of 2.0.
+
+### 3d. The unifying statement: the channel tracks how much the cap binds
+
+All three markets at their smallest rungs, against cap slack (the shortfall of attained gross below
+the 2.0 target):
+
+| country | AUM | cap slack | channel |
+|---|---|---|---|
+| Germany | $1k | **0.01%** | **+0.0008** |
+| **Japan** | **$100k** | **0.01%** | **−0.0009** |
+| Germany | $10k | 0.09% | +0.0086 |
+| India | $1k | 0.25% | +0.0175 |
+| Japan | $1mn | 0.94% | +0.0313 |
+| Germany | $100k | 6.69% | +0.0618 |
+| India | $100k | 7.01% | +0.2114 |
+| Germany | $1mn | 40.5% | +0.7954 |
+
+> **The constraint's effect on net Sharpe is zero when it does not bind, and monotonically positive
+> in how much it binds. There is no scale at which it meaningfully hurts.**
+
+At ~0.01% slack the channel is ±0.001 and its **sign is arbitrary** — Germany +0.0008 against
+Japan −0.0009 on the same cost model. Those are not two regimes, they are noise around zero. Any
+"crossover" a bootstrap locates (Japan's is $115,532, CI [$101k, $349k]) is simply **the point at
+which the cap begins to bind at all**, and carries no economic content.
+
+This also explains, without claiming to adjudicate anyone, why @AHV2025 find no benefit from
+turnover reduction: their cost model contains **no AUM term**, so they sit permanently at zero
+slack, where this channel is zero by construction.
+
+### 3e. Robustness
 
 | dimension | tested | survives |
 |---|---|---|
@@ -108,7 +178,7 @@ Note that value weighting cuts the composite **gross** decile Sharpe by about 80
 equal-weighted anomaly results landing on our own gross numbers. Every gross Sharpe we quote must
 carry it.
 
-### 3d. The small-AUM limit: the channel decays to zero, it does not cross
+### 3f. The small-AUM limit: the channel decays to zero, it does not cross
 
 §2 says the mechanism also implies a small-AUM regime where the cap forfeits more alpha than it
 saves in cost. **We looked for it on the compliant universe and it is not there.** Germany, down to
