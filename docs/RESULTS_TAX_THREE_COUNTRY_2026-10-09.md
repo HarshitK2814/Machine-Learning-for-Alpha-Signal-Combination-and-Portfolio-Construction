@@ -123,6 +123,83 @@ $10bn (+0.186). The scale-invariant quantity is the tax channel itself.
 the one that goes negative after tax, and if its tax channel is likewise scale-invariant then no
 mandate size rescues it.
 
+## 4b. Inference on the tax channel — and the "survival" framing does not survive it
+
+§4 claims taxes are "first-order for survival". **That claim is now withdrawn in the strong form**,
+because it compared point estimates and the comparison does not hold up once the net Sharpe is
+tested against zero. Tool: `tools/exp_after_tax_inference.py`, which runs the same
+`after_tax_backtest` the pipeline uses and tests the paired net-versus-after-tax series.
+
+**Germany, $1bn, composite of 8 prediction cells, 132 months:**
+
+| quantity | value | t | p | |
+|---|---|---|---|---|
+| net Sharpe | +0.1523 | **+0.53** | **0.595** | **not distinguishable from zero** |
+| after-tax Sharpe | +0.0160 | +0.06 | 0.954 | not distinguishable from zero |
+| **tax channel** | **−0.1363** | **−4.67** | **< 0.0001** | **significant**, 95% CI [−0.196, −0.087] |
+
+Per-cell: 3 of 8 significant after Holm.
+
+**Two things follow, and they point in opposite directions.**
+
+1. **The tax channel is real.** −0.136 Sharpe points with t = −4.67 and a CI well clear of zero.
+   Taxes measurably reduce risk-adjusted performance, and that is worth reporting — it is the
+   paired test doing work the point estimates could not.
+2. **But the book was never demonstrably viable before tax either.** Germany's net-of-cost Sharpe
+   is **+0.15 with t = +0.53**. You cannot say "tax turns a viable strategy unviable" when the
+   strategy is not significantly profitable to begin with. **Nothing survives to be decided.**
+
+**The honest formulation**, replacing §4's third bullet:
+
+> Taxes are the smallest of the three frictions by one to two orders of magnitude, and the tax
+> channel is nevertheless statistically significant where cost and capacity have already reduced
+> net performance to a level indistinguishable from zero. The sequence is not "costs and capacity
+> leave a viable strategy that tax then kills" — it is **"costs and capacity leave nothing
+> statistically distinguishable from zero, and tax makes it measurably worse."**
+
+That is a weaker claim than §4 made, and it is the one the data supports. It also means the
+jurisdiction-level framing — "capital-gains statute decides whether ML alpha is viable" — is **not
+available to us**, because viability is not established in any jurisdiction at $1bn before tax.
+
+### 4b.1 All three countries, and the statutory placebo appears in the inference
+
+| | net Sharpe | t | p | after-tax Sharpe | t | p | **tax channel** | **t** | **p** | Holm |
+|---|---|---|---|---|---|---|---|---|---|---|
+| **Germany** (flat 26.375%) | +0.152 | +0.53 | 0.595 | +0.016 | +0.06 | 0.954 | **−0.1363** | **−4.67** | **<0.0001** | **3/8** |
+| **India** (wedge 0.150) | +0.271 | +0.82 | 0.413 | +0.265 | +0.80 | 0.422 | −0.0054 | −1.93 | 0.096 | **0/8** |
+| **Japan** (flat 20.315%) | +0.055 | +0.18 | 0.861 | −0.082 | −0.27 | 0.789 | **−0.1373** | **−4.99** | **0.0010** | **3/8** |
+
+**Two conclusions, and the second is the one worth having.**
+
+**(i) No country's net Sharpe is distinguishable from zero** (t = +0.53, +0.82, +0.18), and neither
+is any after-tax Sharpe, including Japan's negative −0.082 (t = −0.27). So the strategies are **not
+demonstrably profitable net of costs in any of the three jurisdictions** at a $1bn mandate. The
+"Japan goes negative after tax" framing of §4 is arithmetic on two numbers that are each
+indistinguishable from zero, and it is withdrawn.
+
+**(ii) The tax channel's *significance* tracks the statute, with both placebos behaving.** This is
+the statutory claim appearing in the inference rather than only in the point estimates:
+
+> Under the two **flat-rate** regimes, which provide no long-term category
+> (`lt_share` = 0.0000 exactly), the tax channel is **significant**: Germany t = **−4.67**, Japan
+> t = **−4.99**, each with **3 of 8** cells surviving Holm. Under **India's** regime, whose statute
+> exempts long-term gains and shelters 59% of realised gains, the tax channel is **not significant**
+> (t = −1.93, p = 0.096, **0 of 8** cells under Holm).
+
+Two independent flat-rate jurisdictions with a significant tax channel; one wedge-bearing
+jurisdiction without one. The magnitudes are near-identical in the two placebos (−0.1363 and
+−0.1373, within 1%) and an order of magnitude smaller in the treatment (−0.0054). **That is the
+cleanest inferential result in the project**, it is the pre-registered direction, and it does not
+depend on any portfolio being profitable.
+
+What it says: **the capital-gains statute determines whether taxes measurably erode a
+machine-learning equity strategy's risk-adjusted performance** — not the rate (Germany's is 30%
+above Japan's and the channels match to 1%), but whether the law provides a long-term category at
+all.
+
+What it does **not** say: that taxes decide viability. Viability is not established anywhere (point
+i), so there is nothing for taxes to decide.
+
 ## 5. What this does not establish
 
 * **Not a dose-response in the wedge.** The pre-registered claim that the friction penalty is

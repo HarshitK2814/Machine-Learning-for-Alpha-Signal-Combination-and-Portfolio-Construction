@@ -42,11 +42,16 @@ Four results survive.
    registered cost calibration. It survives value-weighting, a six-fold sweep of the impact
    coefficient, a level-matched switch to the Kyle-linear impact law our closest competitor
    prefers, and familywise correction across cells.
-2. **Taxes are second-order as a channel and first-order for survival.** The tax channel is −0.004
-   to −0.111 Sharpe points against cost channels of −7.5 to −11.9 — two orders of magnitude — yet
-   India keeps 98% of its net Sharpe after tax, Germany 14%, and **Japan's book goes negative**
-   (+0.057 → −0.049). An investor cannot grow out of it: Germany's tax bill falls **25-fold** from
-   $100mn to $10bn while the risk-adjusted drag stays flat at −0.11 to −0.16.
+2. **No strategy is distinguishable from zero net of costs, and the capital-gains statute decides
+   whether taxes then measurably erode it further.** At $1bn no country's net Sharpe is
+   significant (t = +0.53 Germany, +0.82 India, +0.18 Japan). The **tax channel**, however, is
+   significant in both **flat-rate** jurisdictions — Germany **−0.1363 (t = −4.67)**, Japan
+   **−0.1373 (t = −4.99)**, 3 of 8 cells under Holm each — and **not** significant under India's
+   long-term exemption (−0.0054, t = −1.93, 0 of 8). Two placebos agreeing to within 1%, one
+   treatment an order of magnitude smaller. It is not the rate (Germany's is 30% above Japan's);
+   it is whether the law provides a long-term category at all. An investor cannot grow out of it:
+   Germany's tax bill falls **25-fold** from $100mn to $10bn while the risk-adjusted drag stays
+   flat at −0.11 to −0.16.
 3. **The statutory wedge determines whether the holding-period channel can exist at all.**
    `lt_share_of_gains` is **identically 0.0000** under both flat-rate regimes (Germany 26.375%,
    Japan 20.315%) and **0.5928** in India, whose statute creates a long-term category. Two
@@ -511,12 +516,35 @@ turns over **2.1×** as fast. Normalising, tax drag per unit turnover is **473**
 against **17** for India, 25× lower because it shelters most gains in an exempt long-term category.
 **The third jurisdiction was required to separate the rate and turnover orderings at all.**
 
-**6.3.3 Second-order as a channel, first-order for survival.** The tax channel is −0.004 (India),
-−0.106 (Japan), −0.111 (Germany) Sharpe points against cost channels of −7.5 to −11.9 and capacity
-channels of +3.6 to +8.9. Two orders of magnitude. **And yet**: India keeps 98% of its net Sharpe,
-Germany **14%**, and Japan's book **goes negative**. A strategy marginally viable before tax is not
-viable after it. This retires the magnitude argument for dropping the tax machinery — the ledger is
-what reveals the Japanese book is unviable, which no cost model alone would.
+**6.3.3 Second-order as a channel; and the "survival" framing is withdrawn.** The tax channel is
+−0.004 (India), −0.106 (Japan), −0.111 (Germany) Sharpe points against cost channels of −7.5 to
+−11.9 and capacity channels of +3.6 to +8.9. Two orders of magnitude.
+
+An earlier version of this section claimed taxes are "first-order for survival" because India keeps
+98% of its net Sharpe, Germany 14%, and Japan's goes negative. **That is withdrawn.** Testing the
+net Sharpe against zero (`tools/exp_after_tax_inference.py`):
+
+| | net Sharpe | t | p | after-tax Sharpe | t | **tax channel** | **t** | **p** | Holm |
+|---|---|---|---|---|---|---|---|---|---|
+| **Germany** (flat 26.375%) | +0.152 | +0.53 | 0.595 | +0.016 | +0.06 | **−0.1363** | **−4.67** | **<0.0001** | **3/8** |
+| **India** (wedge 0.150) | +0.271 | +0.82 | 0.413 | +0.265 | +0.80 | −0.0054 | −1.93 | 0.096 | **0/8** |
+| **Japan** (flat 20.315%) | +0.055 | +0.18 | 0.861 | −0.082 | −0.27 | **−0.1373** | **−4.99** | **0.0010** | **3/8** |
+
+**No country's net Sharpe is distinguishable from zero**, and neither is any after-tax Sharpe
+including Japan's negative one. So "tax turns a viable strategy unviable" is not available — nothing
+survives to be decided, and the 98% / 14% / negative retention figures are arithmetic on quantities
+that are each indistinguishable from zero.
+
+**What replaces it is better identified.** The tax channel's *significance* tracks the statute:
+significant in **both flat-rate** jurisdictions (which have no long-term category,
+`lt_share` = 0.0000 exactly) with magnitudes matching to **within 1%** (−0.1363, −0.1373), and
+**not significant** under India's long-term exemption (−0.0054, 0 of 8 cells). **Two independent
+placebos behaving, one treatment an order of magnitude smaller, in the pre-registered direction,
+and none of it requiring any portfolio to be profitable.** It is not the rate — Germany's is 30%
+above Japan's and the channels are identical.
+
+This still retires the magnitude argument for dropping the tax machinery: the engine is what
+produces the statutory contrast in (ii), which no cost model could.
 
 **6.3.4 You cannot grow out of it.** Germany, prediction cells:
 
