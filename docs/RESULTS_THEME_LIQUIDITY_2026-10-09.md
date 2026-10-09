@@ -81,3 +81,46 @@ the third contradicts it, and nothing is individually significant after correcti
 liquidity-conditioned arm should be built as an experiment with a pre-agreed stopping rule: it is
 promoted only if it beats both the existing static and state-conditional cells on an untouched
 period by an amount a paired test can detect.
+
+---
+
+# Addendum, 22:35 IST: Gate 1 result, and the arm is stopped
+
+The Gate 1 criterion was committed before any variant ran (`2b23610`): in each of three variants the
+mean illiquid-minus-liquid gap must keep at least 50% of the market's baseline gap and at least 8 of
+13 themes must still point the same way; the arm proceeds only if Germany **and** India both pass.
+
+| | baseline (ew, raw ADV) | vw, raw ADV | ew, size-neutral | vw, size-neutral | Gate 1 |
+|---|---|---|---|---|---|
+| **Germany** gap (themes) | +0.496 (10/13) | +0.558, 113% (11/13) PASS | **+0.194, 39% (7/13) FAIL** | **+0.195, 39% (8/13) FAIL** | **FAIL** |
+| **India** gap (themes) | +0.450 (11/13) | +0.357, 79% (11/13) PASS | +0.246, 55% (9/13) PASS | **-0.007, -2% (6/13) FAIL** | **FAIL** |
+| Japan (not gated) | -0.026 (5/13) | +0.018 (8/13) | -0.027 (6/13) | -0.051 (6/13) | n/a |
+
+Size-neutral liquidity is the month-by-month residual of log ADV on log market cap. Its Spearman
+correlation with market cap is +0.113 (Germany), +0.016 (India), +0.027 (Japan), so size is largely
+but not perfectly partialled out in Germany.
+
+## What this does and does not show
+
+* **Value-weighting alone does not remove the pattern.** Germany's gap is 113% of baseline and
+  India's 79%. So the alternative "tiny stocks dominate each equal-weighted decile" is not the main
+  explanation.
+* **Partialling out size does.** Germany keeps 39% and India 55% then -2% as the controls stack. The
+  accurate reading is that most of the apparent liquidity effect is a **size** effect: alpha
+  concentrated in small names, not in names that are illiquid *for their size*.
+* **Germany is partial, not zero.** 39% survives with 7-8 of 13 themes pointing the same way, and its
+  size control is imperfect (+0.113). The frozen rule says FAIL and I am applying it as written; a
+  reader should still know it is a miss by 11 points on one criterion, not a clean null.
+* No theme is significant after Holm in any size-neutral variant in either gated market.
+
+## Decision
+
+Both gates fail: **Gate 1** (the premise is largely a size effect) and **Gate 2**
+(`RESULTS_GATE2_POWER_2026-10-09.md`: the minimum detectable effect is 70-92% of the entire
+gross-to-net gap even for a close variant). Either alone stops the stock-level liquidity arm as a
+flagship candidate. It is retained as a **descriptive diagnostic** and nothing is trained.
+
+The two failures are independent. Gate 1 says the mechanism is mostly size; Gate 2 says that even a
+real mechanism could not be detected with this design. Passing Gate 1 would not have rescued it.
+
+Data: `docs/attachments/THEME_LIQUIDITY_*_{VW_ADV,EW_ADV_RESID,VW_ADV_RESID}_2026-10-09.csv`.
