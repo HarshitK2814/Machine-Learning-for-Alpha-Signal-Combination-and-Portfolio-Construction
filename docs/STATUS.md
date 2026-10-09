@@ -9,26 +9,45 @@ handoff to Workstream B is complete.
 > headline below is still accurate about the tax hypothesis and is kept, but it is no longer the
 > paper.
 >
-> **The claim, in two halves of very different strength.**
+> **The sign flip I reported at 12:25 was retracted at 12:30. It was a cost-input coverage
+> artefact.** Read `docs/RESULTS_CAPACITY_CHANNEL_2026-10-09.md`; `RESULTS_SIGN_FLIP` carries a
+> retraction header and is kept only as the record.
 >
-> **Robust half — the cap creates performance at scale.** In all four specifications (Germany and
-> India × equal- and value-weighted deciles) the capacity channel is strongly positive at $1bn:
-> **t = +5.6 to +12.3**, 8 of 8 cells surviving Holm from $30mn upward. Germany EW: **+11.06**.
+> **The surviving claim.** On the **investable** universe (names with certified spread, volatility
+> and positive ADV — document 13 requirement 2) the ADV participation constraint **improves** net
+> Sharpe at every mandate size measured, monotonically in AUM:
 >
-> **Narrower half — the sign change.** Established in **Germany under equal weighting only**:
-> **−0.81** Sharpe points at $100k (t = −6.10) rising to +11.06 at $1bn, crossing zero at
-> **$3.79mn (95% CI $1.88mn–$7.07mn)**, with 0 of 2,000 replications failing to show a sign change.
-> Under **value weighting** Germany's negative region is directionally the same but **not
-> significant** (t = −1.65, p = 0.117), and **India has no negative region under either
-> weighting**. **We may not claim that both markets flip.** An earlier draft today did, from point
-> estimates before the inference existed; withdrawn in `RESULTS_SIGN_FLIP` §3e.
+> | | $100k | $1mn | $10mn | $100mn | **$1bn** | $10bn |
+> |---|---|---|---|---|---|---|
+> | Germany | +0.068 | +0.917 | +3.646 | +7.634 | **+8.922** (t +11.11) | +9.256 |
+> | India | +0.264 | +0.880 | +2.534 | +4.591 | **+5.693** (t +5.70) | +5.967 |
 >
-> That makes Japan's pre-registered D3 a test of whether the sign change **generalises beyond one
-> market and one weighting** — now the thing most in doubt.
+> Significant on 13 of 14 German rungs and **all 14 Indian rungs**, with 8 of 8 cells under Holm
+> from $1mn upward. **No crossover** — 94.1% (Germany) and **100%** (India) of replications show no
+> sign change anywhere. Robust to equal vs value
+> weighting, to `k ∈ {0.5, 1, 2, 3}`, and to the coverage treatment.
+>
+> **Because we never observe the regime where the cap hurts, we cannot adjudicate Novy-Marx-Velikov
+> versus Azevedo-Hoegner-Velikov, and no longer claim to.** The contribution is a measurement — an
+> AUM-indexed dose-response in non-US markets — not a mechanism adjudication. That is weaker than
+> what I claimed at 12:25 and the loss is real.
+>
+> **What went wrong, because it is the most useful thing to come out of today.** The ladder formed
+> deciles on Germany's **signal-bearing** cross-section (~382 names) instead of its **investable**
+> one (~246). C6 prices **65.1%** of Germany against **99.1%** of India, and an uncovered name was
+> charged **zero cost** in the uncapped book while getting **cap = 0** in the capped book — both
+> pushing the channel down, **only in Germany**. Enforcing the rule flips Germany's $100k channel
+> from **−0.811 to +0.062**; India, the control, moves only +0.183 → +0.211.
+>
+> The spurious result was **t = −6.10**, monotone over nine decades, and it **survived a
+> value-weighting check and a six-fold impact-coefficient sweep** — it even satisfied the
+> mechanism's own `crossover ∝ k^−2` prediction to within 15%. **A wrong result reproduced a
+> theoretical scaling law.** `--require-cost-inputs` is now mandatory for any capacity exhibit, and
+> coverage matching is the fourth requirement in tracker §C6.
 >
 > **Value weighting also cuts our gross decile Sharpes by ~80%** (DEU +2.763 → +0.473, IND +1.209
-> → +0.215). That is Novy-Marx & Velikov's critique landing on our own numbers and every gross
-> Sharpe we quote must carry it.
+> → +0.215) — Novy-Marx & Velikov's critique landing on our own numbers. Every gross Sharpe we
+> quote must carry it.
 >
 > **Why it matters.** The literature disagrees about this sign *in print*, and all parties are US:
 > Novy-Marx & Velikov (RFS 2016) and Korajczyk & Sadka (JF 2004) find turnover reduction and

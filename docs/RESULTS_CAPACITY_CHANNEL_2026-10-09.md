@@ -15,7 +15,7 @@ reported**.
 > For an institutional investor in a mid-size equity market, the ADV participation constraint
 > **improves** net risk-adjusted performance at every mandate size we can measure, and the
 > improvement **grows monotonically with AUM**: from +0.07 Sharpe points at a $100k mandate to
-> **+8.92** at $1bn in Germany, and +0.21 to **+4.51** in India. It does so because it suppresses
+> **+8.92** at $1bn in Germany, and +0.26 to **+5.69** in India. It does so because it suppresses
 > turnover faster than it suppresses signal. The tax channel, measured with a lot-level engine
 > across three statutory regimes, is **two to three orders of magnitude smaller** than either the
 > cost or the capacity channel.
@@ -68,17 +68,31 @@ replications, block 6.
 **Significant at 5% on 13 of 14 rungs; 8 of 8 cells survive Holm at every rung from $1mn upward.**
 **No crossover: 94.1% of replications show no sign change anywhere in $100k..$10bn.**
 
-### 3b. India
+### 3b. India — the same shape, and cleaner
 
-Point estimates from the compliant ladder (inference running at the time of writing; the table will
-be completed from `capacity_channel_inference_IND_cov.csv`):
+| AUM | SR capped | SR uncapped | **channel** | HAC se | t | p | Holm 5% (of 8) |
+|---|---|---|---|---|---|---|---|
+| $100k | +0.309 | +0.045 | **+0.264** | 0.057 | +4.63 | 0.0000 | 7 |
+| $300k | +0.150 | −0.328 | **+0.478** | 0.110 | +4.36 | 0.0005 | **8** |
+| $1mn | −0.119 | −0.999 | **+0.880** | 0.200 | +4.40 | 0.0005 | **8** |
+| $2mn | −0.276 | −1.546 | **+1.271** | 0.274 | +4.64 | 0.0000 | **8** |
+| $3mn | −0.386 | −1.923 | **+1.536** | 0.329 | +4.66 | 0.0000 | **8** |
+| $4mn | −0.474 | −2.213 | **+1.739** | 0.371 | +4.68 | 0.0000 | **8** |
+| $6mn | −0.598 | −2.647 | **+2.049** | 0.435 | +4.71 | 0.0005 | **8** |
+| $8mn | −0.654 | −2.968 | **+2.314** | 0.488 | +4.74 | 0.0010 | **8** |
+| $10mn | −0.686 | −3.221 | **+2.534** | 0.530 | +4.78 | 0.0025 | **8** |
+| $30mn | −0.767 | −4.411 | **+3.644** | 0.729 | +5.00 | 0.0130 | 6 |
+| $100mn | −0.814 | −5.405 | **+4.591** | 0.865 | +5.31 | 0.0075 | 6 |
+| $300mn | −0.634 | −5.969 | **+5.335** | 0.972 | +5.49 | 0.0055 | 7 |
+| **$1bn** | **−0.623** | **−6.315** | **+5.693** | 0.998 | **+5.70** | 0.0035 | 7 |
+| $10bn | −0.623 | −6.589 | **+5.967** | 1.015 | +5.88 | 0.0025 | 7 |
 
-| AUM | $100k | $300k | $1mn | $3mn | $10mn | $100mn | $1bn | $10bn |
-|---|---|---|---|---|---|---|---|---|
-| channel | +0.211 | +0.392 | +0.751 | +1.332 | +2.190 | +3.792 | **+4.507** | +4.657 |
+**Significant at 5% on all 14 rungs**, 7–8 of 8 cells surviving Holm at every rung. **100% of
+replications show no sign change** — India is the cleanest statement of the result in the study.
 
-Monotone, positive throughout, same shape as Germany at roughly half the magnitude — consistent
-with India's weaker signal (composite gross decile Sharpe +0.980 against Germany's +1.998).
+Monotone, positive throughout, the same shape as Germany at roughly two-thirds the magnitude,
+consistent with India's weaker signal (composite gross decile Sharpe **+1.197** against Germany's
+**+2.305**, both on the investable universe).
 
 ### 3c. Robustness
 
@@ -90,7 +104,7 @@ with India's weaker signal (composite gross decile Sharpe +0.980 against Germany
 | **cells** | 8 prediction cells, Holm-corrected | **yes** — 8 of 8 from $1mn upward |
 
 Note that value weighting cuts the composite **gross** decile Sharpe by about 80% (Germany
-+2.763 → +0.473 on the signal-bearing universe), which is Novy-Marx & Velikov's critique of
++2.763 → +0.473, measured on the signal-bearing universe before the coverage fix), which is Novy-Marx & Velikov's critique of
 equal-weighted anomaly results landing on our own gross numbers. Every gross Sharpe we quote must
 carry it.
 
@@ -100,8 +114,8 @@ Capacity against cost against tax, same signals. **Capacity >> cost >> tax in bo
 
 | channel (Sharpe points, $1bn) | Germany | India |
 |---|---|---|
-| cost (gross → net uncapped) | −11.60 | −7.38 |
-| **capacity** (net uncapped → net capped) | **+8.92** | **+4.51** |
+| cost (gross → net uncapped) | −11.90 | −7.51 |
+| **capacity** (net uncapped → net capped) | **+8.92** | **+5.69** |
 | tax (net → after tax, optimised book) | **−0.111** | **−0.004** |
 
 | annualised bps, optimised book, $1bn, prediction cells | Germany | India |

@@ -1,4 +1,49 @@
-# For Maham (workstream C): the claim has changed. Four amendments need countersigning, and one needs your judgement on whether it is still a pre-registration at all.
+# For Maham (workstream C): the claim has changed twice today. Four amendments need countersigning, and the newest one is already retracted.
+
+> ## UPDATE at 12:35 IST — READ THIS BEFORE ANYTHING ELSE
+>
+> **I retracted 001D's hypothesis at 12:30, before Japan reported. The sign flip was a cost-input
+> coverage artefact.** So **ask B below is moot** — you no longer need to rule on whether my 12:06
+> revision was a legitimate pre-registration, because the hypothesis it protected is dead on the
+> exploratory sample. What I now need from you is **ask A** (countersign 001A/B/C, and 001D
+> *as retracted*), **ask C** (economic arm) and **ask D** (the inference, which is unaffected and
+> still carries the surviving result).
+>
+> **What happened.** The ladder formed decile portfolios on Germany's **signal-bearing**
+> cross-section (~382 names a month) instead of its **investable** one (~246). C6 prices **65.1%**
+> of Germany's cross-section over 2009-2019 against **99.1%** of India's, and document 13
+> requirement 2 makes an uncertified security-month non-tradeable with imputation prohibited. The
+> ladder broke that rule twice over: an uncovered name was charged **zero cost** in the uncapped
+> book, and given **cap = 0** in the capped book. Both push the capacity channel down, **and only
+> in Germany**.
+>
+> | Germany at $100k | non-compliant | compliant |
+> |---|---|---|
+> | net uncapped | +1.749 | **+0.657** (35% of positions had been free) |
+> | **capacity channel** | **−0.811** (t = −6.10) | **+0.062** |
+>
+> India, at 99.1% coverage, is the control and moves only **+0.183 → +0.211**. An effect that
+> reverses in the 65%-coverage panel and not in the 99%-coverage panel is a coverage effect.
+>
+> **The one thing I would most like your eye on.** The spurious result was **t = −6.10**, monotone
+> across nine decades of AUM, and it **passed both robustness checks I threw at it** — value
+> weighting and a six-fold impact-coefficient sweep — including satisfying the mechanism's own
+> quantitative prediction that `crossover ∝ k^−2`, to within ±15%. **A wrong result reproduced a
+> theoretical scaling law.** I would like to know what you think a reviewer-proof protocol looks
+> like when a coverage asymmetry can do that, because my robustness instincts demonstrably did not
+> catch it; only enforcing the project's own non-tradeability rule did.
+>
+> **The surviving result** is in `docs/RESULTS_CAPACITY_CHANNEL_2026-10-09.md`: on the investable
+> universe the capacity channel is **positive at every rung in both markets** and monotone in AUM —
+> Germany +0.068 at $100k to **+8.92** at $1bn (t = +11.11), India +0.264 to **+5.69** (t = +5.70),
+> significant on 13 of 14 and 14 of 14 rungs respectively, 8 of 8 cells under Holm from $1mn. **No
+> crossover anywhere** (94.1% / 100% of replications show no sign change). Because we never observe
+> the regime where the cap hurts, we **cannot** adjudicate Novy-Marx-Velikov versus
+> Azevedo-Hoegner-Velikov and no longer claim to. The contribution is a measurement, not a
+> mechanism adjudication.
+>
+> Everything below was written at 12:35 against the retracted claim and is kept for the record.
+> Where it says "the flip", read "the retracted flip".
 
 **From:** Harshit, workstream B
 **Date:** 2026-10-09, 12:35 IST
