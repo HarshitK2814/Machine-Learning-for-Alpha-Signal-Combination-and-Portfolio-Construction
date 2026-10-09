@@ -289,3 +289,65 @@ check, the arm should be reported as *not solvable at this scale* — which is i
 arguably a cleaner one than a performance number — rather than as a performance result.
 
 The $1e8 arm needs no such caveat: 3.8% flagged, and stage 04 reported zero held months.
+
+
+---
+
+## 10. A flaw in how §7 compared the arms, and what it takes to fix it
+
+**§7's net-Sharpe comparison is not leverage-neutral, so it is not yet a clean test.** For a
+long-short book at gross `G`, holding the *direction* of the book fixed:
+
+```
+gross return ~ a*G     spread cost ~ b*G     impact cost ~ d*G^1.5     volatility ~ v*G
+
+net Sharpe = (a*G - b*G - d*G^1.5) / (v*G)  =  (a - b)/v  -  (d/v) * G^0.5
+```
+
+Net Sharpe **falls with gross for purely mechanical reasons**, because the cost model's impact term
+is `|dw|^1.5` while volatility is linear. The $1e8 arm realised gross 0.42 against the $1e9 arm's
+0.13, so §7 charged the smaller-AUM arm for the larger book its optimiser chose. That is exactly
+why the two headline numbers disagreed:
+
+* raw **net** Sharpe said $1e8 was worse (−0.116 against +0.128);
+* **gross** Sharpe, which *is* scale-invariant, said its direction was much better (+0.654 against
+  +0.423).
+
+Both cannot be the headline, and the disagreement is a leverage confound rather than a finding. The
+same confound sits inside the E-vs-P contrast, where the economic arm runs at 1.4–1.7x the
+prediction arm's gross.
+
+### Post-hoc rescaling cannot fix it — the frozen sleeve is endogenous
+
+Two attempts, both correctly refused by the backtest:
+
+1. **Scale each book uniformly** to a common gross. Refused: *"87 unpriceable names moved by
+   2.04e-05 (budget 1.6e-05). A frozen position must be carried, not traded."* A name with no
+   certified market inputs that month cannot be traded at all, so moving its weight by any amount
+   is an unpriceable trade.
+2. **Scale only the tradeable names, carry the frozen weights verbatim.** Also refused, *"13
+   unpriceable names moved by 0.00017"* — and this one is structural, not a bug. The drifted prior
+   book is `w*(1+r)/(1+port_ret)`, so changing the tradeable weights changes the portfolio return,
+   which changes what the frozen weight *would have drifted to*. **The frozen sleeve is endogenous
+   to the whole book**: you cannot alter the tradeable part without altering what the frozen part
+   should be, and you cannot alter the frozen part at all.
+
+So any post-hoc reweighting of these books — leverage matching, volatility matching, risk parity
+overlays — is unavailable while a non-tradeable sleeve is present. Worth knowing before anyone
+tries it.
+
+### The valid test, which is running
+
+Re-optimise instead. Stage 04 now takes `--gross-max`, and the matched arm is **$1e8 capacity with
+the gross budget capped at 0.13**, the level the $1e9 arm chose for itself. Both arms then carry the
+same leverage and the only difference is how tightly the participation constraint binds.
+
+**Prediction, fixed before it lands:** the $1e8-capacity book at matched leverage should beat the
+$1e9 book, because its direction is better (gross Sharpe +0.654 against +0.423) and at equal gross
+it pays equal costs. If it does, capacity suppression costs real *net* performance and §7's ordering
+was indeed a leverage artefact — which would **restore** the original §5.1 prediction and make the
+two-sided-squeeze reading in §7 wrong. If it does not, the squeeze stands.
+
+Until that arm reports, **§7's net-Sharpe ordering should not be quoted**; the gross-Sharpe
+comparison (+0.654 against +0.423) and the weight-level correlations in §8 are the parts that do not
+depend on leverage.
