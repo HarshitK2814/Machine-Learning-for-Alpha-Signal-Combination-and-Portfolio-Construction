@@ -1,11 +1,11 @@
 # Workstream B status (Harshit)
 
-Updated: **2026-10-09 (12:25 IST)**. Workstream A is production-promoted and its real-data
+Updated: **2026-10-09 (13:00 IST)**. Workstream A is production-promoted and its real-data
 handoff to Workstream B is complete.
 
 > ## THE HEADLINE (12:25 IST) — the claim is now a sign flip, not a magnitude
 >
-> Read `docs/RESULTS_SIGN_FLIP_2026-10-09.md` first, then `docs/AMENDMENT_001D_...`. The 06:50
+> Read `docs/RESULTS_CAPACITY_CHANNEL_2026-10-09.md` first, then `docs/AMENDMENT_001D_...`. The 06:50
 > headline below is still accurate about the tax hypothesis and is kept, but it is no longer the
 > paper.
 >
@@ -13,24 +13,42 @@ handoff to Workstream B is complete.
 > artefact.** Read `docs/RESULTS_CAPACITY_CHANNEL_2026-10-09.md`; `RESULTS_SIGN_FLIP` carries a
 > retraction header and is kept only as the record.
 >
-> **The surviving claim.** On the **investable** universe (names with certified spread, volatility
-> and positive ADV — document 13 requirement 2) the ADV participation constraint **improves** net
-> Sharpe at every mandate size measured, monotonically in AUM:
+> **The surviving claim, now on three markets.** On the **investable** universe (certified spread,
+> volatility and positive ADV - document 13 requirement 2) the ADV participation constraint's effect
+> on net Sharpe is **zero while it does not bind and monotonically positive in how much it binds**:
 >
 > | | $100k | $1mn | $10mn | $100mn | **$1bn** | $10bn |
 > |---|---|---|---|---|---|---|
 > | Germany | +0.068 | +0.917 | +3.646 | +7.634 | **+8.922** (t +11.11) | +9.256 |
 > | India | +0.264 | +0.880 | +2.534 | +4.591 | **+5.693** (t +5.70) | +5.967 |
+> | **Japan** | -0.001 | +0.042 | +0.403 | +2.693 | **+6.681** (t +11.01) | +7.151 |
 >
-> Significant on 13 of 14 German rungs and **all 14 Indian rungs**, with 8 of 8 cells under Holm
-> from $1mn upward. **No crossover** — 94.1% (Germany) and **100%** (India) of replications show no
-> sign change anywhere. Robust to equal vs value
-> weighting, to `k ∈ {0.5, 1, 2, 3}`, and to the coverage treatment.
+> Significant on 13/14 German, **14/14** Indian and 11/14 Japanese rungs; 8 of 8 cells under Holm
+> from $1mn (DEU/IND) and $8mn (JPN). Robust to equal vs value weighting, to `k` in {0.5, 1, 2, 3},
+> and to the coverage treatment.
 >
-> **Because we never observe the regime where the cap hurts, we cannot adjudicate Novy-Marx-Velikov
-> versus Azevedo-Hoegner-Velikov, and no longer claim to.** The contribution is a measurement — an
-> AUM-indexed dose-response in non-US markets — not a mechanism adjudication. That is weaker than
-> what I claimed at 12:25 and the loss is real.
+> **Japan is a genuine pre-registered out-of-sample confirmation** of prediction D2, declared and
+> scored by code committed before any Japanese portfolio existed.
+>
+> **The unifying fact.** The channel tracks **cap slack** (shortfall of attained gross below the 2.0
+> target), not AUM per se: at ~0.01% slack it is **+-0.001 with arbitrary sign** (Germany +0.0008,
+> Japan -0.0009, same cost model); 6-7% slack gives +0.06 to +0.21; 40% slack gives +0.80. **There
+> is no scale at which the cap meaningfully hurts**, and any bootstrap "crossover" is just the point
+> where it starts binding. This also explains, without adjudicating anyone, why @AHV2025 find no
+> benefit from turnover reduction: their cost model has **no AUM term**, so they sit permanently at
+> zero slack where this channel is zero by construction.
+>
+> **We cannot adjudicate Novy-Marx-Velikov versus Azevedo-Hoegner-Velikov and no longer claim to.**
+> The contribution is a measurement - an AUM-indexed dose-response in three non-US markets - not a
+> mechanism adjudication. Weaker than what I claimed at 12:25; the loss is real.
+>
+> **Two pre-registered predictions failed and one passed vacuously** (`AMENDMENT_001D` section 11).
+> D3 passed on a **-0.0013 reading with p = 0.370** because I wrote a sign prediction with no
+> magnitude floor - my defect, not evidence - so I am **not** reporting the scorecard's
+> "H-FLIP CONFIRMED" line. D5 failed substantively: Japan's scaled channel at $1bn came out *above*
+> Germany's (5.228 vs 4.00) where I predicted below, so **distance past the capacity frontier is not
+> a sufficient statistic** for how hard the constraint bites - Japan's 1,705-name breadth puts far
+> more positions at the cap than its nearer frontier suggests.
 >
 > **What went wrong, because it is the most useful thing to come out of today.** The ladder formed
 > deciles on Germany's **signal-bearing** cross-section (~382 names) instead of its **investable**
