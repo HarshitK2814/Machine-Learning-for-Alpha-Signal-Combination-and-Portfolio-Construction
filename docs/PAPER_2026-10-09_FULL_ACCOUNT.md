@@ -1011,32 +1011,30 @@ identical bound output means the 456 names are never realised as grandfathered l
 the post-reform window. **The §112A result stands as written and Absar's lookup is discharged.**
 Pinned by six tests. See §8.7.
 
-### 12.2 Japan's tax ladder **[two of three rungs in; $10bn running]**
+### 12.2 Japan's tax ladder **[DONE, all three rungs]**
 
-**Why.** Japan's $1bn book is the only one that goes **negative** after tax. Germany's tax channel
-is scale-invariant (§6.3.4). If Japan's is too, **no mandate size rescues it**.
+Prediction cells, taxable regime, optimised book:
 
-**Result so far** (prediction cells, taxable regime):
+| AUM | turnover | cost bps | tax bps | SR net | **SR after tax** | **tax channel** | lt_share |
+|---|---|---|---|---|---|---|---|
+| **$100mn** | 0.1402 | 166.51 | 35.17 | −0.088 | **−0.205** | **−0.116** | 0.0000 |
+| **$1bn** | 0.0290 | 42.31 | 11.49 | +0.057 | **−0.049** | **−0.106** | 0.0000 |
+| **$10bn** | 0.0036 | 5.48 | 1.35 | −0.100 | **−0.177** | **−0.077** | 0.0000 |
 
-| AUM | turnover | cost bps | tax bps | SR gross | SR net | **SR after tax** | tax channel | lt_share |
-|---|---|---|---|---|---|---|---|---|
-| **$100mn** | 0.1402 | 166.51 | 35.17 | +0.462 | **−0.088** | **−0.205** | **−0.116** | 0.0000 |
-| **$1bn** | 0.0290 | 42.31 | 11.49 | +0.437 | +0.057 | **−0.049** | **−0.106** | 0.0000 |
-| $10bn | | | | | | *running* | | |
+After-tax Sharpe is negative at all three rungs and `lt_share` is exactly 0 at all three. Germany's
+ladder, for comparison, is −0.155 / −0.111 / −0.122.
 
-**Negative after tax at both rungs tested, and at $100mn Japan is negative even *before* tax.**
-Japan's tax channel is **scale-invariant at −0.11 to −0.12**, exactly as Germany's is
-(−0.155 / −0.111 / −0.122), confirming §6.3.4's mechanism in a second market. `lt_share` is 0.0000
-at both rungs, as the statutory argument requires.
+**Reading it correctly, because the tool's own printed verdict overreaches.** The script printed
+"Japan's book is unviable after tax at EVERY mandate size tested". That is the "survival" framing
+withdrawn in §6.3.3. Japan's **pre-tax** net Sharpe is −0.088 / +0.057 / −0.100: negative at two of
+three rungs before any tax, and not distinguishable from zero at $1bn (t = +0.18). Taxes make a
+non-viable book more negative; they do not turn a viable one non-viable.
 
-Note also that Japan's **net** Sharpe *rises* with mandate size (−0.088 → +0.057): the capacity
-channel at work on the **optimised** book, which is independent corroboration of §6.2 on the book
-an investor actually runs.
-
-**How it changes the paper.** If $10bn is also negative, "Japan's book is unviable at $1bn" becomes
-a **jurisdiction-level** conclusion: at Japan's statutory rate and this strategy's turnover, ML
-alpha does not survive tax at **any** scale we can run. That is the strongest single sentence
-available to us, and on two of three rungs it already holds.
+**Correction to "scale-invariant".** Germany's tax channel is roughly flat across the ladder
+(−0.155 / −0.111 / −0.122). Japan's is not: it **shrinks by about a third** at $10bn (−0.116 →
+−0.077), because at that scale turnover has fallen to 0.0036 and the tax bill with it. So the
+claim "you cannot grow out of the tax channel" holds for Germany and only partly for Japan, and
+§6.3.4 should say so.
 
 ### 12.3 Re-run the value-weighting check on the compliant ladder
 
