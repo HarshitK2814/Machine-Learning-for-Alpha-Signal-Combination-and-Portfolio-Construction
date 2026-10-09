@@ -56,8 +56,18 @@ sys.path.insert(0, str(ROOT / "src"))
 P_CELLS = [f"cell_{a}-{b}-P-{d}" for a in "LN" for b in "SC" for d in ("0", "U")]
 
 
-def decile_weights(scores: pd.Series, n_groups: int, gross: float) -> pd.Series:
-    """Equal-weighted long-short spread over the extreme groups, scaled to ``gross``."""
+def decile_weights(scores: pd.Series, n_groups: int, gross: float,
+                   me: pd.Series | None = None) -> pd.Series:
+    """Long-short spread over the extreme groups, scaled to ``gross``.
+
+    ``me=None`` gives the equal-weighted spread, which is what the signal literature usually
+    reports. Passing market capitalisations gives the **value-weighted** spread, each leg
+    weighted by ``me`` within itself. That distinction is not cosmetic here: Novy-Marx & Velikov
+    (RFS 2016) argue equal-weighted anomaly results are "misleading" net of costs precisely
+    because they load on small illiquid names, and those are the names our participation cap
+    removes - so whether the sign flip survives value-weighting is a real test of it, not a
+    formality.
+    """
     if scores.notna().sum() < n_groups * 2:
         return pd.Series(dtype=float)
     ranks = scores.rank(method="first", na_option="keep")
@@ -67,13 +77,26 @@ def decile_weights(scores: pd.Series, n_groups: int, gross: float) -> pd.Series:
     order = ranks[valid].sort_values()
     short_idx, long_idx = order.index[:edge], order.index[-edge:]
     w = pd.Series(0.0, index=scores.index)
-    w.loc[long_idx] = (gross / 2) / edge
-    w.loc[short_idx] = -(gross / 2) / edge
+    if me is None:
+        w.loc[long_idx] = (gross / 2) / edge
+        w.loc[short_idx] = -(gross / 2) / edge
+        return w
+    for idx, sign in ((long_idx, +1.0), (short_idx, -1.0)):
+        cap = pd.to_numeric(me.reindex(idx), errors="coerce")
+        cap = cap.where(cap > 0)
+        tot = float(cap.sum(skipna=True))
+        if not np.isfinite(tot) or tot <= 0:
+            # No usable capitalisations in this leg: fall back to equal weight rather than
+            # silently dropping the leg, and the month still enters the series.
+            w.loc[idx] = sign * (gross / 2) / edge
+        else:
+            w.loc[idx] = sign * (gross / 2) * (cap.fillna(0.0) / tot)
     return w
 
 
 def run(country: str, aum: float, n_groups: int, gross: float,
-        cells: list[str], impact_k: float | None = None) -> tuple[pd.DataFrame, pd.DataFrame]:
+        cells: list[str], impact_k: float | None = None,
+        weighting: str = "ew") -> tuple[pd.DataFrame, pd.DataFrame]:
     from alphacomb.contracts import intl, paths, read_table
     from alphacomb.portfolio.cost_terms import trade_cost_numpy
 
@@ -91,6 +114,8 @@ def run(country: str, aum: float, n_groups: int, gross: float,
     tg["date"] = pd.to_datetime(tg["date"])
     ci = bundle.cost_inputs[["date", "permno", "spread", "sigma_d", "adv_usd"]].copy()
     ci["date"] = pd.to_datetime(ci["date"])
+    uni = bundle.universe[["date", "permno", "me"]].copy()
+    uni["date"] = pd.to_datetime(uni["date"])
 
     index = paths.outputs_root() / "source_index" / f"{country}.csv"
     if not index.exists():
@@ -108,12 +133,14 @@ def run(country: str, aum: float, n_groups: int, gross: float,
                                                     if c not in ("date", "permno", "unc_sd")][0]
         d = f[["date", "permno", col]].rename(columns={col: "score"}).copy()
         d["date"] = pd.to_datetime(d["date"])
-        d = d.merge(tg, on=["date", "permno"], how="inner").merge(ci, on=["date", "permno"],
-                                                                  how="left")
+        d = (d.merge(tg, on=["date", "permno"], how="inner")
+               .merge(ci, on=["date", "permno"], how="left")
+               .merge(uni, on=["date", "permno"], how="left"))
         monthly, prev_u, prev_c, prev_inputs = [], None, None, None
         for date, g in d.groupby("date"):
             g = g.set_index("permno")
-            w = decile_weights(g["score"], n_groups, gross)
+            w = decile_weights(g["score"], n_groups, gross,
+                               me=g["me"] if weighting == "vw" else None)
             if w.empty:
                 continue
             r = g["ret_next"].reindex(w.index).fillna(0.0).to_numpy(dtype=float)
@@ -210,6 +237,11 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--gross", type=float, default=2.0,
                     help="gross of the spread portfolio; 2.0 matches the registered budget")
     ap.add_argument("--out", type=Path, default=ROOT / "outputs" / "signal_vs_portfolio")
+    ap.add_argument("--weighting", choices=["ew", "vw"], default="ew",
+                    help="ew = equal-weighted within each leg (the signal literature's default); "
+                         "vw = value-weighted by market cap. Novy-Marx & Velikov (RFS 2016) hold "
+                         "that equal-weighted anomaly results mislead net of costs, so vw is the "
+                         "robustness check that matters for the capacity channel")
     ap.add_argument("--impact-k", type=float, default=None,
                     help="override the square-root impact coefficient (config default is "
                          "1.0, Grinold-Kahn). The capacity channel's sign depends on it, "
@@ -232,7 +264,7 @@ def main(argv: list[str] | None = None) -> int:
     all_res, all_mon = [], []
     for aum in sorted(args.aum):
         res, feas, mon = run(args.country, aum, args.groups, args.gross, P_CELLS,
-                             impact_k=args.impact_k)
+                             impact_k=args.impact_k, weighting=args.weighting)
         if res.empty:
             print(f"  AUM {aum:.0e}: no cells resolved")
             continue

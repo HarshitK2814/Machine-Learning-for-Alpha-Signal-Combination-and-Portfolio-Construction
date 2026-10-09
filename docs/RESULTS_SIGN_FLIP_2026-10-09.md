@@ -79,9 +79,20 @@ what one should expect: the channel is near zero there by construction.
 | $1bn | +5.552 | +5.66 | 0.0030 | 7/8 |
 | $10bn | +5.822 | +5.85 | 0.0015 | 7/8 |
 
-**50.8% of replications show no sign change anywhere in $1k..$10bn**, and the point estimate is
-"no crossover in range". **The flip is not universal.** India's constraint is close to free at
-small scale and valuable at large scale, but never harmful.
+The point estimate is **no crossover in range**, and **50.8% of replications show no sign change**
+anywhere in $1k..$10bn.
+
+**The precise statement, which is weaker than "India has no crossover".** India's channel at the
+bottom of the ladder is **indistinguishable from zero** (+0.004, t = +0.13, p = 0.89 at $1k), not
+reliably positive. Roughly half the bootstrap replications do cross zero somewhere; the other half
+do not. So the honest claim is **"no crossover is detectable in India, and if one exists it is
+below the scale at which the constraint does anything measurable"** — not that India's constraint
+is provably never harmful. What *is* established for India is the positive half: significantly
+positive from $10k upward, 8 of 8 cells under Holm from $300k to $10mn.
+
+**Either way the flip is not universal**, and that is what matters for the claim: Germany's
+crossover is a real, bounded quantity and India's is not, so the existence of a negative region
+cannot be read off market depth. That is why `AMENDMENT_001D` D3 had to be made conditional.
 
 ### 3c. Why the two markets differ — hypothesis, not claim
 

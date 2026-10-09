@@ -104,6 +104,13 @@ verbatim at **`docs/attachments/CAPACITY_CHANNEL_LADDER_2026-10-09.csv`** becaus
 gitignored and a pre-registration whose exploratory evidence is not version-controlled is worth
 little.
 
+**Provenance of that ladder, so it is reproducible.** It was assembled from the wedge tool's
+`--tag` outputs `crossover`, `xover_fine`, `xover_low` and `asym`, all at the config default
+`impact_k = 1.0` and equal weighting. Later runs added the tags `k05`, `k20`, `k30` (impact-k
+sweep, section 3e) and `vw` (value weighting), which are **not** part of this ladder — a glob over
+`wedge_DEU_*.csv` would now mix four different cost assumptions into one table. The `--tag` flag
+exists because an untagged run had already silently overwritten the $1bn rows once.
+
 **Capacity channel** = (net Sharpe, participation-capped) - (net Sharpe, uncapped).
 
 | AUM | Germany | India |

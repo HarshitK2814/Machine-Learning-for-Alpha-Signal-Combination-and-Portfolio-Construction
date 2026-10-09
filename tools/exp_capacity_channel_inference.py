@@ -148,8 +148,8 @@ def crossover_ci(by_aum: dict[float, pd.DataFrame], n_boot: int, block: int,
 
 
 def run_country(country: str, src: Path, out: Path, n_boot: int, block: int,
-                seed: int) -> tuple[pd.DataFrame, dict]:
-    path = src / f"monthly_{country}_infer.csv"
+                seed: int, tag: str = "infer") -> tuple[pd.DataFrame, dict]:
+    path = src / f"monthly_{country}_{tag}.csv"
     if not path.exists():
         raise SystemExit(f"no monthly series at {path}; run the wedge tool with --dump-monthly")
     mon = pd.read_csv(path, parse_dates=["date"])
@@ -193,7 +193,8 @@ def run_country(country: str, src: Path, out: Path, n_boot: int, block: int,
     tab = pd.DataFrame(rows).sort_values(["country", "aum", "scope", "cell"])
     xo = crossover_ci(by_aum, n_boot=n_boot, block=block, seed=seed)
     out.mkdir(parents=True, exist_ok=True)
-    tab.to_csv(out / f"capacity_channel_inference_{country}.csv", index=False)
+    suffix = "" if tag == "infer" else f"_{tag}"
+    tab.to_csv(out / f"capacity_channel_inference_{country}{suffix}.csv", index=False)
     return tab, xo
 
 
@@ -203,6 +204,10 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--country", nargs="+", default=["DEU", "IND"])
     ap.add_argument("--src", type=Path, default=ROOT / "outputs" / "signal_vs_portfolio")
     ap.add_argument("--out", type=Path, default=ROOT / "outputs" / "capacity_inference")
+    ap.add_argument("--tag", default="infer",
+                    help="which monthly_<country>_<tag>.csv dump to read; 'vw' for the "
+                         "value-weighted ladder, 'k05'/'k20'/'k30' for the impact-k sweep. "
+                         "Mixing tags would mix cost assumptions into one table")
     ap.add_argument("--n-boot", type=int, default=2000)
     ap.add_argument("--block", type=int, default=6, help="expected bootstrap block, months")
     ap.add_argument("--seed", type=int, default=0)
@@ -211,7 +216,7 @@ def main(argv: list[str] | None = None) -> int:
     summary = []
     for c in a.country:
         print(f"\n{'='*78}\n{c}\n{'='*78}")
-        tab, xo = run_country(c, a.src, a.out, a.n_boot, a.block, a.seed)
+        tab, xo = run_country(c, a.src, a.out, a.n_boot, a.block, a.seed, a.tag)
         comp = tab[tab.scope == "composite"].sort_values("aum")
         print(f"\n  composite capacity channel (equal-weighted across "
               f"{tab[tab.scope=='cell'].cell.nunique()} prediction cells)\n")
@@ -244,7 +249,8 @@ def main(argv: list[str] | None = None) -> int:
         print(f"    months {xo['months']}, {xo['n_boot']} replications, block {a.block}")
         summary.append({"country": c, **{k: v for k, v in xo.items()
                                          if k != "channel_by_rung"}})
-    pd.DataFrame(summary).to_csv(a.out / "crossover_intervals.csv", index=False)
+    sfx = "" if a.tag == "infer" else f"_{a.tag}"
+    pd.DataFrame(summary).to_csv(a.out / f"crossover_intervals{sfx}.csv", index=False)
     print(f"\nwrote {a.out / 'crossover_intervals.csv'} and per-country inference tables")
     return 0
 
