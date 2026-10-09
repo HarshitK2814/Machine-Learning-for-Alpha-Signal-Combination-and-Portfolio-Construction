@@ -202,6 +202,10 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--gross", type=float, default=2.0,
                     help="gross of the spread portfolio; 2.0 matches the registered budget")
     ap.add_argument("--out", type=Path, default=ROOT / "outputs" / "signal_vs_portfolio")
+    ap.add_argument("--tag", default="",
+                    help="suffix for the output filename; set it when sweeping a "
+                         "different AUM ladder or group count so a later run cannot "
+                         "silently overwrite an earlier one (this has happened)")
     args = ap.parse_args(argv)
 
     args.out.mkdir(parents=True, exist_ok=True)
@@ -232,8 +236,10 @@ def main(argv: list[str] | None = None) -> int:
         print()
     if all_res:
         out = pd.concat(all_res, ignore_index=True)
-        out.to_csv(args.out / f"wedge_{args.country}.csv", index=False)
-        print(f"wrote {args.out / f'wedge_{args.country}.csv'}")
+        suffix = f"_{args.tag}" if args.tag else ""
+        dest = args.out / f"wedge_{args.country}{suffix}.csv"
+        out.to_csv(dest, index=False)
+        print(f"wrote {dest}")
     return 0
 
 

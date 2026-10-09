@@ -54,12 +54,12 @@ those designs beats an equal-weighted blend of them after tax. Both are [proposa
 | 2 | @SWZ2023 | MS 2026 (Crossref) | Deep parametric portfolio policies; robust to costs | Nonlinear economic-objective cell | Factorial attribution; state dependence; formal snooping control | **High** | Sep 2026 |
 | 3 | @DMNU2020 | RFS 2020 | Linear PPP with TC; netting | Linear economic-loss cell | Nonlinear and conditional cells; netting attribution | Medium | Sep 2026 |
 | 4 | @DMU2024 | JF 2024 | Conditional multifactor (volatility) net of costs | Conditioning x costs in low dimension | Stock-level high-dimensional conditioning; many states; mechanism tests | **High** (for G2) | Sep 2026 |
-| 5 | @ACM2023 | MS 2023 | ML under economic restrictions | Motivation | We propose/attribute, not only diagnose | Low | Sep 2026 |
+| 5 | @ACM2023 | MS 2023 | ML under economic restrictions | Motivation; **and the capacity headline directly** | We propose/attribute, not only diagnose; see row C1-C6 and section C3 | **High** (re-rated Oct 2026, was Low) | Oct 2026 |
 | 6 | @CHK2024 | SSRN WP | 1,056 ML designs; non-standard errors | Design-grid methodology | Our factors are economic ingredients evaluated net of costs with a common optimiser | Medium | Sep 2026 |
 | 7 | @LAL2025 | EFM 2025 | 5,376 portfolios; design choices incl. portfolio construction | Design-grid methodology | Same as above | Medium | Sep 2026 |
 | 8 | @NRRZ2024 | SSRN WP | Factor-zoo timing | State-variable predictability | Stock-level implementation with costs | Medium | Sep 2026 |
 | 9 | @LMNS2025 | arXiv WP | NN forecast uncertainty; uncertainty-averse portfolios | Uncertainty dimension (iv) | Interaction with costs and conditioning | Medium-High (for iv) | Sep 2026 |
-| 10 | @AHV2023 | SSRN WP | ML strategies net of costs and decay | Net-of-cost evaluation | Cost-aware learning, attribution | Medium | Sep 2026 |
+| 10 | @AHV2023 | SSRN WP (= @AHV2025, row C3) | ML strategies net of costs and decay | Net-of-cost evaluation; **opposite sign on turnover reduction** | Cost-aware learning, attribution; scale-dependence of the sign (section C3) | **Severe** (re-rated Oct 2026, was Medium) | Oct 2026 |
 | 11 | @BHHH2023 | JFDS 2023 | Horizon choice and ML alpha net | Horizon/turnover lever | Horizon is a robustness factor | Low-Medium | Sep 2026 |
 | 12 | @CTWZ2021 | NBER WP | RL direct construction; transformer | Direct-objective learning | Controlled attribution; costs | Low-Medium | Sep 2026 |
 | 13 | @CDS2020 | JFE 2020 | Liquidity-regime theory with costs | Economic prediction we test | We test it empirically | Low (supportive) | Sep 2026 |
@@ -136,3 +136,159 @@ high-dimensional ML signal combination after tax" - rests on four general search
 **weak**. It must be re-run against Google Scholar, SSRN full text, and the AQR/Parametric/Vanguard
 publication lists before any novelty claim is committed to, because much of this field is
 practitioner-published and poorly indexed. Raw results: `sources/research_20260920_*.md`.
+
+---
+
+# Capacity and friction literature (added 2026-10-09, read in full text)
+
+**Why this section exists.** The tracker above was built for a tax paper. When the headline moved to
+capacity (`docs/CANDIDATE_REFRAMING_CAPACITY.md`, `docs/STRATEGIC_ASSESSMENT_2026-10-09.md`) it
+became known-incomplete in the dimension that matters. Rows C1-C6 below were added after obtaining
+and reading the **full text** of each paper, not the abstract. Where a claim in the strategic
+assessment turned out to be wrong against the actual paper, that is recorded in section C8.
+
+**Provenance of these rows.** Full texts extracted to
+`scratchpad/lit_txt/{ks2004,nmv2016,gp_capacity,cv_zoo,ahv_afa,ahv_slides,cv_zeroing}.txt`
+from publisher- or author-hosted PDFs. @ACM2023 full text was **not** obtained (INFORMS paywall,
+SSRN blocks automated download); its row is still abstract-level and is flagged as such.
+
+## C1. Tracker rows
+
+| # | Paper | Status | What it actually does (full text) | Overlap | Differentiation | Threat | Checked |
+|---|---|---|---|---|---|---|---|
+| C1 | @KS2004 Korajczyk & Sadka, "Are Momentum Profits Robust to Trading Costs?" | **JF 2004**, 59(3) 1039 | Break-even fund size for momentum under price impact. Impact from Breen-Hodrick-Korajczyk (**exponential, convex**) and Glosten-Harris (**linear**), scaled by *shares outstanding / market cap*, estimated on intraday data. EW/VW plus a derived **liquidity-weighted** strategy. Break-even where alpha = 0: **$4.5-5.0bn**; where *significance* disappears: **$1.1-2.0bn**. All figures stated **relative to Dec-1999 market cap**, = 0.043% of NYSE cap | **High.** Their break-even fund size is the closest published object to our capacity frontier | **Different construct** (see C2) - theirs is where *profit* vanishes, ours where the *mandate becomes infeasible* at target gross. Also: ours is concave (sqrt) impact, theirs convex/linear; ours scaled by **ADV**, theirs by **market cap**; ours non-US | **High** | Oct 2026 |
+| C2 | @NMV2016 Novy-Marx & Velikov, "A Taxonomy of Anomalies and their Trading Costs" | **RFS 2016** | 23 anomalies net of effective spreads; capacity from **Kyle's lambda (linear)** price impact; capacity defined as new capital before the *latest-executing marginal* trader is unprofitable, **one-sided**, stated at Dec-2012. Buy/hold spread (enter on decile, exit on quintile) is the most effective mitigation. Capacities: size **$20-169bn**, gross profitability **$125-131bn**, value **$21-51bn**, momentum **$5.2-5.8bn**, PEAD **$0.8-3.0bn**, **high-frequency combo $0.38-0.44bn**, industry relative reversal **$0.18-0.53bn** | **Severe.** Their high-turnover capacities are **$180-530mn** - the same range as our $55/106/413mn | **This kills the "10-100x below US" claim** (C8.1). Surviving differences: definition, impact law, non-US, and that their mitigation is a *design choice* while ours is an *exogenous constraint* | **Severe** | Oct 2026 |
+| C3 | @AHV2025 Azevedo, Hoegner & Velikov, "The Expected Returns on Machine-Learning Strategies" | SSRN 4702406 (Nov 2023, rev. Jun 2025); AFA programme | ML anomaly combination (OLS-Huber, ENET, FFNN, **LSTM**, ensemble) on ~320 Chen-Zimmermann anomalies, net of Chen-Velikov effective spreads, post-publication decay, post-decimalisation. Net returns to **1.42%/month (t=3.99)** for LSTM1; FF6 net alpha **1.20% (t=3.46)**; one-sided turnover **60-70%**; costs only **20-25 bps/month**. Tests NMV's mitigations (H2/H3/H4 holding periods, QUINTILE, BHS, universe filters): **turnover and costs fall but net performance does not improve** - the gross-return loss more than offsets the cost saving. Only H2 marginally helps | **Severe, and it is the live counterparty to our capacity channel** | They are a **marginal trader with no price impact** - costs are effective spreads, invariant to AUM. We are an **AUM-indexed trader** with square-root impact. Section C3 argues this is exactly why their sign is negative and ours positive | **Severe** | Oct 2026 |
+| C4 | @GP2013 Garleanu & Pedersen, "Dynamic Trading with Predictable Returns and Transaction Costs" and capacity follow-ons | JF 2013 and follow-ons | Optimal trading toward a moving aim portfolio under quadratic costs; capacity expressed as dollar volatility sustainable at a target Sharpe; **Sharpe falls in invested capital** | High on the mechanism (costs vs signal decay trade-off) | They solve for the optimal *policy* given costs; we hold the policy fixed and vary the *constraint*. Their Sharpe-falls-in-scale is the opposite sign to our constrained book's Sharpe-rises-in-scale, which is the fact to explain | **High** | Oct 2026 |
+| C5 | @CV2023 Chen & Velikov, "Zeroing in on the Expected Returns of Anomalies" | **JFQA 2023**, 58(3) 968 | Net expected returns of anomalies after data-mining and cost corrections; strongest anomalies net **~10bp** at best | Moderate - sets the bar for what "survives" means | We do not claim new anomalies; we measure where an existing signal's value goes | Moderate | Oct 2026 |
+| C6 | @CFMZ2023 Cakici, Fieberg, Metko & Zaremba, "Machine Learning Goes Global" | **JEDC 2023**, 155:104725 | ML cross-sectional predictability in **46 markets**, 148 characteristics. Performance depends on firm size and recent-information availability; varies internationally with **number of listed firms** and **average idiosyncratic risk** | **Severe for the "non-US ML" framing.** They own international ML return predictability | They vary *breadth and arbitrage risk*; they do **not** do transaction costs at scale, capacity, AUM, price impact, or taxes. Our contribution must be the **friction** measurement, never "ML works outside the US" | **Severe (for framing)** | Oct 2026 |
+
+Also updated: **row 5 (@ACM2023)** threat Low to **High**, and **row 10 (@AHV2023)** threat Medium to
+**Severe**, because both were rated against the *attribution* claim and the headline has moved to
+frictions. @ACM2023 remains abstract-level; obtain the full text before submission.
+
+## C2. Our capacity frontier is not their break-even fund size
+
+This distinction is the single most important thing to come out of reading C1 and C2, and it has to
+be stated in the paper in one sentence or a referee will assume we rediscovered @KS2004.
+
+* **@KS2004 and @NMV2016 define capacity where profit vanishes.** Break-even fund size is the AUM at
+  which net alpha (KS) or the marginal trader's net profit (NMV) reaches zero.
+* **Our frontier is where the mandate becomes infeasible.** `capacity_frontier = AUM_ref *
+  ceiling_ref / gross_budget`: the largest AUM at which the **target gross of 2.0 is still
+  attainable** under the ADV participation cap. It is an *implementability* bound, independent of
+  whether the strategy is profitable there.
+
+The two can be ordered: implementability binds **before** profitability, because a book can still be
+profitable while unable to reach its mandated gross. Nobody reports the implementability bound, and
+it is the one an allocator writing an investment management agreement actually faces. That is a
+conceptual contribution, it is cheap to establish, and it is honest - but it also means **our number
+is not comparable to theirs**, and C8.1 is the consequence.
+
+## C3. The @NMV2016 / @AHV2025 dispute is where our mechanism belongs
+
+The literature contains a genuine, unresolved disagreement about the **sign** of turnover reduction:
+
+* **@NMV2016 (RFS):** the buy/hold spread is the most effective cost mitigation technique; reducing
+  turnover **improves** net performance.
+* **@KS2004 (JF):** liquidity-weighting - a deliberate tilt toward tradeable names - **raises**
+  break-even fund size by a large factor.
+* **@AHV2025:** the same mitigations significantly reduce turnover and trading costs but **do not
+  improve net performance**, because the gross-return loss dominates. Their stated reason is that
+  post-decimalisation costs are only 20-25 bps/month.
+
+All three are US. The disagreement is not about data, it is about **where on the cost curve the
+investor sits**, and that is what our design varies. With
+
+    net Sharpe = (alpha_eff - kappa * G^0.5) / sigma
+
+a constraint that cuts gross `G` and per-name turnover lowers `alpha_eff` roughly linearly and the
+cost term as `G^0.5`. Tightening therefore helps **iff** `kappa` is large relative to alpha - and
+`kappa` grows with `sqrt(AUM/ADV)`. @AHV2025 operate at `kappa` near zero (marginal trader, effective
+spreads only, no AUM in the cost function at all), so for them mitigation can only destroy alpha.
+We operate at large `kappa`, so for us it creates value.
+
+**Our measured capacity channel is monotone in AUM, which is the dose-response this predicts:**
+
+| AUM | Germany cost channel | Germany **capacity channel** |
+|---|---|---|
+| $100mn | -7.65 | **+4.97** |
+| $1bn | -11.56 | **+8.77** |
+| $10bn | -12.80 | **+10.02** |
+
+(India at $1bn: cost -5.85, capacity **+4.41**.) The prediction that follows, and the reason for
+`AMENDMENT_001D`, is that the capacity channel must **fall toward zero and turn negative** as AUM
+drops far below the frontier - recovering @AHV2025's sign inside our own framework. That is the
+crossover, and locating it is what makes this a mechanism rather than a measurement.
+
+## C4. Claims we must NOT make (capacity additions)
+
+- "First to measure the capacity of a trading strategy": @KS2004; @NMV2016; @GP2013.
+- "First to show ML alpha does not survive realistic frictions": **@ACM2023**, in Management Science,
+  one of our two primary target journals.
+- "First to show ML alpha *does* survive frictions": @AHV2025 - and note they and @ACM2023 disagree.
+- "First to show turnover reduction improves net anomaly performance": **@NMV2016** (buy/hold
+  spread); @KS2004 (liquidity weighting). Our contribution is the *sign flip* and its scale
+  parameter, never the positive sign itself.
+- "First to apply ML to the cross-section outside the US": **@CFMZ2023** (46 markets, JEDC 2023).
+- "First to report capacity in the low hundreds of millions for a high-turnover strategy":
+  **@NMV2016** reports $180-530mn for its high-turnover strategies, in the US.
+- "First to document ML design-choice dispersion": @CHK2024; @LAL2025 (and the 2026 EFM revision
+  reports non-standard errors up to 5x standard errors) - relevant to our design-axis null.
+
+## C5. What survives as ours, stated against the full texts
+
+1. **The implementability frontier as a distinct object** (C2), reported for three non-US markets.
+2. **The sign of the turnover-reduction effect flips with scale, and we locate the crossover** (C3).
+   This adjudicates a live @NMV2016-vs-@AHV2025 disagreement instead of joining one side.
+3. **Taxes measured and ruled out as second-order with a real lot-level engine across three
+   statutory regimes.** None of C1-C6 contains a tax engine; @NMV2016 and @AHV2025 do not mention
+   tax at all. Cost drag beats tax drag 5x (DEU) and 53x (IND).
+4. **Three frictions priced in one framework on one set of signals.** C1-C6 each do one.
+
+## C6. Comparisons that must be made turnover- and units-matched
+
+Reading C1 and C2 showed three ways our headline comparison was not like-for-like. Before any
+capacity number is published:
+
+* **Match on turnover.** @NMV2016 capacities span $0.18bn to $169bn *within one paper*, ordered by
+  turnover. Our strategies rebalance monthly. Compare only against their high-turnover panel.
+* **Match on units.** @KS2004 reports Dec-1999 dollars, @NMV2016 Dec-2012 dollars, one-sided. Ours
+  are 2009-2019. **Report capacity as a share of total investable market cap** as well as in dollars;
+  @KS2004's $5bn is 0.043% of NYSE capitalisation, which is the comparable figure.
+* **Match on the impact law.** @KS2004 is exponential-convex, @NMV2016 Kyle-linear, ours
+  square-root-concave. @KS2004 state explicitly that if true impact is concave their results are
+  conservative because they overestimate large-trade costs. So **our milder law cannot explain a
+  smaller frontier** - which protects the finding, and should be said.
+
+## C7. Search protocol additions
+
+4. Forward citations of **@KS2004**, **@NMV2016**, **@GP2013**, **@ACM2023**, **@CFMZ2023**.
+5. Queries: "capacity" AND ("anomaly" OR "factor") AND ("price impact" OR "break-even fund size");
+   "participation constraint" AND portfolio; "ADV" AND capacity AND backtest; "machine learning"
+   AND capacity AND ("international" OR "non-US"); "turnover reduction" AND "net performance".
+6. Author pages: Velikov (he has three papers in this space and is a co-author on the strongest
+   counter-argument), Novy-Marx, Korajczyk, Zaremba, Avramov.
+
+## C8. Corrections to the strategic assessment forced by these full texts
+
+**C8.1 - the "10-100x below US estimates" claim is wrong and must be withdrawn.**
+`STRATEGIC_ASSESSMENT_2026-10-09.md` section 4.1 says our $55mn/$106mn/$413mn frontiers are "10x to
+100x smaller" than published US estimates, citing @KS2004's $2-5bn for momentum and $50-170bn for
+size/value. Those are **low-turnover** strategies. @NMV2016 Table 7 reports, in the US, **$0.38-0.44bn
+for a high-frequency combination** and **$0.18-0.53bn for industry relative reversal**. Our
+monthly-rebalanced ML books belong in that panel. Turnover-matched, **Japan's $413mn is inside the US
+range**, Germany's $106mn is roughly 2-4x below it and India's $55mn roughly 3-10x below it - and even
+that gap is confounded by the three mismatches in C6. The claim as written would not survive a
+referee who owns @NMV2016, and one of its authors is a co-author of @AHV2025.
+
+**C8.2 - "our 42-row tracker contains none of them" is wrong.**
+@ACM2023 is row 5 and @AHV2023 is row 10. What was missing is the **capacity** literature
+(@KS2004, @NMV2016, @GP2013, @CV2023) and the **international ML** literature (@CFMZ2023). The
+real failure was not absence but **mis-rating**: both were scored against the attribution claim at
+Low and Medium threat, and nobody re-scored them when the headline moved.
+
+**C8.3 - what gets stronger.** The @NMV2016-vs-@AHV2025 disagreement (C3) is a better home for our
+mechanism than "capacity binds" ever was, because it is an open question with named parties rather
+than occupied ground, our comparative static answers it in one line, and our design already contains
+the dose-response that identifies the answer.
