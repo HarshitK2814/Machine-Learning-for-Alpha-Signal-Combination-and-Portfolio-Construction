@@ -34,9 +34,9 @@ whenever `kappa` is large relative to alpha. Since `kappa` grows as `sqrt(AUM/AD
 must grow with mandate size — which is what §3 measures, over five decades.
 
 The same expression says there should exist a small-AUM regime where the cap costs more alpha than
-it saves in cost. **We do not reach it.** At our smallest measurable mandate ($100k) the channel is
-already positive, though insignificantly so (Germany t = +1.22, p = 0.178). The honest reading is
-that the regime exists in theory and lies below the scale at which our data can resolve it.
+it saves in cost. **We looked for it down to a $1,000 mandate and it is not there** — see §3d. The
+channel decays to zero from above rather than crossing, so at the registered cost model that regime
+is not reachable in our data at all.
 
 ## 3. The result
 
@@ -99,7 +99,7 @@ consistent with India's weaker signal (composite gross decile Sharpe **+1.197** 
 | dimension | tested | survives |
 |---|---|---|
 | **weighting** | equal vs value-weighted deciles | **yes** — positive and significant at scale in both markets under both (t = +5.6 to +12.3 at $1bn) |
-| **impact coefficient** | `k ∈ {0.5, 1, 2, 3}` (k=1 is Grinold-Kahn) | **yes** — positive at scale at every k; magnitudes rise with k as the mechanism requires |
+| **impact coefficient** | `k ∈ {0.5, 1, 2, 3}` (k=1 is Grinold-Kahn), on the compliant universe | **yes** — positive at scale at every k, magnitudes rising with k as the mechanism requires. See §3d: only at `k = 0.5` is there any negative region at all, and it is −0.014 |
 | **cost-input coverage** | signal-bearing vs investable universe | **yes for the positive channel.** This is what killed the retracted sign flip, so it is the check that matters — see §6 |
 | **cells** | 8 prediction cells, Holm-corrected | **yes** — 8 of 8 from $1mn upward |
 
@@ -107,6 +107,42 @@ Note that value weighting cuts the composite **gross** decile Sharpe by about 80
 +2.763 → +0.473, measured on the signal-bearing universe before the coverage fix), which is Novy-Marx & Velikov's critique of
 equal-weighted anomaly results landing on our own gross numbers. Every gross Sharpe we quote must
 carry it.
+
+### 3d. The small-AUM limit: the channel decays to zero, it does not cross
+
+§2 says the mechanism also implies a small-AUM regime where the cap forfeits more alpha than it
+saves in cost. **We looked for it on the compliant universe and it is not there.** Germany, down to
+a $1,000 mandate:
+
+| AUM | $1k | $3k | $10k | $20k | $30k | $50k | $100k |
+|---|---|---|---|---|---|---|---|
+| channel | +0.0008 | +0.0021 | +0.0086 | +0.0117 | +0.0181 | +0.0189 | +0.0618 |
+
+**Positive at every rung across seven orders of magnitude of mandate size ($1k to $10bn.)** The
+channel decays smoothly to zero *from above* as AUM falls; it never crosses. So at the registered
+cost model the regime in which a participation cap destroys risk-adjusted performance is **not
+reachable in our data**, and we cannot claim to have observed @AHV2025's side of the literature.
+
+**The sign is weakly `k`-dependent at the very bottom, and this is where the retracted claim's last
+piece dies.** Re-running the impact-coefficient sweep on the *compliant* universe:
+
+| k | channel at $100k | channel at $1mn | channel at $6mn |
+|---|---|---|---|
+| 0.5 | **−0.0142** | +0.1894 | +0.9220 |
+| **1.0** | +0.0618 | +0.9174 | +2.4784 |
+| 2.0 | +0.2113 | +1.8736 | +4.4578 |
+| 3.0 | +0.3540 | +2.7097 | +5.3278 |
+
+Only at `k = 0.5` does a negative region appear at all, and it is **−0.014** — economically
+nothing. Its implied crossover is about $170k, and the `crossover ∝ k^(−2)` law would then put the
+`k = 1` crossover near $40k. **We measured $20k, $30k and $50k directly and all three are
+positive.** So the `k^(−2)` scaling that the retracted ladder appeared to confirm to within ±15%
+**was a property of the artefact, not of the mechanism**, and that confirmation is withdrawn along
+with it.
+
+What survives of the `k` analysis is only the monotone and unsurprising part: the channel's
+magnitude rises with `k` at every AUM, as a larger cost coefficient must make cost avoidance worth
+more. The sign does not turn over anywhere an institution would operate.
 
 ## 4. The friction horse race
 
