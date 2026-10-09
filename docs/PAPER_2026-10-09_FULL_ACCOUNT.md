@@ -705,13 +705,32 @@ the same run.
 **Output is still bit-identical**, and `tools/verify_bound_is_live.py` correctly returns exit 2,
 "BOUND DID NOT BIND".
 
-**Status: unresolved, and it matters.** 422 of the 456 names are **materially held** in India's
-prediction cells and 75 are held post-reform, so their deemed cost should enter. Two explanations
-remain: the affected names are never realised as **long-term gains on pre-February-2018 lots sold
-after 2018-04-01** (benign — the binding set is narrow), or **the reference values are not threaded
-into the computation** (a bug in the tax engine). An all-rows perturbation diagnostic is running to
-separate them. **Absar's lookup therefore remains a live blocker** and `docs/handoff/20_...` says
-so.
+**RESOLVED 17:20 IST — the engine is correct and the 456 values cannot change the result.**
+
+422 of the 456 names are materially held and 75 are held post-reform, so the possibility of a bug
+in the dated engine was live and serious. It is excluded, end to end at the unit level. For a
+**perturbed** permno, a long lot acquired 2017-01-31 at basis 100 and sold 2018-06-30 at 200:
+
+| bound | ratio | statutory reference | tax basis | **taxable gain** |
+|---|---|---|---|---|
+| MAXTAX | 1e−6 | 0.0001 | 100 (actual cost) | **100** (full gain taxed) |
+| MINTAX | 1e6 | 1e8 | 200 (sale value) | **0** (fully sheltered) |
+
+That is `max(actual_cost, min(fmv, sale_value))` working exactly as §55(2)(ac) requires, with the
+perturbation flowing through **maximally**. So the reference value is threaded.
+
+**Therefore the identical aggregate output has one remaining explanation:** none of the 456 names
+is ever realised as a **grandfathered long-term gain on a pre-February-2018 lot sold after
+2018-04-01** in any of the 16 cells. Had even one been, its taxable gain would have differed by the
+entire gain between bounds, which must have moved `mean_tax_per_gain_post` — and that is identical
+to sixteen significant figures (0.0408371359251255).
+
+The deduction is only valid while the plumbing is known good, so it is pinned by **six tests** in
+`tests/tax/test_112a_reference_threading.py`, including one asserting the exact mistake: moving
+`fmv` and `close` together is a no-op. **Absar's lookup is no longer a blocker** — it would be nice
+for completeness and nothing waits on it. `docs/handoff/20_...` records the resolution and the fact
+that the 02:45 escalation was too strong, because I had not checked whether the affected names were
+in the binding set before escalating.
 
 ---
 
@@ -819,17 +838,12 @@ hard the constraint bites.**
 
 Ordered by how much each could move the paper.
 
-### 12.1 Resolve §8.7 — is the §112A reference value threaded into the tax engine at all? **[running]**
+### 12.1 ~~Resolve §8.7 — is the §112A reference value threaded into the tax engine?~~ **DONE**
 
-**Why.** Two bounding attempts produced bit-identical output with a genuinely varying input. Either
-the binding set is narrow (benign) or **the dated engine ignores the lot-level reference value** (a
-bug in the one piece of machinery nobody else has). An all-rows perturbation diagnostic is running:
-if output still does not move when **all 1,002** rows are perturbed, it is a bug.
-
-**How it changes the paper.** If a bug: §6.3's India numbers are suspect in the post-2018 period and
-the dated-engine claim needs repair before any tax result is published. **This is the single highest
-risk item on the list.** If benign: Absar's 456 values become a robustness footnote rather than a
-blocker, and §6.3 stands as written.
+**Resolved 17:20 IST.** The engine is correct (unit-tested end to end, maximal flow-through), so the
+identical bound output means the 456 names are never realised as grandfathered long-term gains in
+the post-reform window. **The §112A result stands as written and Absar's lookup is discharged.**
+Pinned by six tests. See §8.7.
 
 ### 12.2 Japan's tax ladder **[two of three rungs in; $10bn running]**
 
@@ -921,11 +935,14 @@ band. The sweep is cheap and has not been run.
 * Opinion on §9/§10: what a reviewer-proof protocol looks like when a coverage asymmetry can
   produce a t = −6.10 result that passes two robustness checks.
 
-### 12.10 Absar's lookup **[blocked on him — the only genuine external blocker]**
+### 12.10 ~~Absar's lookup~~ **DISCHARGED — there is no longer any external blocker**
 
-`prchd` on 2018-01-31 in INR for the 456 permnos in
-`docs/handoff/attachments/IND_112A_MISSING_REFERENCE_PERMNOS_2026-10-09.csv`. A WRDS/Compustat
-entitlement we do not have. Still live because §8.7's bounding failed twice.
+The 456 missing §112A reference values **cannot change the event study** (§8.7, §12.1). Obtaining
+them remains desirable for completeness and nothing waits on them.
+
+**As of 17:20 IST this project has no blocker that only another person can clear.** Everything
+outstanding is either our own compute (§12.2–12.8) or Maham's judgement on work already done
+(§12.9), and none of §12.9 blocks a result — it blocks sign-off.
 
 ### 12.11 Not worth doing
 

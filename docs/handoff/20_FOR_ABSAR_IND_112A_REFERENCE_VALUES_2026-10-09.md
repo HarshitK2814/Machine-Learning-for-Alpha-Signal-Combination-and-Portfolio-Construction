@@ -41,6 +41,46 @@ entitlement for. Everything else from doc 18 is answered and withdrawn (see §5)
 > corrected bounds do agree it becomes a robustness note rather than a blocker; if they disagree it
 > is back to being on the critical path. Either way the request in §2 is unchanged.
 
+
+> ## RESOLVED 2026-10-09, 17:20 IST - YOUR LOOKUP IS NO LONGER A BLOCKER
+>
+> **The 456 missing reference values cannot change the section 112A event study.** You do not need
+> to run the WRDS lookup for this result. It would still be nice to have for completeness, but
+> nothing is waiting on it.
+>
+> **How this was established**, because the 12:35 update above said the opposite and the earlier
+> bounding was invalid twice:
+>
+> 1. **The corrected bound varies the right quantity.** `*_V2.csv` moves the
+>    `fmv_price_local / close_price_local` **ratio** - which is what the engine reads - on all 456
+>    rows (1e-6 for MAXTAX, 1e6 for MINTAX), leaving the 546 real rows bit-identical.
+> 2. **The engine threads it correctly, verified end to end at the unit level.** For a perturbed
+>    permno, a long lot acquired 2017-01-31 at basis 100 and sold 2018-06-30 at 200:
+>
+>    | bound | ratio | statutory reference | tax basis | **taxable gain** |
+>    |---|---|---|---|---|
+>    | MAXTAX | 1e-6 | 0.0001 | 100 (actual cost) | **100** (full gain taxed) |
+>    | MINTAX | 1e6 | 1e8 | 200 (sale value) | **0** (fully sheltered) |
+>
+>    That is the statute working exactly as written - `max(actual_cost, min(fmv, sale_value))` -
+>    and the perturbation flowing through **maximally**. So the reference value is not being
+>    ignored.
+> 3. **Therefore the identical aggregate output has only one remaining explanation:** none of the
+>    456 names is ever realised as a **grandfathered long-term gain on a pre-February-2018 lot sold
+>    after 2018-04-01** in any of the 16 cells. Had even one been, its taxable gain would have
+>    differed by the entire gain between bounds, which must have moved `mean_tax_per_gain_post` -
+>    and that is identical to sixteen significant figures (0.0408371359251255).
+>
+> The deduction is only valid while the plumbing is known good, so it is pinned by six tests in
+> `tests/tax/test_112a_reference_threading.py`, including one that asserts the exact mistake I made:
+> moving `fmv` and `close` together is a no-op.
+>
+> **What I got wrong, for the record.** At 02:45 I told you this was blocking "the cleanest
+> identification left in the project". At 12:35 I told you the bounding was invalid and you were
+> still blocked. Both were right at the time; the 02:45 framing was too strong, because I had not
+> checked whether the affected names were in the binding set before escalating. The lesson is in
+> `docs/VERIFICATION_PROTOCOL_2026-10-09.md` C1.
+
 ---
 
 ## 1. The error
