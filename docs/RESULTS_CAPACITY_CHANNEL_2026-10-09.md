@@ -18,7 +18,7 @@ confirmation** of the positive channel (§3c, `AMENDMENT_001D` D2), reported 12:
 > (Germany), **+5.69** (India) and **+6.68** (Japan) Sharpe points at a $1bn mandate, from
 > ±0.001 where the cap is slack. It pays because it suppresses turnover faster than it suppresses
 > signal. **At the registered cost calibration there is no scale at which it meaningfully
-> hurts** (see SS3g for the calibration dependence). The tax channel, measured with a
+> hurts** (see §3g for the calibration dependence). The tax channel, measured with a
 > lot-level engine across three statutory regimes, is **two to three orders of magnitude smaller**
 > than either the cost or the capacity channel.
 
@@ -155,7 +155,7 @@ the 2.0 target):
 
 > **The constraint's effect on net Sharpe is zero when it does not bind, and monotonically positive
 > in how much it binds. At the registered calibration there is no scale at which it meaningfully
-> hurts** - though SS3g shows that a materially cheaper impact calibration would create one.
+> hurts** - though §3g shows that a materially cheaper impact calibration would create one.
 
 At ~0.01% slack the channel is ±0.001 and its **sign is arbitrary** — Germany +0.0008 against
 Japan −0.0009 on the same cost model. Those are not two regimes, they are noise around zero. Any
@@ -172,7 +172,7 @@ slack, where this channel is zero by construction.
 |---|---|---|
 | **weighting** | equal vs value-weighted deciles | **yes** — positive and significant at scale in both markets under both (t = +5.6 to +12.3 at $1bn) |
 | **impact coefficient** | `k ∈ {0.5, 1, 2, 3}` (k=1 is Grinold-Kahn), on the compliant universe | **yes** — positive at scale at every k, magnitudes rising with k as the mechanism requires. See §3d: only at `k = 0.5` is there any negative region at all, and it is −0.014 |
-| **impact curvature** | Kyle-linear (`exponent 2.0`) level-matched against our square-root contract - the law @NMV2016 argue for against ours | **yes** - positive at every rung in both markets, +7.74 / +3.64 at $1bn (SS3g) |
+| **impact curvature** | Kyle-linear (`exponent 2.0`) level-matched against our square-root contract - the law @NMV2016 argue for against ours | **yes** - positive at every rung in both markets, +7.74 / +3.64 at $1bn (§3g) |
 | **cost-input coverage** | signal-bearing vs investable universe | **yes for the positive channel.** This is what killed the retracted sign flip, so it is the check that matters — see §6 |
 | **cells** | 8 prediction cells, Holm-corrected | **yes** — 8 of 8 from $1mn upward |
 
