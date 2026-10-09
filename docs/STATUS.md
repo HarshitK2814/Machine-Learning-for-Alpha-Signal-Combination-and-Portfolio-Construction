@@ -1,6 +1,6 @@
 # Workstream B status (Harshit)
 
-Updated: **2026-10-09 (02:15 IST)**. Workstream A is production-promoted and its real-data
+Updated: **2026-10-09 (06:50 IST)**. Workstream A is production-promoted and its real-data
 handoff to Workstream B is complete.
 
 > ## The headline, as of this update
@@ -43,6 +43,48 @@ handoff to Workstream B is complete.
 >
 > Read `docs/RESULTS_WEDGE_TEST.md` - §2 is the failure and the retraction - before any number
 > below.
+>
+> ### The candidate reframing, which is what the evidence actually supports
+>
+> **`docs/CANDIDATE_REFRAMING_CAPACITY.md`** - the same fact killed all three dead results, and it
+> has been in the exhibits since the first real-data run: **at $1bn the ADV participation cap binds
+> on essentially every position, so the portfolio is set by capacity, not alpha and not risk.**
+>
+> | | capacity ceiling | **share of names ADV-capped** | realised gross P / E | held / eligible |
+> |---|---|---|---|---|
+> | DEU | 0.189-0.233 | **96.8-97.6%** | 0.132 / 0.178 | 298-305 / ~253 |
+> | IND | 0.113-0.148 | **99.5-100.0%** | 0.056 / 0.097 | 330-335 / ~341 |
+>
+> Attainable gross is **6-23% of the registered budget of 2.0** (India at most 11.3% invested), the
+> risk budget never binds, and the book holds nearly the whole eligible universe. The proposed
+> headline is the **wedge between signal-level and portfolio-level evidence**: prediction-cell IC is
+> **+0.0757 (t +8.6..+10.4, 8/8) in Germany** and **+0.0368 (t +2.8..+5.4, 8/8) in India**, yet
+> **0 of 21** strategies survive deflation and **Hansen SPA against equal-weight is p = 0.70**. The
+> signal is real; the portfolio cannot express it. §6 of that doc states the honest risk: the
+> **capacity dose-response at 1e8/1e10 is what settles it**, and until that curve exists this is a
+> well-evidenced hypothesis, not a finished result. **It is running now** (Germany, no retraining
+> needed).
+>
+> ### The E-arm experiment resolved the cause but not the arm
+>
+> Retraining India's economic cells at the attainable gross (0.10) instead of the infeasible
+> registered 2.0, both restricted to the frozen window for comparability: mean IC moves
+> **-0.00606 -> +0.00741** and positive cells **1/8 -> 7/8**. So the fixed-gross defect is real and
+> causal. But **no cell reaches significance** (max t +1.69) and the arm stays ~5x below the
+> prediction arm, so the factorial's economic main effect still cannot be read as a property of
+> economic objectives. Caught before reporting: without `--years` the retrained cells span 212
+> months and 2 cells *do* reach significance - that came from out-of-window months.
+>
+> ### Provenance: the hazard that bit four consumers in one night
+>
+> `outputs/weights|predictions/<strategy>/` are shared across countries and `paths.latest_run`
+> resolves by **modification time**. Caught: a Germany exhibit resolving to India's book, an IC
+> diagnostic comparing Japan's scores to India's targets, a book-characteristics table printing
+> India's leverage under a German heading, and stage 04 itself, which would have built German
+> portfolios from Japanese predictions. **Every one produced a plausible number, none produced an
+> error.** Now closed on both sides: stage 04 writes `outputs/weights_index/<C>_<aum>.csv`, stage 02
+> writes `outputs/source_index/<C>.csv`, `contracts/provenance.py` resolves through them and
+> **raises rather than falling back**, and 10 tests assert the refusals.
 >
 > **Also settled overnight:** India's net-of-cost factorial replicates Germany's (economic main
 > effect -0.0063 p.a., 81.6% of total, against Germany's -0.0054). The dated C14 engine is now
