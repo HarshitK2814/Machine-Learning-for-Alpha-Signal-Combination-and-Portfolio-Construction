@@ -1,6 +1,40 @@
 # Amendment 001D: the capacity channel changes sign with scale, and Japan tests it
 
-**Declared:** 2026-10-09, 11:30 IST
+> ## REVISED 2026-10-09, 12:06 IST, BEFORE JAPAN REPORTED
+>
+> **What changed and why.** Sections 3 and 4 as first written used the **mean across cells of each
+> cell's Sharpe difference**. Having then built the inference (`sharpe_difference_test`,
+> `tools/exp_capacity_channel_inference.py`) I measured the **composite** channel — one
+> equal-weighted portfolio of the 8 prediction cells, which is the object a paper should quote —
+> and the two statistics do not agree about India.
+>
+> | | mean of per-cell Sharpe diffs | **composite portfolio** |
+> |---|---|---|
+> | Germany, channel at $1bn | +8.77 | **+11.06**, t = +12.27 |
+> | Germany, crossover | between $3mn and $4mn | **$3.79mn, 95% CI [$1.88mn, $7.07mn]** |
+> | India, channel at $1k | −0.0039 | **+0.0035**, t = +0.13, p = 0.89 |
+> | India, crossover | "between $1k and $3k" | **none in $1k..$10bn**; 50.8% of bootstrap draws show no sign change |
+>
+> **So India does not show a sign flip.** Its channel is positive at every scale we can measure and
+> significantly so from $10k upward. The original claim that India's crossover sits between $1k and
+> $3k was an artefact of the mean-of-Sharpes statistic and is **withdrawn**. Germany's flip, by
+> contrast, is confirmed at both tails: significantly **negative** at $100k/$300k/$1mn (t = −6.10,
+> −5.99, −4.01; Holm-adjusted across 8 cells) and significantly **positive** from $8mn upward
+> (t = +2.30 to +12.99).
+>
+> **Consequences, all applied below.** The composite is now the primary statistic throughout.
+> Prediction **D3 was ill-posed** (it compared Japan's crossover against an India crossover that
+> does not exist) and is **replaced**. D2 is restated so it does not presume the flip is universal —
+> which, on two markets, it demonstrably is not.
+>
+> **Why this revision is legitimate.** Japan had not reported when it was made: re-verified at
+> 12:06 IST that `outputs/` contains no Japanese portfolio, weights-index entry or stage-04
+> artefact of any kind, and that Japan's stage 02 is still training. The revision corrects the
+> **exploratory** sample's statistic; it does not weaken a prediction after seeing the answer. Both
+> the original text and this block are kept, and the git history is the record. Nothing may be
+> revised once Japan's arm reports.
+
+**Declared:** 2026-10-09, 11:30 IST (revised 12:06 IST, before Japan reported)
 **Status:** declared **before any Japanese portfolio exists**. See section 6 for the evidence.
 **Awaiting countersignature:** Maham (workstream C), as with 001A, 001B and 001C.
 **Supersedes nothing.** PLAN_001 (`cae8140b7e2b7ee4`, N=64), 001A, 001B and 001C all stand.
@@ -86,53 +120,97 @@ little.
 | $10bn | +10.0150 | +4.5521 |
 | $1tn (asymptote) | +10.4002 | +4.6042 |
 
-Three facts, all exploratory, all on the sample that generated them:
+### 3a. The composite statistic, which is now primary
 
-1. **The channel is monotone increasing in AUM** in both markets, over nine decades, without
+The table above is the **mean across cells of each cell's Sharpe difference**. The object the paper
+should quote is the **composite**: one equal-weighted portfolio of the 8 prediction cells, tested
+with the paired studentized bootstrap (`sharpe_difference_test`). Full table with standard errors:
+`outputs/capacity_inference/capacity_channel_inference_{DEU,IND}.csv`.
+
+| AUM | Germany channel | t | Holm 5% | India channel | t | Holm 5% |
+|---|---|---|---|---|---|---|
+| $1k | | | | +0.0035 | +0.13 | 0/8 |
+| $3k | | | | +0.0284 | +0.98 | 0/8 |
+| $10k | | | | +0.0575 | +1.76 | 0/8 |
+| $100k | **−0.8114** | **−6.10** | **8/8** | +0.2320 | +4.12 | 3/8 |
+| $300k | **−0.8006** | **−5.99** | **8/8** | +0.4355 | +4.10 | 8/8 |
+| $1mn | **−0.6219** | **−4.01** | 3/8 | +0.8273 | +4.21 | 8/8 |
+| $2mn | −0.3430 | −1.87 | 1/8 | | | |
+| $3mn | −0.1447 | −0.71 | 0/8 | +1.4619 | +4.49 | 8/8 |
+| $4mn | +0.0331 | +0.15 | 0/8 | | | |
+| $8mn | **+0.6782** | **+2.30** | 1/8 | | | |
+| $10mn | **+0.9447** | **+2.96** | 3/8 | +2.4341 | +4.65 | 8/8 |
+| $100mn | **+6.0853** | **+9.74** | **8/8** | +4.4674 | +5.25 | 6/8 |
+| $1bn | **+11.0552** | **+12.27** | **8/8** | +5.5523 | +5.66 | 7/8 |
+| $10bn | **+12.6546** | **+12.99** | **8/8** | +5.8220 | +5.85 | 7/8 |
+
+Four facts, all exploratory, all on the sample that generated them:
+
+1. **The channel is monotone increasing in AUM** in both markets, across every rung, without
    exception.
-2. **It changes sign.** Germany's crossover is between **$3mn and $4mn**; India's between **$1k and
-   $3k**. Below the crossover the cap destroys net Sharpe, which is Azevedo et al.'s finding
-   reproduced inside our own framework. At $100k Germany's capped book loses 0.69 Sharpe points to
-   the cap; at $1bn it gains 8.77.
-3. **The crossover does not scale with the capacity frontier.** In units of AUM/frontier the
-   crossovers are 3.6e-2 (Germany) and 3.3e-5 (India) -- three orders of magnitude apart, against a
-   frontier ratio of only 1.9x. Whatever sets the crossover, it is not depth alone. The candidate
-   explanation, to be tested not asserted, is that it depends on how much alpha sits in the
-   illiquid tail: Germany's decile spread has gross Sharpe +2.38 against India's +1.00, so Germany
-   forfeits more by capping.
+2. **Germany's channel changes sign, and both tails are significant.** Significantly **negative** at
+   $100k, $300k and $1mn (t = −6.10, −5.99, −4.01; 8 of 8 cells surviving Holm at the first two) and
+   significantly **positive** from $8mn upward (t = +2.30 rising to +12.99). The crossover is
+   **$3.79mn, 95% bootstrap CI [$1.88mn, $7.07mn]**, with **0%** of 2,000 replications failing to
+   show a sign change. This is Azevedo et al.'s regime and Novy-Marx & Velikov's regime in the same
+   dataset, separated by a factor of about 10 in mandate size.
+3. **India's channel does not change sign.** It is positive at every rung, insignificantly so below
+   $10k and significantly from $10k upward. **50.8%** of bootstrap replications show no sign change
+   anywhere in $1k..$10bn. India is a market where the participation cap helps at every mandate size
+   an investor could actually run. **The flip is therefore not universal**, which is a result in its
+   own right and is why prediction D3 below had to be rewritten.
+4. **A candidate regularity.** The asymptotic channel scaled by the composite gross Sharpe agrees
+   across the two markets: Germany +12.6546/2.763 = **4.58**; India +5.8220/1.209 = **4.82**. With
+   n = 2 this is weak and is pre-registered as a secondary prediction only.
 
-A fourth fact is a candidate regularity rather than an established one:
+### 3b. Why India has no flip, as a hypothesis rather than a claim
 
-4. **The asymptotic channel, scaled by the signal's own gross Sharpe, agrees across the two
-   markets to within 5%:** Germany +10.4249/2.3828 = **4.375**; India +4.6079/1.0024 = **4.597**.
-   With n = 2 this is weak, and it is pre-registered below as a secondary prediction only.
+The crossover is not a fixed multiple of the capacity frontier — Germany's is 3.6e-2 of its $106mn
+frontier while India has none at all, against a frontier ratio of only 1.9x. Depth alone does not
+set it. The candidate explanation, to be tested and not asserted, is the **share of alpha sitting in
+the illiquid tail**: Germany's composite decile spread has gross Sharpe +2.763 against India's
++1.209, so Germany forfeits more than twice as much signal per unit of gross that the cap removes,
+and needs a correspondingly larger cost saving before capping pays. India's signal is weaker and
+more evenly spread, so the cap is nearly free at any scale.
 
 ## 4. The predictions for Japan, fixed now
 
 Japan's arm runs at `--max-names 600`, `--years 2009 2019` (amendment 001B), on the
 prediction-loss cells. The ladder will be the same nine decades.
 
+All predictions are on the **composite** channel (section 3a), tested with
+`sharpe_difference_test`, on the ladder $1k..$10bn.
+
 | # | prediction | falsified if | weight |
 |---|---|---|---|
-| **D1** | Japan's capacity channel is **monotone non-decreasing** in AUM across $1k to $1tn | any decrease exceeding 0.05 Sharpe points between adjacent rungs | **primary** |
-| **D2** | Japan's capacity channel is **negative at the bottom of the ladder** and **positive at $1bn**, i.e. a crossover exists strictly inside the range | no sign change anywhere in $1k..$1tn, or the channel is negative at $1bn | **primary** |
-| **D3** | Japan's crossover AUM **exceeds India's** (between $1k and $3k), because Japan's market is deeper on every cost input we have measured | Japan's crossover is below India's | **primary** |
-| **D4** | Japan's **asymptotic** capacity channel divided by its own decile-spread gross Sharpe lies in **[3.5, 5.5]** | outside that band | secondary (n = 2) |
-| **D5** | Japan's capacity channel at $1bn, **scaled by its gross Sharpe**, is below Germany's +3.681, because $1bn is only 2.4x past Japan's $413mn frontier against 9.4x past Germany's $106mn | at or above +3.681 | secondary |
+| **D1** | Japan's composite capacity channel is **monotone non-decreasing** in AUM across $1k..$10bn | any decrease exceeding 0.05 Sharpe points between adjacent rungs | **primary** |
+| **D2** | Japan's channel is **significantly positive at $1bn** (5%, paired test), because $1bn is 2.4x past Japan's $413mn frontier | not significantly positive at $1bn, or negative there | **primary** |
+| **D3** (replaced) | **Japan resembles Germany rather than India on the sign question**, i.e. Japan's channel is **negative at the bottom of the ladder**, because Japan's composite gross decile Sharpe will exceed India's +1.209 and the section-3b hypothesis says the flip appears where there is more alpha to forfeit. Stated conditionally and scored both ways: **if** Japan's gross Sharpe > 1.209 **then** a negative region should exist; **if** it is below, no flip is predicted and D3 is void | Japan's gross Sharpe exceeds +1.209 **and** no rung in $1k..$1mn has a negative channel | **primary, conditional** |
+| **D4** | Japan's **asymptotic** composite channel divided by its own composite gross decile Sharpe lies in **[3.5, 5.5]** | outside that band | secondary (n = 2) |
+| **D5** | Japan's channel at $1bn, **scaled by its gross Sharpe**, is below Germany's 11.0552/2.763 = **+4.00**, because $1bn is only 2.4x past Japan's frontier against 9.4x past Germany's | at or above +4.00 | secondary |
 
 **D2 and D3 are the real tests.** D1 is close to mechanical given the cost model and should be read
 as a consistency check: if it fails, something is wrong with the pipeline rather than with H-FLIP.
 D4 rests on two observations and a failure should be reported as a failure of the regularity, not of
 H-FLIP. D5 depends on Japan's gross Sharpe, which is unknown.
 
+**D3 is deliberately conditional, and that is a weakening of this amendment relative to its first
+version.** India having no flip means the flip's existence cannot be predicted from market depth
+alone, so an unconditional "Japan will flip" would be a guess. Tying it to Japan's gross Sharpe
+makes it a test of the **section-3b mechanism** rather than of depth, which is the thing actually at
+issue — but it also means D3 can come out void, and if it does, the sign-flip mechanism will rest on
+Germany alone and must be reported that way.
+
 ## 5. What would falsify H-FLIP as a whole
 
-* **D2 failing.** If Japan shows no sign change across nine decades of AUM, then the sign of the
-  constraint's effect is not governed by scale and the reconciliation of the literature fails.
-* **D1 and D3 both failing.** A non-monotone channel together with a crossover ordered against
-  market depth would mean `kappa` is not the governing parameter.
-* A **negative capacity channel at $1bn in Japan** would be the single most damaging result, because
-  $1bn is past Japan's frontier and the mechanism says the constraint must be helping there.
+* **D2 failing.** A channel that is not positive at $1bn in Japan, well past its frontier, would
+  break the mechanism's core claim that the cap pays once `kappa` is large.
+* **D1 failing.** A non-monotone channel would mean `kappa` is not the governing parameter.
+* **D3 failing in its antecedent-true branch** — Japan's gross Sharpe above India's but no negative
+  region anywhere — would falsify the section-3b explanation of *why* Germany flips and India does
+  not, leaving the flip an unexplained one-market fact.
+* The **joint** failure of D2 and D3 would mean scale does not govern the sign and the
+  reconciliation of the literature fails.
 
 ## 6. That this precedes any Japanese result
 
