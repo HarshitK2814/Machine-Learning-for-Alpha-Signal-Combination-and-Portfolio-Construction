@@ -500,6 +500,28 @@ paper. The negative region in the uncalibrated row is a **level** artefact and v
 level is restored — but it is also what the comparative static predicts, so the honest statement is
 that the sign at small mandates depends on the cost **calibration**, and ours is Grinold-Kahn.
 
+### 6.2.5 Inference on the signal-to-portfolio ladder (added 17:30 IST)
+
+The decile-spread Sharpes that anchor the ladder previously had no standard errors. HAC t statistics
+on the composite of the 8 prediction cells, $1bn, compliant universe:
+
+| | gross SR | t | p | net uncapped | **net capped** | t | p |
+|---|---|---|---|---|---|---|---|
+| Germany | **+2.305** | +7.14 | <0.0001 | -9.597 | **-0.675** | **-2.29** | 0.022 |
+| India | **+1.197** | +3.19 | 0.0014 | -6.315 | **-0.623** | -1.80 | 0.071 |
+| Japan | **+1.278** | +4.11 | <0.0001 | -7.456 | **-0.775** | **-2.56** | 0.011 |
+
+The signal is real (gross significant everywhere); the uncapped book is destroyed by cost; and the
+**executable capped decile book is significantly negative in Germany and Japan**. That is the
+signal-to-portfolio wedge with inference, and it is the cleanest single-sentence statement of the
+Avramov-Cheng-Metzker result in our three markets.
+
+**Caveat that prevents over-reading.** The capped decile book attains a gross of only ~0.03 of its
+2.0 target at $1bn, so its Sharpe is a ratio of two tiny quantities, dominated by the fixed spread
+cost on a very small book. The negative t statistics are statements about a nearly-empty executable
+decile portfolio, not about the optimised book, whose net Sharpe (+0.128 Germany) is insignificant
+(section 6.3.3). Quote both together or neither.
+
 ### 6.3 Taxes across three statutory regimes
 
 Optimised book, $1bn, prediction cells, taxable regime, HIFO.
