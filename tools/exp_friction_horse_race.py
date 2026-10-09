@@ -46,9 +46,9 @@ ROOT = Path(__file__).resolve().parents[1]
 BPS = 12 * 1e4
 
 
-def decile_panel(country: str, src: Path) -> pd.DataFrame:
+def decile_panel(country: str, src: Path, tag: str = "cov") -> pd.DataFrame:
     """Cost and capacity drag by AUM, from the decile-spread monthly series."""
-    path = src / f"monthly_{country}_infer.csv"
+    path = src / f"monthly_{country}_{tag}.csv"
     if not path.exists():
         raise SystemExit(f"no monthly series at {path}; "
                          f"run exp_signal_vs_portfolio_wedge.py --dump-monthly")
@@ -133,6 +133,12 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--country", nargs="+", default=["DEU", "IND"])
     ap.add_argument("--src", type=Path, default=ROOT / "outputs" / "signal_vs_portfolio")
     ap.add_argument("--out", type=Path, default=ROOT / "outputs" / "horse_race")
+    ap.add_argument("--tag", default="cov",
+                    help="which decile ladder to read. Default 'cov' is the COMPLIANT, "
+                         "investable-universe ladder (--require-cost-inputs). The 'infer' ladder "
+                         "was built on the signal-bearing cross-section and its Panel A is not "
+                         "compliant with document 13 requirement 2; see "
+                         "docs/RESULTS_CAPACITY_CHANNEL_2026-10-09.md section 6")
     ap.add_argument("--aum-tag", default="1e9",
                     help="which optimised-book after-tax summary to use for the tax column")
     a = ap.parse_args(argv)
@@ -140,7 +146,7 @@ def main(argv: list[str] | None = None) -> int:
 
     dec_all, tax_all = [], []
     for c in a.country:
-        dec = decile_panel(c, a.src)
+        dec = decile_panel(c, a.src, a.tag)
         tx = tax_panel(c, a.aum_tag)
         dec_all.append(dec)
         tax_all.append(tx)
@@ -148,7 +154,9 @@ def main(argv: list[str] | None = None) -> int:
         print(f"\n{'='*100}")
         print(f"{c}  -  FRICTION HORSE RACE")
         print(f"{'='*100}")
-        print(f"\nPanel A. Decile-spread book, prediction cells, {int(dec.months.iloc[0])} months.")
+        warn = "" if a.tag == "cov" else "   *** NOT THE COMPLIANT LADDER ***"
+        print(f"\nPanel A. Decile-spread book, prediction cells, "
+              f"{int(dec.months.iloc[0])} months, ladder '{a.tag}'.{warn}")
         print("  Annualised bps of drag on return, and the same decomposition in Sharpe points.\n")
         print(f"  {'AUM':>9} | {'gross':>9} {'cost':>10} {'capacity':>10} {'net capped':>11} | "
               f"{'SR gross':>9} {'cost ch':>8} {'cap ch':>8} {'SR net cap':>10}")
