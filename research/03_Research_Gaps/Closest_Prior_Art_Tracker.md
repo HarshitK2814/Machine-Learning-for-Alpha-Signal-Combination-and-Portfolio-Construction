@@ -305,3 +305,17 @@ Low and Medium threat, and nobody re-scored them when the headline moved.
 mechanism than "capacity binds" ever was, because it is an open question with named parties rather
 than occupied ground, our comparative static answers it in one line, and our design already contains
 the dose-response that identifies the answer.
+
+## C9. Tax-timing and tax-aware construction (added 2026-10-09, ABSTRACT-LEVEL ONLY)
+
+Both rows below were confirmed from abstracts and publisher listings, not full text. Read before
+submission.
+
+| # | Paper | Status | What it does | Overlap | Differentiation | Threat |
+|---|---|---|---|---|---|---|
+| C7 | @DLLY2026 Dai, Lei, Liu & Yang, "Optimal Tax Timing with Transaction Costs" | **Management Science**, online Feb 2026, DOI 10.1287/mnsc.2023.03118 | Dynamic portfolio model combining capital-gains tax, transaction costs and **year-end taxation**. Tiny transaction costs substantially delay loss realisation, far more than gain realisation; offered as an explanation for the disposition effect. Earlier working paper NUS RMI 2020-04; same group's RFS 2015 paper handles asymmetric long/short-term rates | **High on the joint-friction idea.** Combining taxes and transaction costs, even dynamically, is not a novelty claim | Theory of one investor's timing problem. Ours is an empirical evaluation of ML signals under dated, jurisdiction-specific statutes and an AUM-indexed impact model; they do not price market capacity | **High** |
+| C8 | @MKBA2021 Moehle, Kochenderfer, Boyd & Ang, "Tax-Aware Portfolio Construction via Convex Optimization" | **J. Optimization Theory and Applications** 189(2) 364-383, May 2021; arXiv 2008.04985 | Adds tax liability to Markowitz construction and outputs a trade list that includes **which tax lots to sell**; handles wash sales; the problem is nonconvex but convex once buy/sell is fixed per asset, solved by a custom relaxation | **High on the optimiser.** Tax-lot-aware convex construction is prior art | Our `tax_aware` optimiser is a **tool**, not a contribution. It is myopic and static-ledger; theirs handles the buy/sell nonconvexity | **High** |
+
+**Consequence.** The framing "tax-aware implementable frontier" cannot rest on the optimiser being
+new. If a tax-aware arm is built it is a bounded experiment with a pre-agreed stopping rule, and the
+paper's contribution stays the empirical, statute-specific, multi-jurisdiction evaluation.

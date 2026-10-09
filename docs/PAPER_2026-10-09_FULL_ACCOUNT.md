@@ -44,9 +44,10 @@ Four results survive.
 
 1. **The ADV participation constraint improves net risk-adjusted performance, and the improvement
    is monotone in how hard the constraint binds.** Measured at the largest mandate where the
-   uncapped comparison book is still solvent (§8.8), the capacity channel is **+7.63** (Germany,
-   $100mn, t = +10.21), **+3.64** (India, $30mn, t = +5.00) and **+6.68** (Japan, $1bn,
-   t = +11.01) Sharpe points; Japan's comparison book is solvent through $10bn. Beyond those rungs
+   uncapped comparison book is still solvent (§8.8), and on the pipeline's own accounting of both
+   books (§8.9), the capacity channel is **+6.80** (Germany, $100mn), **+3.19** (India, $30mn) and
+   **+6.92** (Japan, $1bn) Sharpe points (the wedge tool gave +7.63 / +3.64 / +6.68, with
+   inference t = +10.21 / +5.00 / +11.01); Japan's comparison book is solvent through $10bn. Beyond those rungs
    the German and Indian uncapped books are bankrupt, and the larger figures quoted elsewhere are
    not interpretable as performance gains. Japan is a **pre-registered out-of-sample
    confirmation**. The effect is zero where
@@ -67,9 +68,13 @@ Four results survive.
    significant (t = +0.53 Germany, +0.82 India, +0.18 Japan). The **tax channel**, however, is
    significant in both **flat-rate** jurisdictions — Germany **−0.1363 (t = −4.67)**, Japan
    **−0.1373 (t = −4.99)**, 3 of 8 cells under Holm each — and **not** significant under India's
-   long-term exemption (−0.0054, t = −1.93, 0 of 8). Two placebos agreeing to within 1%, one
-   treatment an order of magnitude smaller. It is not the rate (Germany's is 30% above Japan's);
-   it is whether the law provides a long-term category at all. An investor cannot grow out of it:
+   long-term exemption (−0.0054, t = −1.93, 0 of 8) **on the optimised book**. **On the executable
+   decile book the contrast is weaker than that**: Germany −0.070 (t −3.55), Japan −0.170 (t −3.67),
+   India −0.009 (t −2.14), so the flat regimes are 8–19× larger in magnitude than India but India
+   is itself borderline-significant, and the two placebos differ by a factor of 2.4 rather than
+   agreeing to 1% (§8.9). The robust statement is the **magnitude ordering by statute type**, not
+   the exact match or the clean insignificance. It is not the rate (Germany's is 30% above
+   Japan's); it is whether the law provides a long-term category at all. An investor cannot grow out of it:
    Germany's tax bill falls **25-fold** from $100mn to $10bn while the risk-adjusted drag stays
    flat at −0.11 to −0.16.
 3. **The statutory wedge determines whether the holding-period channel can exist at all.**
@@ -579,11 +584,13 @@ that are each indistinguishable from zero.
 
 **What replaces it is better identified.** The tax channel's *significance* tracks the statute:
 significant in **both flat-rate** jurisdictions (which have no long-term category,
-`lt_share` = 0.0000 exactly) with magnitudes matching to **within 1%** (−0.1363, −0.1373), and
-**not significant** under India's long-term exemption (−0.0054, 0 of 8 cells). **Two independent
-placebos behaving, one treatment an order of magnitude smaller, in the pre-registered direction,
-and none of it requiring any portfolio to be profitable.** It is not the rate — Germany's is 30%
-above Japan's and the channels are identical.
+`lt_share` = 0.0000 exactly) and an order of magnitude smaller under India's exemption — **on the
+optimised book**, where the placebos happen to match (−0.1363, −0.1373) and India is not
+significant (−0.0054, 0 of 8 cells). **That precision does not survive a change of book (§8.9):**
+on the decile book the placebos are −0.070 and −0.170, and India is −0.009 with t = −2.14. What
+does survive is the **ordering of magnitudes by statute type** (flat regimes 8–19× larger than
+India) and `lt_share`, which needs no estimation. It is not the rate — Germany's is 30% above
+Japan's and the ordering is not by rate.
 
 This still retires the magnitude argument for dropping the tax machinery: the engine is what
 produces the statutory contrast in (ii), which no cost model could.
@@ -844,6 +851,54 @@ for was warranted: the headline magnitude was a ratio statistic on a degenerate 
 uncapped leg is insolvent. A better-posed quantity is the **cost avoided as a share of gross alpha**
 or the net return in basis points, both of which stay finite. That reformulation is open work
 (§12.12).
+
+### 8.9 Matched-book accounting: the one-book ladder, and the tax-channel match was a coincidence of the book — CORRECTED
+
+Step 1 of the revised plan: the saved decile weights (capped and uncapped) go through the **same**
+`after_tax_backtest` under the zero-tax control and the country's statutory regime, on identical
+dates and the identical investable universe (`tools/exp_matched_book_accounting.py`).
+
+**Cost, capacity and tax on one book, at the largest solvent rung** (prediction cells, composite):
+
+| | AUM | gross SR | net SR uncapped | net SR capped | **cost ch** | **capacity ch** | **tax ch (capped)** | t |
+|---|---|---|---|---|---|---|---|---|
+| Germany | $100mn | +2.305 | −7.312 | −0.510 | **−9.618** | **+6.802** | **−0.098** | −3.90 |
+| India | $30mn | +1.197 | −3.987 | −0.801 | **−5.184** | **+3.186** | **−0.005** | −2.13 |
+| Japan | $1bn | +1.278 | −7.745 | −0.828 | **−9.023** | **+6.917** | **−0.170** | −3.67 |
+
+At $1bn the engine itself reports the German and Indian uncapped books insolvent (NAV exhausted
+after **1 of 132** months in all 8 cells), independently confirming §8.8.
+
+**Ordering on one book: capacity (+3.2 to +6.9) and cost (−5.2 to −9.6) are two orders of magnitude
+above tax (−0.005 to −0.170).** That is now a like-for-like comparison, and it retires the
+horse-race limitation of §6.5 for the solvent rungs.
+
+**Three corrections that come out of it.**
+
+1. **The capacity channel is smaller on the pipeline's accounting than on my wedge tool's.**
+   Germany **+6.80 versus +7.63**, India **+3.19 versus +3.64**, Japan **+6.92 versus +6.68**. The
+   executable (capped) book reconciles between the two to about **5e−4** per month, so the cost
+   code is consistent. The *uncapped* book does not (max monthly difference up to 0.27 at Germany
+   $100mn): the pipeline compounds NAV and charges costs on drifted positions, the wedge tool
+   treats each month independently at fixed AUM. The pipeline is the more faithful account of a
+   real portfolio, so **the matched-book figures supersede the wedge-tool figures** wherever both
+   exist.
+2. **The executable decile book's net Sharpe is negative or borderline everywhere:** Germany −0.510
+   (t −1.83), India −0.801 (t −2.28), Japan −0.828 (t −2.74) at the solvent rungs. This is the
+   signal-to-portfolio wedge on a single book. The caveat of §6.2.5 stands: that book attains only a
+   few percent of its target gross, so its Sharpe is a ratio of small numbers.
+3. **The tax-channel "match within 1%" was a property of the optimised book, not of the statutes.**
+   On the optimised book Germany and Japan gave −0.1363 and −0.1373. On the executable decile book
+   they are **−0.070 (t −3.55) and −0.170 (t −3.67)** at $1bn, a factor of **2.4** apart, and India
+   is **−0.009 with t = −2.14**, i.e. borderline significant where the optimised book gave
+   t = −1.93. What survives is the **ordering of magnitudes by statute type** — the flat regimes
+   are **8–19×** India's — and the exact `lt_share` contrast. The clean "two placebos agree,
+   treatment insignificant" statement is **withdrawn**; it was a coincidence of one book.
+
+   A side observation: on Japan's uncapped book the tax channel is **positive** (+0.078, t +1.51).
+   A book that loses money every month realises losses, and realised losses earn tax credits, so
+   the sign of the tax channel depends on whether the book has gains to tax. That is correct
+   behaviour of the engine and a reason not to read the sign as a property of the statute.
 
 ## 9. The shape of the errors
 
@@ -1163,7 +1218,7 @@ At a $1bn mandate in Germany, India or Japan, a machine-learning equity strategy
 Sharpe ratio is **not statistically distinguishable from zero** (t = +0.53, +0.82, +0.18), which
 corroborates Avramov, Cheng & Metzker in markets they did not study. Against that backdrop three
 channels can be measured and two of them are significant. A **binding ADV participation constraint
-improves** risk-adjusted performance by **+7.6 / +3.6 / +6.7** Sharpe points at the largest mandate
+improves** risk-adjusted performance by **+6.8 / +3.2 / +6.9** Sharpe points at the largest mandate
 where the uncapped comparison book is still solvent ($100mn Germany, $30mn India, $1bn Japan) — and
 beyond that the German and Indian uncapped books are bankrupt, so larger figures are not
 performance gains — so the constraint rescues the strategy from disaster rather than into profit,
@@ -1172,9 +1227,11 @@ monotone in how hard it binds, confirmed out of sample in Japan against a pre-re
 and robust to weighting, impact curvature, the impact coefficient and cost-input coverage. The
 **tax channel** is two orders of magnitude smaller but **significant in exactly the two
 jurisdictions whose statute provides no long-term category** — Germany −0.1363 (t = −4.67) and
-Japan −0.1373 (t = −4.99), matching to within 1% at rates 30% apart — and **insignificant** under
-India's long-term exemption (−0.0054, t = −1.93): two placebos behaving, one treatment, in the
-pre-registered direction, and no portfolio needing to be profitable for the contrast to hold. No
+Japan −0.1373 (t = −4.99) on the optimised book — and **insignificant** under India's long-term
+exemption (−0.0054, t = −1.93). That contrast is not robust to the choice of book: on the
+executable decile book the flat regimes are 8–19× larger than India, but India is
+borderline-significant and the two placebos differ by 2.4× (§8.9), so only the magnitude ordering
+by statute type should be quoted. No
 machine-learning **design axis** is detectable on an executable book at any mandate size (0 of 42
 in each of two markets), though the signals carry information coefficients with t up to +10.4. The
 paper's most uncomfortable contribution is that a 35-percentage-point cost-input coverage asymmetry
