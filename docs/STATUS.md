@@ -9,13 +9,26 @@ handoff to Workstream B is complete.
 > headline below is still accurate about the tax hypothesis and is kept, but it is no longer the
 > paper.
 >
-> **The claim.** The effect of the ADV participation constraint on net Sharpe is **monotone in
-> mandate size and changes sign**. Germany: **−0.81** Sharpe points at $100k, **+11.06** at $1bn,
-> crossing zero at **$3.79mn (95% CI $1.88mn–$7.07mn)**. Both tails significant at 5% under a
-> paired test with Holm correction across 8 cells (t = −6.10 low, +12.27 high; 0 of 2,000
-> bootstrap replications without a sign change). **India has no crossover at any measurable
-> scale** — the cap helps everywhere, and 50.8% of replications show no sign change at all. **The
-> flip is not universal**, which is itself a result.
+> **The claim, in two halves of very different strength.**
+>
+> **Robust half — the cap creates performance at scale.** In all four specifications (Germany and
+> India × equal- and value-weighted deciles) the capacity channel is strongly positive at $1bn:
+> **t = +5.6 to +12.3**, 8 of 8 cells surviving Holm from $30mn upward. Germany EW: **+11.06**.
+>
+> **Narrower half — the sign change.** Established in **Germany under equal weighting only**:
+> **−0.81** Sharpe points at $100k (t = −6.10) rising to +11.06 at $1bn, crossing zero at
+> **$3.79mn (95% CI $1.88mn–$7.07mn)**, with 0 of 2,000 replications failing to show a sign change.
+> Under **value weighting** Germany's negative region is directionally the same but **not
+> significant** (t = −1.65, p = 0.117), and **India has no negative region under either
+> weighting**. **We may not claim that both markets flip.** An earlier draft today did, from point
+> estimates before the inference existed; withdrawn in `RESULTS_SIGN_FLIP` §3e.
+>
+> That makes Japan's pre-registered D3 a test of whether the sign change **generalises beyond one
+> market and one weighting** — now the thing most in doubt.
+>
+> **Value weighting also cuts our gross decile Sharpes by ~80%** (DEU +2.763 → +0.473, IND +1.209
+> → +0.215). That is Novy-Marx & Velikov's critique landing on our own numbers and every gross
+> Sharpe we quote must carry it.
 >
 > **Why it matters.** The literature disagrees about this sign *in print*, and all parties are US:
 > Novy-Marx & Velikov (RFS 2016) and Korajczyk & Sadka (JF 2004) find turnover reduction and
