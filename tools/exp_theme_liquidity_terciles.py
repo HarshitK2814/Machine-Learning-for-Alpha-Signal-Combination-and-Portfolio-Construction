@@ -93,26 +93,50 @@ def monthly_rank_ic(frame: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
     return pd.DataFrame({c: [np.nanmean(v) if len(v) else np.nan] for c, v in out.items()})
 
 
-def decile_spread(g: pd.DataFrame, score: str, frac: float = 0.10) -> float:
+def decile_spread(g: pd.DataFrame, score: str, frac: float = 0.10,
+                  weight: str | None = None) -> float:
+    """Top-decile minus bottom-decile next-month return by ``score``.
+
+    ``weight=None`` is equal-weighted within each leg, which flatters small names. ``weight='me'``
+    value-weights each leg by market capitalisation, the construction Novy-Marx & Velikov
+    recommend, and is what Gate 1 needs: if the illiquid-tercile advantage is only the influence of
+    tiny stocks, it should shrink or vanish here.
+    """
     n = len(g)
     k = max(int(np.floor(n * frac)), 1)
     if n < 2 * k + 2:
         return float("nan")
     order = g[score].rank(method="first")
-    top = g.loc[order >= n - k + 1, "ret_next"].mean()
-    bot = g.loc[order <= k, "ret_next"].mean()
-    return float(top - bot)
+    top_g, bot_g = g.loc[order >= n - k + 1], g.loc[order <= k]
+    if weight is None:
+        return float(top_g["ret_next"].mean() - bot_g["ret_next"].mean())
+
+    def leg(x: pd.DataFrame) -> float:
+        w = pd.to_numeric(x[weight], errors="coerce")
+        ok = w.notna() & (w > 0) & x["ret_next"].notna()
+        if not ok.any():
+            return float("nan")
+        return float(np.average(x.loc[ok, "ret_next"], weights=w[ok]))
+
+    return float(leg(top_g) - leg(bot_g))
 
 
-def run_country(country: str, n_boot: int, seed: int) -> pd.DataFrame:
+def run_country(country: str, n_boot: int, seed: int, weighting: str = "ew",
+                liquidity: str = "adv") -> pd.DataFrame:
+    """``weighting``: 'ew' or 'vw'. ``liquidity``: 'adv' (raw dollar ADV) or 'adv_resid'.
+
+    ``adv_resid`` is the month-by-month residual of log ADV on log market cap, i.e. liquidity with
+    size partialled out. Terciles on it ask whether a name is illiquid *for its size*, so any
+    illiquid-tercile advantage that survives is not merely a small-cap effect.
+    """
     b = intl.load_country_bundle(country, max_names=600)
     sig_cols = list(b.signal_columns)
     meta = b.signal_meta.set_index("signal")
     themes = {t: [s for s in g.index if s in sig_cols] for t, g in meta.groupby("theme")}
 
-    uni = b.universe[["date", "permno", "in_universe"]].copy()
+    uni = b.universe[["date", "permno", "in_universe", "me"]].copy()
     uni["date"] = pd.to_datetime(uni["date"])
-    uni = uni[uni.in_universe.astype(bool)][["date", "permno"]]
+    uni = uni[uni.in_universe.astype(bool)][["date", "permno", "me"]]
     tg = b.targets[["date", "permno", "ret_next"]].copy()
     tg["date"] = pd.to_datetime(tg["date"])
     ci = b.cost_inputs[["date", "permno", "spread", "sigma_d", "adv_usd"]].copy()
@@ -150,7 +174,28 @@ def run_country(country: str, n_boot: int, seed: int) -> pd.DataFrame:
             return pd.Series(np.nan, index=s.index)
         return pd.qcut(s.rank(method="first"), 3, labels=[0, 1, 2]).astype(float)
 
-    ev["tercile"] = ev.groupby("date")["adv_usd"].transform(_terciles)
+    if liquidity == "adv_resid":
+        def _resid(g: pd.DataFrame) -> pd.Series:
+            ok = (g["me"] > 0) & (g["adv_usd"] > 0)
+            out = pd.Series(np.nan, index=g.index)
+            if ok.sum() < 30:
+                return out
+            x, y = np.log(g.loc[ok, "me"].to_numpy(float)), np.log(g.loc[ok, "adv_usd"].to_numpy(float))
+            slope, icpt = np.polyfit(x, y, 1)
+            out.loc[ok] = y - (icpt + slope * x)
+            return out
+
+        ev["liq"] = ev.groupby("date", group_keys=False).apply(_resid)
+    elif liquidity == "adv":
+        ev["liq"] = ev["adv_usd"]
+    else:
+        raise SystemExit(f"unknown liquidity measure {liquidity!r}")
+    if liquidity == "adv_resid":
+        rho = ev.groupby("date").apply(
+            lambda g: g[["liq", "me"]].dropna().corr(method="spearman").iloc[0, 1]).mean()
+        print(f"  {country}: mean monthly Spearman(size-neutral liquidity, market cap) = {rho:+.3f}"
+              f"  (raw ADV vs size is far higher; ~0 confirms size is partialled out)")
+    ev["tercile"] = ev.groupby("date")["liq"].transform(_terciles)
 
     rows = []
     for t in themes:
@@ -160,7 +205,8 @@ def run_country(country: str, n_boot: int, seed: int) -> pd.DataFrame:
             vals = {}
             for date, g in ev.groupby("date"):
                 gg = g if name == "all" else g[g.tercile == mask]
-                vals[date] = decile_spread(gg.dropna(subset=[sc]), sc)
+                vals[date] = decile_spread(gg.dropna(subset=[sc]), sc,
+                                           weight="me" if weighting == "vw" else None)
             series[name] = pd.Series(vals).sort_index()
         rr = {}
         for name, s in series.items():
@@ -188,6 +234,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--country", nargs="+", default=["DEU", "IND", "JPN"])
     ap.add_argument("--n-boot", type=int, default=1000)
     ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--weighting", choices=["ew", "vw"], default="ew")
+    ap.add_argument("--liquidity", choices=["adv", "adv_resid"], default="adv")
     ap.add_argument("--out", type=Path, default=ROOT / "outputs" / "theme_liquidity")
     a = ap.parse_args(argv)
     a.out.mkdir(parents=True, exist_ok=True)
@@ -195,9 +243,12 @@ def main(argv: list[str] | None = None) -> int:
     allr = []
     for c in a.country:
         print(f"\n{'='*100}\n{c}\n{'='*100}")
-        t = run_country(c, a.n_boot, a.seed)
+        t = run_country(c, a.n_boot, a.seed, a.weighting, a.liquidity)
         allr.append(t)
-        t.to_csv(a.out / f"theme_liquidity_{c}.csv", index=False)
+        # The default (ew, adv) keeps its original filename; variants carry a suffix so a Gate 1
+        # run can never overwrite the baseline it is being compared against.
+        sfx = "" if (a.weighting, a.liquidity) == ("ew", "adv") else f"_{a.weighting}_{a.liquidity}"
+        t.to_csv(a.out / f"theme_liquidity_{c}{sfx}.csv", index=False)
         show = t.sort_values("sr_all", ascending=False)
         print(f"\n  {'theme':<20}{'#':>3} | {'ALL':>6} {'t':>6} | {'illiq':>6} {'t':>6} | "
               f"{'mid':>6} | {'liquid':>6} {'t':>6} | {'illiq-liq':>9} {'t':>6} {'p(Holm)':>8}")
