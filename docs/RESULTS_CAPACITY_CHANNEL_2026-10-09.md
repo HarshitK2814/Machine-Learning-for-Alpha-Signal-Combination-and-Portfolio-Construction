@@ -198,6 +198,29 @@ coverage asymmetry can manufacture a significant, theoretically coherent, robust
 cross-country contrast.** Tracker §C6 now lists coverage matching alongside turnover, units and
 impact law as requirements any capacity comparison must meet.
 
+### 6a. How far the defect spread: audited, and it is confined to one tool
+
+Because the same mistake elsewhere would invalidate more than this exhibit, every tool and pipeline
+stage that loads a country bundle was checked for whether it builds portfolio weights directly from
+scores, and if so whether it enforces cost-input eligibility first.
+
+| consumer | builds weights from scores? | eligibility enforced |
+|---|---|---|
+| `exp_signal_vs_portfolio_wedge.py` | **yes** | **this was the defect**; now via `--require-cost-inputs` |
+| `pipelines/04_construct_portfolios.py` | yes, via the optimiser | **yes** — `optimizer.py` calls `eligible_cost_input_permnos` at both construct sites (lines 461, 611) and `partition_prior_book` for the frozen sleeve |
+| `exp_capacity_dose_response.py` | no — reads optimised weights via `provenance.country_weights` | yes, inherited, and masks on finite ADV |
+| `exp_book_characteristics.py`, `verify_trade_caps.py`, `exp_leverage_matched.py`, `dev_backtest.py` | no — all consume the optimised book | yes, inherited |
+| `exp_112a_event_study.py`, `06_after_tax_eval.py` | no — consume realised weights | yes, inherited |
+
+**So the capacity frontier ($106mn / $55mn / $413mn), the dose-response correlations
+(+0.555 → +0.854), the book characteristics, the tax ledger and every stage-04 and stage-06 number
+are unaffected**, because they all route through the optimiser, which has enforced eligibility
+since the frozen-sleeve work of 8 October. The frontier in particular was already computed on
+eligible names — Germany's 246, not 382 — which is why it was internally consistent and why the
+non-compliant ladder's inconsistency with it was the clue worth following.
+
+Only the one tool written today was wrong, and only for one day.
+
 ## 7. Reproduction
 
 ```
