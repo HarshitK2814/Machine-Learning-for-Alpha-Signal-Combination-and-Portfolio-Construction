@@ -259,3 +259,33 @@ another:
 
 Two margins moving the right way at once, on weights rather than returns, is better evidence for
 the mechanism than a single alarming-looking correlation that turned out not to be reproducible.
+
+
+---
+
+## 9. An independent corroboration, and a caveat on the $1e10 arm
+
+The optimiser's own solution quality degrades monotonically with AUM, measured across every month
+of every strategy in each Germany arm:
+
+| AUM | strategies | months optimal / inaccurate | share flagged inaccurate |
+|---|---|---|---|
+| $1e8 | 21 | 2,668 / 104 | **3.8%** |
+| $1e9 | 21 | 1,910 / 862 | **31.1%** |
+| $1e10 | 1 (in progress) | 1 / 131 | **99.2%** |
+
+This is corroboration the performance numbers cannot give, because it is a property of the *problem*
+rather than of the result: as AUM rises the participation constraint collapses the feasible set
+until the quadratic programme is numerically degenerate. At $10bn essentially every month is
+flagged. A constraint that is merely *present* does not do that; one that is *binding on almost
+every name and leaves a feasible region of near-zero volume* does.
+
+**The caveat.** At $1e10, 99.2% of months are flagged inaccurate, so **no performance number from
+that arm should be reported without first verifying its constraints** with
+`tools/verify_trade_caps.py --country DEU --strict`. On the India 1e9 arm the same flag turned out
+to be a tolerance label rather than a violation (0.02–0.22% of trades over cap, cumulative excess
+gross at most 0.76%), but at 99.2% that cannot be assumed. If the $1e10 weights do not survive that
+check, the arm should be reported as *not solvable at this scale* — which is itself a finding, and
+arguably a cleaner one than a performance number — rather than as a performance result.
+
+The $1e8 arm needs no such caveat: 3.8% flagged, and stage 04 reported zero held months.
