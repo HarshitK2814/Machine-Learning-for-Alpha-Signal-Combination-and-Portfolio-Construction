@@ -515,8 +515,19 @@ class DatedC12Patch:
     def from_frozen_evaluation_artifacts(
         cls, project_root: str | Path,
         *, sample_config: str = "configs/workstream_a_c14_evaluation_sample_2026-10-07.json",
+        reference_values_path: str | Path | None = None,
     ) -> "DatedC12Patch":
-        """Materialize the pre-results C14 engine from frozen local artefacts."""
+        """Materialize the pre-results C14 engine from frozen local artefacts.
+
+        ``reference_values_path`` substitutes a different India section 112A reference table. It
+        exists for **bounding scenarios only**: the frozen table covers the 546 names in the
+        January 2018 investible universe, while the tax ledger holds 1,002 because positions
+        persist after leaving that universe, and the engine rightly refuses to value a
+        grandfathered lot it has no 2018-01-31 price for. Supplying a table whose extra rows are
+        constructed rather than observed lets the result be *bounded* while the real values are
+        obtained. Any such table must be labelled as not-observed in ``source_cache``, and nothing
+        produced with one may be reported as a point estimate. Default is the frozen table.
+        """
         root = Path(project_root)
         sample_path = root / sample_config
         sample = json.loads(sample_path.read_text(encoding="utf-8"))
@@ -537,7 +548,8 @@ class DatedC12Patch:
             },
             fx_provider=PointInTimeFXStore.from_validated_csv(fx_path),
             reference_values=SecurityReferenceValueStore.from_validated_csv(
-                root / "data/intl_c14/candidate_working/IND_SECTION_112A_REFERENCE_VALUES.csv"
+                Path(reference_values_path) if reference_values_path is not None
+                else root / "data/intl_c14/candidate_working/IND_SECTION_112A_REFERENCE_VALUES.csv"
             ),
         ))
 

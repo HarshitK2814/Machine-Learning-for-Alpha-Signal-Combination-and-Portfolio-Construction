@@ -271,6 +271,10 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--strategies", nargs="+", default=CELLS)
     ap.add_argument("--aum", default="1e9",
                     help="which country weights index to read, e.g. 1e9 -> weights_index/IND_1e9.csv")
+    ap.add_argument("--reference-values", default=None,
+                    help="substitute India's section 112A reference table. BOUNDING SCENARIOS "
+                         "ONLY - see outputs/bounds/. Results from a constructed table are bounds, "
+                         "never point estimates.")
     ap.add_argument("--include-truncated-year", action="store_true",
                     help="keep India's FY2019-20, which the evaluation window cuts at 9 months")
     ap.add_argument("--out", type=Path, default=ROOT / "outputs" / "event_112a")
@@ -278,7 +282,11 @@ def main(argv: list[str] | None = None) -> int:
 
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
     cfg = load_config("base")
-    engine = DatedC12Patch.from_frozen_evaluation_artifacts(ROOT)
+    engine = DatedC12Patch.from_frozen_evaluation_artifacts(
+        ROOT, reference_values_path=args.reference_values)
+    if args.reference_values:
+        print(f"*** BOUNDING RUN: reference table {args.reference_values}")
+        print("*** Numbers from this run are a BOUND, not a point estimate.")
     log.info("dated C14 schedule: %s over %s..%s", engine.schedule.validate(*WINDOW), *WINDOW)
     for country in args.countries:
         before = engine.schedule.resolve(country, "2018-03-31")
