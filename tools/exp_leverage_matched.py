@@ -113,6 +113,36 @@ def rescale_arm(country: str, aum: float, target: float, suffix: str,
     return written
 
 
+REFUSAL = """
+This approach DOES NOT WORK and this tool will not write books. Kept as the record of why.
+
+Post-hoc rescaling cannot leverage-match a book that carries a frozen, non-tradeable sleeve:
+
+  1. Scaling the whole book uniformly moves frozen positions, and a name with no certified market
+     inputs that month cannot be traded at all. The backtest refuses it:
+       "87 unpriceable names moved by 2.04e-05 (budget 1.6e-05) in the C11 weights.
+        A frozen position must be carried, not traded."
+
+  2. Scaling only the tradeable names and carrying the frozen weights through verbatim fails too,
+     and this one is structural. The drifted prior book is w*(1+r)/(1+port_ret), so changing the
+     tradeable weights changes the portfolio return, which changes what the frozen weight WOULD
+     have drifted to. The frozen sleeve is endogenous to the whole book: you cannot alter the
+     tradeable part without altering what the frozen part should be, and you cannot alter the
+     frozen part at all. The backtest refuses this as well:
+       "13 unpriceable names moved by 0.00017"
+
+So no post-hoc reweighting of these books is available - not leverage matching, not volatility
+matching, not a risk-parity overlay - while a non-tradeable sleeve is present.
+
+DO THIS INSTEAD. Re-optimise under a different gross budget, which is a feasible portfolio by
+construction:
+
+    python pipelines/04_construct_portfolios.py --country DEU --aum 1e8         --gross-max 0.13 --suffix _g013 --strategies <cells>
+
+See docs/CANDIDATE_REFRAMING_CAPACITY.md §10.
+"""
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -120,7 +150,13 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--aum", nargs="+", type=float, default=[1e8, 1e9])
     ap.add_argument("--target-gross", type=float, default=None,
                     help="default: the smallest mean gross across the arms, so nothing scales up")
+    ap.add_argument("--i-know-this-does-not-work", action="store_true",
+                    help=argparse.SUPPRESS)
     args = ap.parse_args(argv)
+
+    if not getattr(args, "i_know_this_does_not_work", False):
+        print(REFUSAL)
+        return 2
 
     from alphacomb.contracts import intl, provenance, read_table
     from alphacomb.contracts.provenance import MissingProvenance
