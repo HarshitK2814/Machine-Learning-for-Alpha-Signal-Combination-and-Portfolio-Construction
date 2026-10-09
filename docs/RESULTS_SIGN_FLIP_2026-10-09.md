@@ -1,3 +1,22 @@
+> # RETRACTED 2026-10-09, 12:30 IST
+>
+> **The central claim of this document — a capacity channel that changes sign, with a crossover at
+> $3.79mn — was a cost-input coverage artefact and is withdrawn in full.**
+>
+> The ladder formed deciles on Germany's **signal-bearing** cross-section (~382 names a month)
+> rather than its **investable** one (~246). The promoted C6 prices 65.1% of Germany against 99.1%
+> of India, and an uncovered name was charged **zero cost** in the uncapped book while receiving
+> **cap = 0** in the capped book. Both push the channel down, and only in Germany. Enforcing
+> document 13 requirement 2 reverses Germany's $100k channel from **−0.811 to +0.062**; India, the
+> 99.1%-coverage control, moves only +0.183 → +0.211.
+>
+> **Read `docs/RESULTS_CAPACITY_CHANNEL_2026-10-09.md` instead.** It states the surviving result
+> (the channel is positive and monotone in AUM in both markets, with no crossover anywhere) and its
+> §6 explains this retraction, including why the artefact passed a value-weighting check and a
+> six-fold impact-coefficient sweep.
+>
+> This file is kept unedited below as the record of a claim that did not hold.
+
 # When does a liquidity constraint help a machine-learning strategy?
 
 **Date:** 2026-10-09

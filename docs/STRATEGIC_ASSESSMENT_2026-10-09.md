@@ -100,8 +100,33 @@ to a paper they published two years ago.
    confound even that residual gap; tracker section C6 lists what must be matched before any
    capacity number is published. One of @NMV2016's authors co-authors @AHV2025, so a referee who
    owns this is likely.
-2. **The capacity channel changes sign with scale, and the crossover is measurable.** This is the
-   corrected and much stronger form of what item 2 originally said. Measured over **nine decades of
+2. > **RETRACTED 2026-10-09, 12:30 IST — THIRD PASS. The sign flip was a cost-input coverage
+   > artefact and is withdrawn in full.** See `AMENDMENT_001D` retraction header and §10. In one
+   > line: the ladder formed deciles on Germany's **signal-bearing** cross-section (~382 names)
+   > rather than its **investable** one (~246), because the promoted C6 prices only 65.1% of
+   > Germany against 99.1% of India. An uncovered name was charged **zero cost** in the uncapped
+   > book and given **cap = 0** in the capped book — both pushing the channel down, and only in
+   > Germany. Enforcing the project's own non-tradeability rule reverses the sign at $100k from
+   > **−0.811 to +0.062**, while India (the 99.1%-coverage control) moves only +0.183 → +0.211.
+   > **On the compliant universe the channel is positive at every rung in both markets**, so we
+   > never observe the regime where the cap hurts and **cannot** adjudicate
+   > @NMV2016-versus-@AHV2025. The surviving claim is item 2' below.
+   >
+   > The spurious result was **t = −6.10**, and it survived a value-weighting robustness check and
+   > a six-fold impact-coefficient sweep. Only the coverage rule killed it. That is the third time
+   > today a correctly-computed quantity met the wrong benchmark, and the second time one of my own
+   > robustness checks failed to catch it.
+
+   **2'. The surviving claim: the capacity channel is positive, monotone in AUM, and large.**
+   On the compliant universe the ADV participation constraint **creates** risk-adjusted
+   performance at every scale measured, rising monotonically to **+8.05** (Germany) and **+4.51**
+   (India) Sharpe points at $1bn. Robust to equal- versus value-weighting, to the impact
+   coefficient over `k ∈ {0.5, 1, 2, 3}`, and to the coverage treatment. This is the
+   @NMV2016/@KS2004 side of the literature confirmed in non-US markets at AUM-indexed scale — a
+   measurement, not an adjudication, and weaker than what §5 and item 2 claimed before 12:30.
+
+   ~~**The capacity channel changes sign with scale, and the crossover is measurable.** This is the
+   corrected and much stronger form of what item 2 originally said.~~ Measured over **nine decades of
    AUM** on the German and Indian scores, the capacity channel is **monotone increasing in AUM** and
    **crosses zero**: Germany between **$3mn and $4mn**, India between **$1k and $3k**. Below the
    crossover the participation cap **destroys** net Sharpe (Germany −0.69 at $100k); above it the cap
