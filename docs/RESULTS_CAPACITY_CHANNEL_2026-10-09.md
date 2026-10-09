@@ -221,6 +221,28 @@ non-compliant ladder's inconsistency with it was the clue worth following.
 
 Only the one tool written today was wrong, and only for one day.
 
+### 6b. Coverage across all three panels, and a verification worth having
+
+| country | cost-input coverage over 2009-2019 (mean / median / min) | signal-bearing names, median | **investable names, median** | frontier's `eligible_names_median` |
+|---|---|---|---|---|
+| **Germany** | **0.651 / 0.654 / 0.517** | 381.5 | **246.0** | **246** |
+| India | 0.991 / 1.000 / 0.004 | 349.0 | 348.5 | 348 |
+| **Japan** | **0.998 / 1.000 / 0.941** | 1707.5 | 1705.0 | 1705 |
+
+Two things follow.
+
+**Germany is the only panel with a coverage problem.** India and Japan are both at or above 99%. So
+the artefact in §6 could only ever have arisen in Germany, which is exactly where it arose, and
+Japan's forthcoming test is not exposed to it. India's 0.004 minimum is a single month
+(January 2009) and is the reason its ladder reports 131 months rather than 132.
+
+**The investable counts reproduce the capacity frontier's own universe exactly** — 246 / 348.5 /
+1705 against the frontier's 246 / 348 / 1705. That is a useful verification in both directions: it
+confirms `--require-cost-inputs` implements the same eligibility rule the frontier was computed
+under, and it confirms the frontier was right all along. It is also the clue that should have been
+followed sooner: a ladder running on 382 German names while the frontier it was being compared
+against ran on 246 was internally inconsistent before any result was interpreted.
+
 ## 7. Reproduction
 
 ```
