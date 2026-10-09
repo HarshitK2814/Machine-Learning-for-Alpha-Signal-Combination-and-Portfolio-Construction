@@ -10,6 +10,37 @@ project. Nothing else in workstream B is blocked by this.
 **This is the only kind of blocker I think needs you** — it is a WRDS/Compustat lookup I have no
 entitlement for. Everything else from doc 18 is answered and withdrawn (see §5).
 
+
+> ## UPDATE 2026-10-09, 13:05 IST — the bounding run I promised was built wrong, and is being redone
+>
+> At 02:45 I said I would bound the answer by re-running the event study with the 456 missing
+> values set to the two tax extremes, so that if both bounds agree your lookup stops being a
+> blocker. **I ran that, both bounds came back bit-identical to full precision, and I nearly
+> reported you as unblocked. The bounding was invalid.**
+>
+> The engine does not consume an absolute FMV. `DatedC12Patch.attach_statutory_reference` computes
+>
+>     statutory_reference_value = close_value_local * reference.high_to_close_ratio
+>
+> where `high_to_close_ratio = fmv_price_local / close_price_local`. **The ratio is the only
+> lever.** My bound files set `fmv` and `close` to the *same* extreme value on all 456 rows
+> (0.0001/0.0001 and 1e9/1e9), so the ratio was **1.0 in both** and the engine multiplied each
+> lot's real close price by 1.0 either way. The two runs were the same run. Bit-identical output
+> was the symptom, not the finding.
+>
+> It mattered: **422 of the 456 names are materially held in India's prediction cells and 75 are
+> held after 2018-04-01**, so their deemed cost genuinely does enter the result. "The missing
+> values cannot change the conclusion" was never established.
+>
+> Corrected bounds (`*_V2.csv`) vary the **ratio** — 1e-6 for MAXTAX (no grandfathering relief,
+> deemed cost falls back to actual cost) and 1e6 for MINTAX (full relief, deemed cost reaches sale
+> value) — leaving the 546 real rows untouched and bit-identical between bounds. Re-running now;
+> I will report whether the bounds agree once they land.
+>
+> **Your lookup therefore remains outstanding and is still the one thing only you can do.** If the
+> corrected bounds do agree it becomes a robustness note rather than a blocker; if they disagree it
+> is back to being on the critical path. Either way the request in §2 is unchanged.
+
 ---
 
 ## 1. The error
