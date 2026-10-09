@@ -80,6 +80,41 @@ progressively taken over by the constraint as size rises:
 | $1e9 | **31.1%** |
 | $1e10 | **99.2%** (prediction cells; economic cells solve, being projections only) |
 
+## 4b. The capacity frontier, in all three markets — and it needs no models
+
+The cleanest statement of the mechanism is a **dollar figure per market**, and it is computable
+from the C6 cost inputs alone — no training, no portfolios, so **Japan contributes here even though
+its model arm has not finished**.
+
+The attainable gross is `ceiling(AUM) = sum_i min(w_max, adv_i * p / AUM)`. The ADV term dominates,
+so the ceiling scales as `1/AUM`, and the AUM at which it falls to the gross budget is the
+**capacity frontier**: the largest mandate at which the *risk budget*, not liquidity, still
+determines the book.
+
+| country | median eligible names | ceiling at $1bn | **capacity frontier** | range across months |
+|---|---|---|---|---|
+| **Germany** | 246 | 0.213 | **$106mn** | $77–142mn |
+| **India** | 348 | 0.110 | **$55mn** | up to $98mn |
+| **Japan** | 1,705 | 0.825 | **$413mn** | $223–692mn |
+
+Three things follow, and they are the paper's cross-country content:
+
+1. **The frontier is between $55mn and $413mn in every market studied.** Every institutional
+   mandate is past it. A $1bn mandate is **2.4x past it in Japan and 18x past it in India**.
+2. **It scales with market breadth, not with any model choice.** 246, 348 and 1,705 eligible names
+   give $106mn, $55mn and $413mn. The constraint is a property of the market, which is why no
+   design choice in §5c can escape it.
+3. **Japan at $100mn is the one point in the whole study where capacity does not bind** — its
+   ceiling there is 2.97–4.84 against a budget of 2.0, so the risk budget binds instead. That makes
+   it the natural control for the entire mechanism, and the sharp prediction (recorded here before
+   its arm runs) is that **Japan at $1e8 should be the one cell where the book tracks alpha rather
+   than ADV, and where the design axes of §5c could become detectable**. If Japan at $1e8 looks
+   like the capacity-bound arms, the mechanism is wrong.
+
+India's month-level range extends down to near zero because its early sample has very few eligible
+names; the median is the figure to quote and the minimum is an early-sample artefact, not a month
+in which the market had no capacity.
+
 ## 5. The dose-response, at matched leverage
 
 Net Sharpe is **not** leverage-neutral: impact cost scales as `gross^1.5` while volatility scales
