@@ -47,8 +47,15 @@ CELLS = [f"{n}-{c}-{e}-{u}" for n in "LN" for c in "SC" for e in "PE" for u in (
 TOL = 1.01  # 1% slack for conic residue on caps sitting at the 1e-6 floor
 
 
+#: Set from main() when --aum pins an arm; None keeps the legacy mtime behaviour.
+_PINNED = None
+
+
 def check_cell(code: str, bundle, cfg: OptimizerConfig, advmap, rets, strict: bool) -> dict | None:
-    latest = paths.latest_run("weights", f"cell_{code}")
+    if _PINNED is not None:
+        latest = _PINNED.get(f"cell_{code}")
+    else:
+        latest = paths.latest_run("weights", f"cell_{code}")
     if latest is None:
         return None
     w = pd.read_parquet(latest)
@@ -104,6 +111,13 @@ def check_cell(code: str, bundle, cfg: OptimizerConfig, advmap, rets, strict: bo
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--country", default="DEU", choices=["DEU", "IND", "JPN"])
+    ap.add_argument("--aum", default=None,
+                    help="AUM arm to verify, e.g. 1e10 or 1e8_g013. This BOTH pins the weights to "
+                         "that arm's index and sets the AUM the participation cap is computed "
+                         "from. Without it the cap comes from configs while the weights come from "
+                         "whichever arm ran stage 04 last, which silently checks one arm's book "
+                         "against another arm's cap - a 10x error in the cap, in the lenient "
+                         "direction.")
     ap.add_argument("--cells", nargs="*", default=None)
     ap.add_argument("--strict", action="store_true",
                     help="exit non-zero if any cell has a trade over the cap, or a frozen "
@@ -114,6 +128,17 @@ def main(argv: list[str] | None = None) -> int:
 
     bundle = intl.load_country_bundle(args.country)
     cfg = OptimizerConfig.from_files()
+    if args.aum:
+        global _PINNED
+        from alphacomb.contracts import provenance
+
+        _PINNED = provenance.country_weights(args.country, args.aum)
+        # The cap is adv * participation / AUM, so verifying one arm's book against another arm's
+        # AUM is a multiplicative error in the cap. Pin both together or neither.
+        numeric = args.aum.split("_")[0]
+        cfg = OptimizerConfig(**{**cfg.__dict__, "aum_usd": float(numeric)})
+        print(f"pinned to {args.country}_{args.aum}: {len(_PINNED)} strategies, "
+              f"cap computed at AUM {cfg.aum_usd:,.0f}")
     advmap = bundle.cost_inputs.set_index(["date", "permno"])["adv_usd"]
     rets = bundle.targets.set_index(["date", "permno"])["ret_next"]
 
