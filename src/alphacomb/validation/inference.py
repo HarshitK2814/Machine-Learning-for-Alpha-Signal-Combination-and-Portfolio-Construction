@@ -371,6 +371,111 @@ def hansen_spa(benchmark, candidates: pd.DataFrame, n_boot: int = 2000, block: i
                                   if p < 0.05 else "no candidate beats the benchmark"})
 
 
+def sharpe_difference_test(returns_a, returns_b, periods: int = 12, n_boot: int = 4000,
+                           block: int = 6, seed: int = 0) -> TestResult:
+    """Studentized bootstrap test for the difference of two Sharpe ratios on **paired** series.
+
+    This is the Ledoit-Wolf (2008) test. It is the right tool for the capacity channel, which is
+    ``SR(net capped) - SR(net uncapped)`` computed on the *same* months from the *same* scores:
+    the two series are strongly dependent, so an unpaired comparison of two Sharpe ratios and
+    their separate standard errors would be badly oversized.
+
+    Why not Jobson-Korkie/Memmel: that test assumes i.i.d. normal returns. Monthly net returns of
+    a capped portfolio are neither - the cap induces serial dependence in the attained gross - so
+    we studentize with a HAC estimate and calibrate against a stationary bootstrap under the null
+    of equal Sharpe ratios.
+
+    Parameters
+    ----------
+    returns_a, returns_b
+        Paired return series. The statistic is ``SR(a) - SR(b)``, so pass the **capped** series as
+        ``a`` to get the capacity channel with the sign used throughout this project.
+    periods
+        Observations per year, for annualisation. 12 for monthly.
+    n_boot, block
+        Stationary-bootstrap replications and expected block length (6 months by default, matching
+        ``hansen_spa``).
+
+    Returns
+    -------
+    TestResult
+        ``statistic`` is the annualised Sharpe difference, ``p_value`` is two-sided. ``detail``
+        carries the two Sharpe ratios, the HAC standard error of the difference, the studentized
+        statistic, and a bootstrap percentile confidence interval for the difference itself.
+    """
+    a = np.asarray(returns_a, dtype=float)
+    b = np.asarray(returns_b, dtype=float)
+    if a.shape != b.shape:
+        raise ValueError(f"paired series must be the same length, got {a.shape} and {b.shape}")
+    ok = np.isfinite(a) & np.isfinite(b)
+    a, b = a[ok], b[ok]
+    T = a.size
+    if T < 12:
+        raise ValueError(f"need at least 12 paired observations, got {T}")
+
+    def _sr(x: np.ndarray) -> float:
+        s = x.std(ddof=1)
+        return float(x.mean() / s * np.sqrt(periods)) if s > 0 else np.nan
+
+    sr_a, sr_b = _sr(a), _sr(b)
+    diff = sr_a - sr_b
+    if not np.isfinite(diff):
+        return TestResult("sharpe_difference", float("nan"), float("nan"),
+                          {"sharpe_a": sr_a, "sharpe_b": sr_b, "n_obs": T,
+                           "note": "a series has zero variance; difference undefined"})
+
+    # HAC standard error of the Sharpe difference by the delta method. The influence function of
+    # an annualised Sharpe ratio at observation t is
+    #     (r_t - mu) / sigma - (SR / 2) * ((r_t - mu)^2 / sigma^2 - 1),  all times sqrt(periods),
+    # which is the Lo (2002) / Christie expansion. Differencing the two influence functions and
+    # taking a Newey-West standard error of the mean gives the SE of the difference and handles
+    # both the serial dependence and the cross-dependence of the pair at once.
+    def _infl(x: np.ndarray, sr: float) -> np.ndarray:
+        mu, sg = x.mean(), x.std(ddof=1)
+        z = (x - mu) / sg
+        return np.sqrt(periods) * (z - 0.5 * sr / np.sqrt(periods) * (z ** 2 - 1.0))
+
+    # ``psi`` is mean-zero by construction, and the SE of *its mean* is exactly the SE of the
+    # difference estimator, so newey_west_se is applied directly with no rescaling.
+    psi = _infl(a, sr_a) - _infl(b, sr_b)
+    se = float(newey_west_se(psi))
+    stud = diff / se if se > 0 else np.nan
+
+    # Stationary bootstrap, centred so the null is "equal Sharpe ratios".
+    rng = np.random.default_rng(seed)
+    boot_diff = np.empty(n_boot)
+    boot_stud = np.empty(n_boot)
+    for i in range(n_boot):
+        idx = _stationary_bootstrap_index(T, block, rng)
+        ab, bb = a[idx], b[idx]
+        sa, sb = _sr(ab), _sr(bb)
+        d = sa - sb
+        boot_diff[i] = d
+        try:
+            pb = _infl(ab, sa) - _infl(bb, sb)
+            sb_se = float(newey_west_se(pb))
+            boot_stud[i] = (d - diff) / sb_se if sb_se > 0 else np.nan
+        except (ZeroDivisionError, FloatingPointError, ValueError):
+            boot_stud[i] = np.nan
+
+    fin = np.isfinite(boot_stud)
+    if fin.sum() < 100 or not np.isfinite(stud):
+        # Fall back to a percentile test on the difference itself.
+        bd = boot_diff[np.isfinite(boot_diff)]
+        p = 2.0 * min((bd <= 0).mean(), (bd >= 0).mean()) if bd.size else float("nan")
+        lo, hi = (np.percentile(bd, [2.5, 97.5]) if bd.size else (np.nan, np.nan))
+    else:
+        p = float((np.abs(boot_stud[fin]) >= abs(stud)).mean())
+        bd = boot_diff[np.isfinite(boot_diff)]
+        lo, hi = np.percentile(bd, [2.5, 97.5])
+
+    return TestResult("sharpe_difference", float(diff), float(min(max(p, 0.0), 1.0)),
+                      {"sharpe_a": sr_a, "sharpe_b": sr_b, "se_hac": se,
+                       "studentized": float(stud) if np.isfinite(stud) else float("nan"),
+                       "ci95_low": float(lo), "ci95_high": float(hi),
+                       "n_obs": T, "n_boot": int(n_boot), "block": int(block)})
+
+
 def diebold_mariano(errors_a, errors_b, lags: int | None = None) -> TestResult:
     """Diebold-Mariano test of equal predictive accuracy between two forecast error series."""
     a = np.asarray(errors_a, dtype=float) ** 2

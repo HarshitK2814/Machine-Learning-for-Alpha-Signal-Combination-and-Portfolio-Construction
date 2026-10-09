@@ -95,7 +95,7 @@ def run(country: str, aum: float, n_groups: int, gross: float,
     src = pd.read_csv(index)
     src = dict(zip(src["strategy"].astype(str), src["artefact"].astype(str)))
 
-    rows, feas = [], []
+    rows, feas, monthlies = [], [], []
     for cell in cells:
         path = src.get(cell)
         if path is None or not Path(path).exists():
@@ -177,6 +177,9 @@ def run(country: str, aum: float, n_groups: int, gross: float,
         if not monthly:
             continue
         m = pd.DataFrame(monthly)
+        mm = m.copy()
+        mm["cell"] = cell.removeprefix("cell_")
+        monthlies.append(mm)
 
         def sharpe(x):
             s = x.std(ddof=1)
@@ -190,7 +193,9 @@ def run(country: str, aum: float, n_groups: int, gross: float,
             "mean_gross_attained_capped": float(m["gross_capped"].mean()),
             "cost_bps_uncapped": float((m["gross_ret"] - m["net_ret_uncapped"]).mean()*12*1e4),
         })
-    return pd.DataFrame(rows), pd.DataFrame(feas)
+    monthly_all = (pd.concat(monthlies, ignore_index=True) if monthlies
+                   else pd.DataFrame())
+    return pd.DataFrame(rows), pd.DataFrame(feas), monthly_all
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -202,6 +207,10 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--gross", type=float, default=2.0,
                     help="gross of the spread portfolio; 2.0 matches the registered budget")
     ap.add_argument("--out", type=Path, default=ROOT / "outputs" / "signal_vs_portfolio")
+    ap.add_argument("--dump-monthly", action="store_true",
+                    help="also write the per-cell monthly return series (gross, net uncapped, net "
+                         "capped) for every AUM rung. Required for any inference on the capacity "
+                         "channel, which is a difference of two Sharpe ratios on paired months")
     ap.add_argument("--tag", default="",
                     help="suffix for the output filename; set it when sweeping a "
                          "different AUM ladder or group count so a later run cannot "
@@ -212,14 +221,18 @@ def main(argv: list[str] | None = None) -> int:
     print(f"{args.country}: {args.groups}-group long/short spread at gross {args.gross}, "
           f"from the same stage-02 scores as the optimised book")
     print()
-    all_res = []
+    all_res, all_mon = [], []
     for aum in sorted(args.aum):
-        res, feas = run(args.country, aum, args.groups, args.gross, P_CELLS)
+        res, feas, mon = run(args.country, aum, args.groups, args.gross, P_CELLS)
         if res.empty:
             print(f"  AUM {aum:.0e}: no cells resolved")
             continue
         res["aum"] = aum
         all_res.append(res)
+        if args.dump_monthly and not mon.empty:
+            mon = mon.copy()
+            mon["aum"] = aum
+            all_mon.append(mon)
         m = res.mean(numeric_only=True)
         print(f"AUM {aum:.0e}  ({len(res)} prediction cells, {int(res['months'].iloc[0])} months)")
         print(f"   1) decile spread, GROSS, no costs no caps : Sharpe {m['sharpe_gross_uncapped']:+.4f}"
@@ -234,12 +247,16 @@ def main(argv: list[str] | None = None) -> int:
         print(f"      COST channel     1->2 : {m['sharpe_net_uncapped']-m['sharpe_gross_uncapped']:+.4f}")
         print(f"      CAPACITY channel 2->3 : {m['sharpe_net_capped']-m['sharpe_net_uncapped']:+.4f}")
         print()
+    suffix = f"_{args.tag}" if args.tag else ""
     if all_res:
         out = pd.concat(all_res, ignore_index=True)
-        suffix = f"_{args.tag}" if args.tag else ""
         dest = args.out / f"wedge_{args.country}{suffix}.csv"
         out.to_csv(dest, index=False)
         print(f"wrote {dest}")
+    if all_mon:
+        md = args.out / f"monthly_{args.country}{suffix}.csv"
+        pd.concat(all_mon, ignore_index=True).to_csv(md, index=False)
+        print(f"wrote {md}")
     return 0
 
 
