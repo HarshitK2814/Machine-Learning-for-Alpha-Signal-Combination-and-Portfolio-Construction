@@ -79,8 +79,12 @@ limit rather than by its position cap, its risk contribution or its alpha.** The
 * The book holds **nearly the entire eligible universe**. There is almost no cross-sectional
   selection left for the signal to perform — the optimiser is not choosing *which* names, it is
   being told *how much* of each by ADV.
-* On the German panel, position size correlates **+0.871 with the ADV cap** and **−0.080 with
-  alpha**. The book is a liquidity-weighted index with a small alpha tilt.
+* On the German panel at $1bn, position size correlates **+0.854 with the ADV cap** against
+  **+0.160 with signal strength**, and the book's *directional* tilt toward alpha is **+0.321**
+  (`tools/exp_capacity_dose_response.py`). Liquidity dominates the book by a factor of five on the
+  magnitude margin — but see the correction note below: an earlier figure of "−0.080 with alpha"
+  circulated in these docs and is **not reproducible**. The book is genuinely tilted toward alpha;
+  liquidity simply dominates it, and dominates it more as size rises.
 
 The mechanism is simply scale relative to market depth: $1bn against a median ADV under $2mn.
 
@@ -221,3 +225,37 @@ $1e10 is running and will complete the curve. The prediction for it, fixed now: 
 **below** +0.423, cost drag below 17.2 bps, and net Sharpe poor for the opposite reason — signal
 suppressed rather than costs paid. If that holds, net performance is hump-shaped in AUM with a low
 peak, and "no scale works" is established on three points rather than two.
+
+
+---
+
+## 8. Correction: the "−0.080 with alpha" figure is withdrawn
+
+Earlier versions of this document, and of `docs/STATUS.md`, said position size correlates "+0.871
+with the ADV cap and −0.080 with alpha", and used the second number to call the book "a
+liquidity-weighted index with a small alpha tilt". Measured reproducibly by
+`tools/exp_capacity_dose_response.py` over all 16 cells and 132 months:
+
+| AUM | corr(\|w\|, adv_cap) | corr(\|w\|, \|alpha\|) | **corr(w, alpha) signed** | share pinned at cap |
+|---|---|---|---|---|
+| $1e8 | +0.5546 | +0.2621 | **+0.4972** | 0.519 |
+| $1e9 | **+0.8540** | +0.1602 | **+0.3210** | 0.670 |
+
+The ADV figure replicates closely (+0.854 against the quoted +0.871). **The alpha figure does
+not**: it is **+0.321** signed, or +0.160 on magnitudes, not −0.080. I cannot reproduce −0.080 under
+any definition I have tried, so it is withdrawn rather than reconciled.
+
+This matters because I had leaned on it. The corrected reading is weaker in one way and stronger in
+another:
+
+* **Weaker:** the book is *not* alpha-blind. It carries a real directional tilt toward the signal
+  (+0.321 at $1bn), so "a liquidity-weighted index with a small alpha tilt" overstated the case.
+* **Stronger, and this is now the cleanest statement of the mechanism:** both correlations move in
+  the predicted directions as size rises, measured on the cross-section of weights rather than
+  inferred from performance. From $1e8 to $1e9 the liquidity correlation rises **+0.555 → +0.854**
+  while the alpha tilt falls **+0.497 → +0.321** and the share of positions pinned at their
+  participation limit rises **0.519 → 0.670**. The book is being progressively taken over by the
+  constraint, and the dose controls how much.
+
+Two margins moving the right way at once, on weights rather than returns, is better evidence for
+the mechanism than a single alarming-looking correlation that turned out not to be reproducible.

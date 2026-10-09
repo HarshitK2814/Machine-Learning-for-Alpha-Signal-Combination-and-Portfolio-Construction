@@ -78,9 +78,15 @@ def arm_table(country: str, aum: float, scores: dict[str, pd.DataFrame],
                    # constraint actually binding rather than the one that was budgeted for.
                    "share_at_cap": float(np.mean(abs_w[ok] >= cap[ok] * 0.999)) if ok.sum() else np.nan}
             if "signal" in g.columns:
-                s = np.abs(g["signal"].to_numpy(dtype=float))
-                ok2 = np.isfinite(s) & np.isfinite(abs_w)
-                row["corr_w_alpha"] = cross_sectional_corr(abs_w[ok2], s[ok2])
+                sig = g["signal"].to_numpy(dtype=float)
+                signed_w = g[wcol].to_numpy(dtype=float)
+                ok2 = np.isfinite(sig) & np.isfinite(abs_w)
+                # Two different questions, and our own notes have conflated them. The MAGNITUDE
+                # correlation asks whether position SIZE is driven by signal strength; the SIGNED
+                # correlation asks whether the book is tilted in the direction of the alpha at all.
+                # A book can score well on the first and badly on the second.
+                row["corr_w_alpha"] = cross_sectional_corr(abs_w[ok2], np.abs(sig[ok2]))
+                row["corr_signed_w_alpha"] = cross_sectional_corr(signed_w[ok2], sig[ok2])
             rows.append(row)
     return pd.DataFrame(rows)
 
@@ -147,8 +153,8 @@ def main(argv: list[str] | None = None) -> int:
     args.out.mkdir(parents=True, exist_ok=True)
     panel.to_csv(args.out / f"dose_panel_{args.country}.csv", index=False)
 
-    cols = ["gross", "share_at_cap", "corr_w_advcap"] + (
-        ["corr_w_alpha"] if "corr_w_alpha" in panel.columns else [])
+    cols = ["gross", "share_at_cap", "corr_w_advcap"] + [
+        c for c in ("corr_w_alpha", "corr_signed_w_alpha") if c in panel.columns]
     summary = panel.groupby("aum")[cols].mean()
     summary["n_months"] = panel.groupby("aum")["date"].nunique()
     summary.to_csv(args.out / f"dose_summary_{args.country}.csv")
@@ -175,8 +181,13 @@ def main(argv: list[str] | None = None) -> int:
         a_lo, a_hi = summary.loc[lo, "corr_w_alpha"], summary.loc[hi, "corr_w_alpha"]
         print(f"  corr(|w|, alpha)  : {a_lo:+.4f} at {lo:.0e}  ->  {a_hi:+.4f} at {hi:.0e}")
         alpha_ok = a_lo > a_hi
-        print(f"    {'AS PREDICTED' if alpha_ok else 'AGAINST THE PREDICTION'}: the signal "
-              f"{'does' if alpha_ok else 'does not'} matter more at smaller size")
+        print(f"    {'AS PREDICTED' if alpha_ok else 'AGAINST THE PREDICTION'}: position SIZE "
+              f"tracks signal strength {'more' if alpha_ok else 'less'} at smaller size")
+        if "corr_signed_w_alpha" in summary.columns:
+            d_lo, d_hi = summary.loc[lo, "corr_signed_w_alpha"], summary.loc[hi, "corr_signed_w_alpha"]
+            print(f"  corr(w, alpha) SIGNED: {d_lo:+.4f} at {lo:.0e}  ->  {d_hi:+.4f} at {hi:.0e}")
+            print(f"    this is the directional question - whether the book is tilted toward alpha")
+            print(f"    at all, which is not the same as position size tracking signal strength.")
     sc_lo, sc_hi = summary.loc[lo, "share_at_cap"], summary.loc[hi, "share_at_cap"]
     print(f"  share at the cap  : {sc_lo:.4f} at {lo:.0e}  ->  {sc_hi:.4f} at {hi:.0e}")
     print()

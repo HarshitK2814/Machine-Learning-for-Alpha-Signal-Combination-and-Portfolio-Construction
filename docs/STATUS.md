@@ -65,6 +65,13 @@ handoff to Workstream B is complete.
 > well-evidenced hypothesis, not a finished result. **It is running now** (Germany, no retraining
 > needed).
 >
+> **Correction (07:10):** an earlier "-0.080 correlation with alpha" figure is **withdrawn, not
+> reproducible**. Measured properly: at $1e9 corr(|w|, adv_cap) **+0.854** against a directional
+> alpha tilt of **+0.321**; at $1e8 **+0.555** against **+0.497**. The book is genuinely tilted
+> toward alpha - liquidity dominates it, and dominates more as size rises. Both margins moving the
+> predicted way on the cross-section of WEIGHTS is better mechanism evidence than the withdrawn
+> number was.
+>
 > ### The E-arm experiment resolved the cause but not the arm
 >
 > Retraining India's economic cells at the attainable gross (0.10) instead of the infeasible
