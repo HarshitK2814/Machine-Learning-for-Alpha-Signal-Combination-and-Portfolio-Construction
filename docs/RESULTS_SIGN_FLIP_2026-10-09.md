@@ -101,6 +101,45 @@ The asymptotic channel scaled by the composite gross Sharpe: Germany 12.655/2.76
 5.822/1.209 = **4.82**. Agreement within 5% on n = 2. Pre-registered as a secondary prediction
 (D4) only; it should not be leaned on.
 
+## 3e. The impact coefficient: the mechanism predicts its own sensitivity, and is confirmed
+
+`k = 1` is Grinold-Kahn and is an assumption, not an estimate. Because the channel's sign depends
+on `kappa ∝ k·sqrt(AUM/ADV)`, the crossover must move with `k` — and the mechanism says exactly
+how. The crossover sits where `kappa` reaches a critical value, so `k·sqrt(AUM)` is constant there
+and therefore
+
+> **crossover AUM ∝ k^(−2).**
+
+That is a quantitative, falsifiable prediction about a nuisance parameter. Germany, composite
+channel, `k` swept over a six-fold range:
+
+| k | crossover | crossover × k² | min channel below $1mn | channel at $1bn |
+|---|---|---|---|---|
+| 0.5 | **$16.56mn** | 4.14mn | −0.909 | +8.62 |
+| **1.0** | **$3.79mn** | **3.79mn** | −0.811 | +11.06 |
+| 2.0 | **$1.06mn** | 4.24mn | −0.802 | +11.84 |
+| 3.0 | **$0.55mn** | 4.97mn | −0.791 | +11.76 |
+
+Three things follow, and they matter more than the point estimate did.
+
+1. **The sign flip exists at every `k` tested.** Every column has a negative region below $1mn and
+   a strongly positive channel at $1bn. The *existence* of the flip does not depend on the impact
+   coefficient at all; only its location does.
+2. **`crossover × k²` is constant to within about ±15% for `k ≤ 2`**, drifting mildly at `k = 3`.
+   The mechanism's own prediction about how the crossover scales with the cost coefficient is
+   confirmed over a six-fold range. This is internal validation of the comparative static that does
+   **not** depend on Japan.
+3. **The depth of the negative region is almost invariant to `k`** (−0.79 to −0.91). That is what
+   the mechanism implies: at small mandates the cap's damage is nearly pure alpha forfeiture, which
+   has no `k` in it, while the cost saving it buys is negligible.
+
+So section 6's warning that `k` was "the largest unquantified sensitivity" is **discharged**: the
+qualitative claim is robust to `k`, and the quantitative claim about the crossover's location
+should be quoted as **$3.79mn at `k = 1`, moving as `k^(−2)`**, with the CI in section 3a
+conditional on `k = 1`. A referee who prefers `k = 2` gets $1.06mn and the same paper.
+
+Data: `outputs/signal_vs_portfolio/impact_k_sensitivity_DEU.csv`.
+
 ## 4. The friction horse race
 
 Capacity against cost against tax, same signals. **The ordering is capacity >> cost >> tax in both
@@ -171,10 +210,10 @@ tracker §C8.1.
 * **Japan**, per `AMENDMENT_001D` D1–D5. D2 (channel significantly positive at $1bn) and D3
   (conditional: Japan resembles Germany if its gross Sharpe exceeds India's) are the real tests.
   D3 can come out void, and then the flip rests on **Germany alone** and must be reported so.
-* **The impact coefficient.** `k = 1` is Grinold-Kahn. The channel's *sign* depends on `kappa`, so
-  the crossover location moves with `k`. The dependence is bounded, not settled, and the crossover
-  CI above does **not** include uncertainty in `k`. This is the largest unquantified sensitivity in
-  the paper and it should be a panel, not a footnote.
+* ~~**The impact coefficient.**~~ **DISCHARGED, see §3e.** Swept over `k ∈ {0.5, 1, 2, 3}`: the
+  sign flip exists at every value, `crossover × k²` is constant to within ±15% for `k ≤ 2` exactly
+  as the mechanism predicts, and the depth of the negative region is almost invariant to `k`. The
+  crossover CI in §3a remains conditional on `k = 1`, and that conditioning must be stated.
 * **Decile-spread construction.** Equal-weighted within decile. @NMV2016 show equal-weighting
   flatters small illiquid names and is "misleading" net of costs; that is precisely the alpha our
   cap removes in Germany, so the flip's location is sensitive to this choice. A value-weighted

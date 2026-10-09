@@ -1,9 +1,64 @@
 # Workstream B status (Harshit)
 
-Updated: **2026-10-09 (06:50 IST)**. Workstream A is production-promoted and its real-data
+Updated: **2026-10-09 (12:25 IST)**. Workstream A is production-promoted and its real-data
 handoff to Workstream B is complete.
 
-> ## The headline, as of this update
+> ## THE HEADLINE (12:25 IST) — the claim is now a sign flip, not a magnitude
+>
+> Read `docs/RESULTS_SIGN_FLIP_2026-10-09.md` first, then `docs/AMENDMENT_001D_...`. The 06:50
+> headline below is still accurate about the tax hypothesis and is kept, but it is no longer the
+> paper.
+>
+> **The claim.** The effect of the ADV participation constraint on net Sharpe is **monotone in
+> mandate size and changes sign**. Germany: **−0.81** Sharpe points at $100k, **+11.06** at $1bn,
+> crossing zero at **$3.79mn (95% CI $1.88mn–$7.07mn)**. Both tails significant at 5% under a
+> paired test with Holm correction across 8 cells (t = −6.10 low, +12.27 high; 0 of 2,000
+> bootstrap replications without a sign change). **India has no crossover at any measurable
+> scale** — the cap helps everywhere, and 50.8% of replications show no sign change at all. **The
+> flip is not universal**, which is itself a result.
+>
+> **Why it matters.** The literature disagrees about this sign *in print*, and all parties are US:
+> Novy-Marx & Velikov (RFS 2016) and Korajczyk & Sadka (JF 2004) find turnover reduction and
+> liquidity tilting help — KS get a **5,000x** break-even range from the tilt alone — while
+> Azevedo, Hoegner & Velikov (2025) find the same mitigations do **not** improve net performance.
+> All three are right about their own setting. Both fall out of
+> `net Sharpe = (alpha_eff − kappa·G^0.5)/sigma` with `kappa ∝ sqrt(AUM/ADV)`: AHV sit at
+> `kappa ≈ 0`. We recover their regime inside our own data and walk it up to where the cap is
+> worth +12.7 Sharpe points. **This closes blocker 5** (economic mechanism).
+>
+> **Three of our own claims were withdrawn today, all the same error** — a quantity computed
+> correctly and compared against the wrong benchmark:
+> 1. **"Frontiers 10–100x below US estimates" — WITHDRAWN.** Not turnover-matched. @NMV2016 Table 7
+>    reports **$0.18–0.53bn** for *high-turnover* US strategies; Japan's $413mn is inside that
+>    range. (Tracker §C8.1.)
+> 2. **"The tracker contains none of the capacity papers" — WRONG.** @ACM2023 is row 5, @AHV2023
+>    row 10. The failure was mis-rating them against the old claim, not omitting them.
+> 3. **"Costs beat taxes 5x (DEU) / 53x (IND)" — those are all-16-cell averages** including the
+>    broken economic arm. On prediction cells only: **2.70x** and **87.4x**. Germany's margin is
+>    one order of magnitude, not two.
+>
+> **Taxes, honestly, in two parts.** As a *channel magnitude* the tax channel is 0.111 Sharpe
+> points against 11–14 for cost and capacity — second-order, decisively. As a *share of what
+> survives* it is not: Germany's book nets **+0.128** and keeps **+0.017** after tax, so tax takes
+> **87%** of the remaining risk-adjusted return. Worth a paragraph, not a paper.
+>
+> **Japan is a live pre-registered test.** `AMENDMENT_001D` (declared 11:30, revised 12:06, both
+> before any Japanese portfolio existed) fixes five predictions, and
+> `tools/score_amendment_001d.py` — also committed before Japan reported — scores them
+> mechanically. Japan's stage 02 is on its final cell.
+>
+> **A bug caught before it bit.** `outputs/source_index/<COUNTRY>.csv` was written with `to_csv`,
+> i.e. overwritten, by each stage-02 invocation. Japan's index held **7 rows and none of the 8
+> prediction cells** the pre-registered predictions concern, because two runs split its strategies
+> across two manifests. Stage 02 now merges; `tools/repair_source_index.py` rebuilds from the
+> manifests and refuses to name an artefact that is not on disk. Found by checking Japan's index
+> *before* using it.
+>
+> **Venue:** JFQA primary. RFS is now a defensible stretch rather than a fantasy (the paper
+> adjudicates an RFS paper against a JF paper and their successor). Management Science stays
+> compromised by @ACM2023.
+
+> ## The headline as of 06:50 IST (superseded above, still accurate on the tax hypothesis)
 >
 > **The pre-registered wedge statistic failed, and was separately found to be ill-defined.**
 > India returned slope -4.83, t = -2.59 - significantly the WRONG sign - and the statistic
