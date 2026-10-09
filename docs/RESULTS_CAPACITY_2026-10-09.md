@@ -121,9 +121,47 @@ Costs enter linearly once weights are fixed, so the crossover solves exactly:
 | **1.00** (as calibrated) | **+0.1229** | −0.0276 | tighter capacity |
 
 **The turnover-brake conclusion holds unless transaction costs are overstated by more than 1.75x.**
-Not knife-edge (it tolerates a 43% overstatement), not bulletproof (2x would flip it). `impact_k`
-is therefore the most load-bearing single parameter in the paper and was **inherited rather than
-estimated here** — it needs an independent calibration check before submission.
+
+Resolved further, on the impact term specifically. The cost model is the **canonical square-root
+law**: `impact_i = k * sigma_d_i * sqrt(AUM/ADV_i) * |dw_i|^1.5`, which rewritten with traded
+dollars `Q_i = |dw_i|*AUM` is `cost_i/|dw_i| = k * sigma_d_i * sqrt(Q_i/ADV_i)`. So `k = 1` means
+*trading one day's volume costs one day's volatility* — the Grinold–Kahn rule of thumb, and inside
+the range Almgren et al. estimate. It is a standard choice, not an aggressive one.
+
+Decomposed from the C12 engine's own monthly `cost_spread` / `cost_impact` / `cost_borrow`
+(reconciled against the published summary: L-S-P-0 gross 0.00294 and cost 20.88 bps against 0.0029
+and 20.88):
+
+| | spread | **impact** | borrow | total | impact share |
+|---|---|---|---|---|---|
+| $1e9, gross 0.132 | 3.15 | **7.47** | 6.59 | **17.21** | 43.4% |
+| $1e8, gross 0.130 | 7.17 | **46.23** | 6.49 | **59.89** | **77.2%** |
+
+The looser-capacity arm's cost is impact-dominated, because with the participation cap slack it
+takes much larger per-name trades and impact is superlinear in trade size. Solving for the
+crossover on `impact_k` alone:
+
+| `impact_k` | $1e9 | $1e8 matched | winner |
+|---|---|---|---|
+| 0.00 | +0.2516 | **+0.4716** | looser capacity |
+| 0.25 | +0.2194 | **+0.3460** | looser capacity |
+| 0.50 | +0.1872 | **+0.2204** | looser capacity |
+| **0.5888** | — | — | **tie** |
+| **1.00** (canonical) | **+0.1229** | −0.0308 | tighter capacity |
+| 2.00 | −0.0059 | −0.5333 | tighter capacity |
+
+**The turnover-brake conclusion requires the square-root impact coefficient to be at least 59% of
+its canonical value.** That is the honest statement of the dependency: the model's `k = 1` is the
+standard calibration, published estimates of this coefficient span roughly 0.3–1.5 across studies
+and markets, and a coefficient at the low end of that range would reverse the ordering. So the
+result should be reported **with the crossover stated**, and an independent estimate of `k` on
+these specific markets would strengthen it materially.
+
+*A correction worth recording:* I first inferred from per-trade medians (median half-spread 29.8 bps
+against median impact 11.9 bps per dollar traded) that cost was spread-dominated and `impact_k`
+therefore could not matter. That was wrong. Because impact is superlinear, the aggregate annual drag
+is dominated by the large trades sitting at the 5% participation cap (p95 participation 4.68%)
+rather than by the median trade. Per-trade medians are the wrong statistic for this question.
 
 **Independent of the calibration:** §2's ICs, §4's constraint-binding shares and weight
 correlations, §4's conditioning curve, and §5's *gross* Sharpe comparison. Lead with those if the
