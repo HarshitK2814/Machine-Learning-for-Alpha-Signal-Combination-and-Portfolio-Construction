@@ -1,5 +1,52 @@
 # Amendment 001D: the capacity channel changes sign with scale, and Japan tests it
 
+> # RETRACTED 2026-10-09, 12:30 IST — H-FLIP IS FALSIFIED ON ITS OWN EXPLORATORY SAMPLE
+>
+> **Japan never needed to report. The sign flip was an artefact of cost-input coverage and it is
+> withdrawn.**
+>
+> **The defect.** The ladder in section 3 formed decile portfolios on the **signal-bearing**
+> cross-section (~382 German names a month) rather than the **investable** one (~246). The promoted
+> C6 prices only **65.1%** of Germany's cross-section over 2009-2019 — `adv_usd` is the binding
+> field — against **99.1%** of India's. Document 13 requirement 2 makes an uncertified
+> security-month **non-tradeable** and prohibits imputation (`docs/NON_TRADEABLE_TREATMENT.md`),
+> and the ladder violated that rule in both directions at once:
+> * in the **uncapped** book an uncovered name was charged **zero cost**, so 35% of Germany's
+>   positions were being traded for free;
+> * in the **capped** book the same name got `cap = 0` and was dropped outright.
+>
+> Both push the capacity channel downward, and **only in Germany**. That was the negative region.
+>
+> **The corrected numbers** (`--require-cost-inputs`, Germany at $100k):
+>
+> | | non-compliant | compliant |
+> |---|---|---|
+> | gross | +2.383 | **+1.998** (the excluded names did carry alpha) |
+> | net uncapped | +1.749 | **+0.657** (35% of positions were free) |
+> | net capped | +0.938 | **+0.719** |
+> | **capacity channel** | **−0.811** | **+0.062** |
+>
+> India, at 99.1% coverage, is the control and barely moves: **+0.183 → +0.211**. That is precisely
+> the signature of a coverage artefact rather than a market difference.
+>
+> **On the compliant universe the channel is positive at every rung in both markets and monotone
+> increasing in AUM. There is no crossover anywhere in the data.** We never observe the regime in
+> which the cap hurts, so we **cannot** adjudicate the
+> Novy-Marx-Velikov-versus-Azevedo-Hoegner-Velikov disagreement, and the claim to do so is
+> withdrawn in full.
+>
+> **Status of each prediction:** D1 (monotonicity) holds and is the only one that survives. D2
+> (positive at $1bn) is expected to hold but is no longer a test of anything contested. **D3 is
+> dead** — there is no negative region in the exploratory sample for Japan to generalise. D4 and D5
+> were conditional on quantities this retraction changes.
+>
+> **This retraction was written before Japan reported**, with Japan's stage 02 on its final cell and
+> no Japanese portfolio in existence, so no Japanese result influenced it. The error was found by
+> checking whether the wedge tool obeyed the project's own non-tradeability rule — it did not.
+>
+> **What survives is in section 10 below**, added with this retraction. Everything between here and
+> there is kept as the record of a claim that did not hold.
+
 > ## REVISED 2026-10-09, 12:06 IST, BEFORE JAPAN REPORTED
 >
 > **What changed and why.** Sections 3 and 4 as first written used the **mean across cells of each
@@ -259,6 +306,53 @@ Checked immediately before writing this document:
 * What is claimed: **the sign is scale-dependent, the crossover is measurable, the published
   endpoints are recovered as limiting cases of one expression, and the crossover is not a fixed
   multiple of the capacity frontier.**
+
+## 10. What survives the retraction (added 2026-10-09, 12:31 IST)
+
+On the **compliant** universe — investable names only, `--require-cost-inputs`, which is what
+document 13 requirement 2 has always required — the capacity channel is:
+
+| AUM | Germany | India |
+|---|---|---|
+| $100k | **+0.062** | **+0.211** |
+| $300k | +0.256 | +0.392 |
+| $1mn | +0.795 | +0.751 |
+| $2mn | +1.282 | +1.096 |
+| $3mn | +1.653 | +1.332 |
+| $4mn | +1.971 | +1.509 |
+| $6mn | +2.478 | +1.780 |
+| $8mn | +2.887 | +2.005 |
+| $1e7 | +3.236 | +2.190 |
+| $3e7 | +5.115 | +3.072 |
+| $1e8 | +6.818 | +3.792 |
+| $3e8 | +7.617 | +4.290 |
+| $1e9 | +8.047 | +4.507 |
+| $1e10 | +8.336 | +4.657 |
+
+**Three things survive, and they are worth having.**
+
+1. **The capacity channel is positive and monotone increasing in AUM, in both markets, at every
+   scale measured.** It reaches **+8.05** (Germany) and **+4.51** (India) Sharpe points at $1bn. It
+   is robust to the weighting scheme (§3e), to the impact coefficient over a six-fold range (§3f),
+   and now to the coverage treatment. A binding ADV participation constraint **creates**
+   risk-adjusted performance at institutional scale, and the effect grows with mandate size.
+2. **The comparative static still explains that**, and its `k`-scaling prediction (§3f) still held
+   on the non-compliant ladder; it should be re-checked on the compliant one before being quoted.
+3. **The coverage asymmetry is itself a methods finding** worth a paragraph: a 35-point gap in
+   cost-input coverage between two panels of the same study generated a spurious, highly
+   significant (t = −6.10), sign-flipping result that survived a value-weighting robustness check
+   and an impact-coefficient sweep. Only enforcing the project's own non-tradeability rule killed
+   it. For non-US work, where coverage is never complete, that is a general warning.
+
+**What does not survive:** the sign flip, the crossover and its confidence interval, and the claim
+to adjudicate the @NMV2016-versus-@AHV2025 disagreement. **We only ever observe the regime in which
+the cap helps.** Our result is therefore *consistent with* @NMV2016 and @KS2004 and says nothing
+about @AHV2025, who operate at a scale we do not reach.
+
+**What this does to the paper.** The contribution reverts to a measurement — the positive capacity
+channel, AUM-indexed, in three non-US markets, with the tax channel ruled out as second-order — and
+loses the mechanism-adjudication framing that made it interesting. That is a real loss and should
+not be dressed up. `docs/STRATEGIC_ASSESSMENT_2026-10-09.md` needs a fourth pass.
 
 ## 9. Countersignature
 

@@ -44,6 +44,7 @@ portfolio is not merely expensive but unexecutable at scale.
 from __future__ import annotations
 
 import argparse
+import logging
 import sys
 from pathlib import Path
 
@@ -52,6 +53,8 @@ import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
+
+log = logging.getLogger(__name__)
 
 P_CELLS = [f"cell_{a}-{b}-P-{d}" for a in "LN" for b in "SC" for d in ("0", "U")]
 
@@ -96,7 +99,8 @@ def decile_weights(scores: pd.Series, n_groups: int, gross: float,
 
 def run(country: str, aum: float, n_groups: int, gross: float,
         cells: list[str], impact_k: float | None = None,
-        weighting: str = "ew") -> tuple[pd.DataFrame, pd.DataFrame]:
+        weighting: str = "ew",
+        require_cost_inputs: bool = False) -> tuple[pd.DataFrame, pd.DataFrame]:
     from alphacomb.contracts import intl, paths, read_table
     from alphacomb.portfolio.cost_terms import trade_cost_numpy
 
@@ -136,6 +140,23 @@ def run(country: str, aum: float, n_groups: int, gross: float,
         d = (d.merge(tg, on=["date", "permno"], how="inner")
                .merge(ci, on=["date", "permno"], how="left")
                .merge(uni, on=["date", "permno"], how="left"))
+        if require_cost_inputs:
+            # Germany has a persistent 25-48% gap in adv_usd (C6 coverage, see
+            # docs/handoff/18_FOR_ABSAR_C6_COVERAGE...), India has essentially none. Left
+            # untreated that asymmetry is an alternative explanation for the whole result: a name
+            # with no ADV gets cap = 0, so it is dropped from the CAPPED book entirely, and it is
+            # also charged zero cost in the UNCAPPED book. Both push the capacity channel
+            # downward, and only in Germany - which is exactly where the negative region appears.
+            # Restricting both books to names with usable cost inputs makes the comparison
+            # like-for-like and is the only way to tell a liquidity constraint from missing data.
+            n0 = len(d)
+            good = (np.isfinite(d["adv_usd"]) & (d["adv_usd"] > 0)
+                    & np.isfinite(d["spread"]) & np.isfinite(d["sigma_d"]))
+            d = d.loc[good].copy()
+            msg = (f"  cost-input filter [{country} {cell}]: kept {len(d):,} of {n0:,} rows "
+                   f"({100.0 * len(d) / max(n0, 1):.1f}%)")
+            log.info(msg)
+            print(msg)
         monthly, prev_u, prev_c, prev_inputs = [], None, None, None
         for date, g in d.groupby("date"):
             g = g.set_index("permno")
@@ -237,6 +258,13 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--gross", type=float, default=2.0,
                     help="gross of the spread portfolio; 2.0 matches the registered budget")
     ap.add_argument("--out", type=Path, default=ROOT / "outputs" / "signal_vs_portfolio")
+    ap.add_argument("--require-cost-inputs", action="store_true",
+                    help="restrict the universe to names with finite positive adv_usd, spread and "
+                         "sigma_d BEFORE forming deciles. Germany has a 25-48%% adv_usd gap and "
+                         "India almost none, and an uncovered name is silently dropped from the "
+                         "capped book (cap=0) while being charged zero cost in the uncapped book. "
+                         "This flag is the test of whether the capacity channel is a liquidity "
+                         "constraint or a data-coverage artefact")
     ap.add_argument("--weighting", choices=["ew", "vw"], default="ew",
                     help="ew = equal-weighted within each leg (the signal literature's default); "
                          "vw = value-weighted by market cap. Novy-Marx & Velikov (RFS 2016) hold "
@@ -264,7 +292,8 @@ def main(argv: list[str] | None = None) -> int:
     all_res, all_mon = [], []
     for aum in sorted(args.aum):
         res, feas, mon = run(args.country, aum, args.groups, args.gross, P_CELLS,
-                             impact_k=args.impact_k, weighting=args.weighting)
+                             impact_k=args.impact_k, weighting=args.weighting,
+                             require_cost_inputs=args.require_cost_inputs)
         if res.empty:
             print(f"  AUM {aum:.0e}: no cells resolved")
             continue

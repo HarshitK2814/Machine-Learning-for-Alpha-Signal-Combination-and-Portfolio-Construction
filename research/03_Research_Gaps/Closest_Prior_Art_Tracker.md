@@ -260,6 +260,19 @@ capacity number is published:
   square-root-concave. @KS2004 state explicitly that if true impact is concave their results are
   conservative because they overestimate large-trade costs. So **our milder law cannot explain a
   smaller frontier** - which protects the finding, and should be said.
+* **Match on cost-input coverage, which is ours alone and is a trap.** The promoted C6 prices only
+  **65%** of Germany's signal-bearing cross-section over 2009-2019 (`adv_usd` is the binding field)
+  against essentially 100% of India's. Document 13 requirement 2 makes an uncertified
+  security-month **non-tradeable** and prohibits imputation, so Germany's investable universe is
+  ~246 names a month, not the ~382 that carry a signal
+  (`docs/NON_TRADEABLE_TREATMENT.md`). Any exhibit that forms portfolios on the *signal-bearing*
+  cross-section rather than the *investable* one silently gives uncovered names zero cost in an
+  uncapped book and a zero cap in a capped one - **both of which push a capacity channel downward,
+  and only in Germany.** That is an alternative explanation for any Germany-versus-India contrast
+  and must be controlled before such a contrast is reported. The wedge tool's
+  `--require-cost-inputs` flag exists for exactly this and the compliant ladder is the one to
+  quote. @KS2004 and @NMV2016 do not face this because US CRSP/TAQ coverage is near-complete; it is
+  a hazard specific to non-US work and is worth a methods paragraph of its own.
 
 ## C7. Search protocol additions
 
