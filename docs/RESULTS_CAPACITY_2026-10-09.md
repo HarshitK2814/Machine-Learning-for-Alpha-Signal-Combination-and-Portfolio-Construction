@@ -144,6 +144,29 @@ signal" is true from $1e8 to $1e9 and false from $1e9 to $1e10, and I had assert
 version. What *is* monotone is the share of names at the cap (83% → 97% → 100%), the cost drag, and
 the net Sharpe.
 
+## 5c. The factorial, with the broken arm removed: no axis matters
+
+The 16-cell design's only significant main effect is the **objective** axis, and the economic arm
+is not a competent implementation of its objective (§10, `ECONOMIC_ARM_CAPABILITY_GAP.md`). So the
+effect is estimated on the **2^3 design over the eight prediction-loss cells**, where every cell's
+scores carry significant signal. Contrast-coded in the time domain, Newey-West HAC, 132 months
+(`tools/exp_factorial_prediction_arm.py`):
+
+| axis | ON / OFF | effect p.a. | t | significant |
+|---|---|---|---|---|
+| representation | nonlinear / linear | +0.00074 | +0.48 | no |
+| conditioning | state / static | −0.00093 | −1.20 | no |
+| uncertainty | shrinkage / none | +0.00065 | +1.53 | no |
+
+**No design axis has a detectable main effect.** That is a result, not an absence of one: among
+choices made on scores that demonstrably work, none moves net-of-cost performance. It is also
+exactly what §4 predicts — the constraint, not the model, is setting the book, so the design
+choices have nothing left to express.
+
+Taken with §5b this is the cleanest form of the paper's claim: the design axes this literature
+debates are jointly undetectable at every scale tested, while the friction that does bind is
+measured and monotone.
+
 ## 6. How much this depends on the cost calibration
 
 Costs enter linearly once weights are fixed, so the crossover solves exactly:

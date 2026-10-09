@@ -50,14 +50,23 @@ def load_monthly(country: str, cells: list[str], column: str) -> pd.DataFrame:
     root = paths.outputs_root() / "returns"
     if not root.exists():
         raise SystemExit("no outputs/returns/; re-run stage 06 with --save-returns")
+    import glob
+    import os
+
     out = {}
     for cell in cells:
         folder = root / cell
         if not folder.exists():
             continue
-        latest = paths.latest_run("returns", cell)
-        if latest is None:
+        # NOT paths.latest_run. outputs/returns/<cell>/ accumulates a file per backtest of that
+        # cell across every country and every AUM arm, so "latest" means whichever ran most
+        # recently - which while the 1e10 chain was running meant the 1e10 book, giving numbers
+        # 7x too small under a 1e9 heading. Select the stage-06 tax_exempt table by name instead.
+        matches = sorted(glob.glob(os.path.join(str(folder),
+                                                f"tax_{cell}_tax_exempt_*.parquet")))
+        if not matches:
             continue
+        latest = Path(matches[-1])
         frame = read_table(latest, "returns")
         if column not in frame.columns:
             raise SystemExit(f"{latest} has no column {column!r}; have {list(frame.columns)}")
