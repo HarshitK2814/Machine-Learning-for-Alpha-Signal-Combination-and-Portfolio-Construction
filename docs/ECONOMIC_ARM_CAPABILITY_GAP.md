@@ -132,3 +132,52 @@ the stage-02 outputs the published portfolios consumed, rather than whatever a l
 write — the same mtime hazard that
 `docs/AMENDMENT_001B_UNIVERSE_BREADTH_CAP.md` and the weights index exist to close, and which
 caught this diagnostic too before it was fixed.
+
+
+---
+
+## 7. ADDED 06:45 — the experiment: retraining at a feasible gross confirms the cause but does not fix the arm
+
+India's 8 economic cells were retrained at **gross 0.10**, the measured attainable level, with
+`--suffix _g010` so the registered artefacts are untouched. Both runs' information coefficients,
+**restricted to the frozen 2009-01..2019-12 window so they are comparable** (131 months each):
+
+| cell | gross 2.0 (registered) IC | t | gross 0.10 (feasible) IC | t |
+|---|---|---|---|---|
+| L-C-E-0 | −0.00314 | −0.32 | **+0.00504** | +0.46 |
+| L-C-E-U | −0.01768 | −1.82 | **+0.00001** | +0.00 |
+| L-S-E-0 | −0.00141 | −0.14 | **+0.00707** | +0.62 |
+| L-S-E-U | −0.01953 | −1.91 | −0.00585 | −0.57 |
+| N-C-E-0 | −0.00198 | −0.19 | **+0.01613** | +1.57 |
+| N-C-E-U | +0.00389 | +0.40 | **+0.01502** | +1.69 |
+| N-S-E-0 | −0.00790 | −0.91 | **+0.00764** | +0.97 |
+| N-S-E-U | −0.00071 | −0.08 | **+0.01420** | +1.62 |
+| **mean** | **−0.00606** (1 of 8 positive) | | **+0.00741** (7 of 8 positive) | |
+
+**The cause is confirmed.** Forcing the policy to a gross it can never run at costs it real
+information: correcting the budget flips the mean IC's sign and turns 1 of 8 positive cells into
+7 of 8, a swing of +0.0135 in mean IC. §4's diagnosis was right and the defect is causal, not
+incidental.
+
+**The fix is not sufficient.** No cell reaches significance (the largest is t = +1.69), and the arm
+remains about **five times weaker** than the prediction arm's +0.03683, which is significant in all
+8 cells on the same months. So the leverage mismatch explains part of the capability gap and not
+all of it; the remainder is unexplained and would need its own investigation (candidate causes in
+§4's list: the cost term differenced against an undrifted prior book, the 12-month sequence reset,
+or simple undertraining at these cross-section sizes).
+
+**A caveat on the first reading of this experiment.** Run without `--years`, the retrained cells
+span **212** months, not 131, because India's panel extends outside the frozen window — and on
+those 212 months **2 of 8 cells did reach significance** (t = +2.12, +2.24). Inside the frozen
+window neither does. The significance came from out-of-window months, so the comparable figure is
+the 131-month one above, and the `_g010` artefacts should only be used window-restricted or be
+regenerated with `--years 2009 2019`.
+
+**What this means for the paper.** The factorial's economic main effect still cannot be reported as
+"economic objectives underperform". Part of it is now attributable to a specific, identified and
+fixable defect — a fixed gross budget that capacity makes infeasible — and the rest is an
+unexplained implementation gap. The defensible version is a methodological finding in its own
+right: *a parametric portfolio policy with a fixed gross target loses a measurable part of its
+information when the binding constraint is capacity rather than risk, and correcting the target
+recovers some but not all of it.* That is consistent with, and a mechanism for, the broader
+capacity story in `docs/CANDIDATE_REFRAMING_CAPACITY.md`.
