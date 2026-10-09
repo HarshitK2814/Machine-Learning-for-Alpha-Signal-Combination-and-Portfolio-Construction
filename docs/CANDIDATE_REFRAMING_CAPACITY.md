@@ -351,3 +351,63 @@ two-sided-squeeze reading in §7 wrong. If it does not, the squeeze stands.
 Until that arm reports, **§7's net-Sharpe ordering should not be quoted**; the gross-Sharpe
 comparison (+0.654 against +0.423) and the weight-level correlations in §8 are the parts that do not
 depend on leverage.
+
+
+---
+
+## 11. The matched-leverage test: §7 survives, and the mechanism is sharper than I thought
+
+§10 suspended §7's net-Sharpe ordering pending a leverage-matched comparison. That arm is now run:
+$1e8 capacity — the ADV participation cap 10x looser — re-optimised with the gross budget **capped
+at 0.130**, the level the $1e9 arm chose for itself. The cap bound in all 132 months at exactly
+0.1300, 16 cells, zero held months, 132/132 `optimal` on the economic cells.
+
+| prediction-loss arm, 8 cells, **both at gross ≈ 0.13** | $1e9 capacity | $1e8 capacity | ratio |
+|---|---|---|---|
+| **gross** Sharpe | +0.4227 | **+0.6167** | **1.46x** |
+| turnover | 0.0135 | **0.0258** | **1.91x** |
+| cost drag | 17.21 bps | **59.59 bps** | **3.46x** |
+| **net** Sharpe | **+0.1282** | **−0.0250** | worse |
+| best single cell, net | +0.3302 | +0.2678 | worse |
+
+**§7's conclusion stands.** The leverage confound in §10 was real but did not drive it: with
+leverage held identical, the looser-capacity book is still net-worse. So the two-sided squeeze is
+confirmed rather than refuted, and §10's prediction — that matching would reverse the ordering —
+was **wrong**.
+
+### The sharper mechanism: capacity is also a turnover brake
+
+The matched test shows *why*, and it is not what §7 assumed. At the same leverage the
+looser-capacity book trades **1.91x more** and pays **3.46x the cost**. The participation
+constraint was doing two things at once, and only one of them was in the story:
+
+1. it **suppresses signal** — gross Sharpe is 46% lower when it binds, exactly as claimed; and
+2. it **pins the book in place** — with the cap binding on ~97% of names there is no room to
+   rebalance, so turnover is roughly halved and costs cut by about two thirds.
+
+**In this sample the second effect is worth more than the first costs.** The constraint, on net,
+*helps*. That is why $1bn sits near the net-optimal scale: not coincidence, but because the brake
+is more valuable than the alpha it blocks.
+
+### What the claim becomes
+
+> At institutional scale the participation constraint binds on essentially every position. It
+> costs real signal — relax it at matched leverage and gross Sharpe rises 46% from identical
+> scores — but it simultaneously pins the book, halving turnover and cutting transaction costs by
+> two thirds. The second effect dominates. **Across two orders of magnitude of AUM there is no
+> scale at which machine-learning alpha combination delivers positive net performance in these
+> markets, and relaxing the binding constraint makes performance worse rather than better.**
+
+That is a sharper and more counterintuitive result than either §2 or §7, and it is now measured
+three ways that agree: on performance (this table), on the cross-section of weights (§8, the book
+decoupling from liquidity and coupling to alpha as size falls), and on the optimiser's own
+conditioning (§9).
+
+### The one calibration this rests on
+
+The conclusion is driven by the cost model's impact term, `|dw|^1.5` with coefficient `impact_k`.
+A 3.46x cost increase at matched gross is a large number, and if `impact_k` is overstated the
+turnover-brake effect shrinks and the ordering could flip back. **Before publishing, `impact_k`
+needs an independent calibration check** — this is now the most load-bearing single parameter in
+the paper, and it was inherited rather than estimated here. A sensitivity curve over `impact_k`
+is cheap (no retraining; it only changes the backtest) and should accompany the result.
