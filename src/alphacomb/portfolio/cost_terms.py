@@ -59,11 +59,29 @@ def impact_coefficient(sigma_d: np.ndarray, adv_usd: np.ndarray, aum: float, k: 
 
 
 def trade_cost_numpy(dw: np.ndarray, spread: np.ndarray, sigma_d: np.ndarray, adv_usd: np.ndarray,
-                     aum: float, k: float = 1.0, commission_bps: float = 1.0) -> np.ndarray:
-    """Per-stock trading cost in return units (matches Absar's evaluation-time implementation)."""
+                     aum: float, k: float = 1.0, commission_bps: float = 1.0,
+                     exponent: float = 1.5) -> np.ndarray:
+    """Per-stock trading cost in return units (matches Absar's evaluation-time implementation).
+
+    ``exponent`` is the power on the traded fraction in the impact term and **defaults to 1.5,
+    which is the frozen contract**: a square-root (concave) per-unit price impact, total cost
+    ``~ Q^1.5``, Grinold-Kahn at ``k = 1``. Callers that leave it alone are bit-identical to
+    before.
+
+    It is exposed only so the **curvature** of the impact law can be tested, because that choice is
+    disputed in the literature we compete with. Novy-Marx & Velikov (RFS 2016) use a Kyle-linear
+    price impact - total cost ``~ Q^2``, i.e. ``exponent = 2.0`` - and their footnote 9 argues
+    explicitly against concave impact functions on endogeneity grounds. Korajczyk & Sadka (JF 2004)
+    take the opposite view, stating that concave true impact would make their convex-impact results
+    conservative. Our frozen 1.5 sits on the side @NMV2016 doubt, so a curvature robustness check
+    is owed to a referee.
+
+    Changing ``exponent`` does **not** recalibrate the coefficient, so a run at 2.0 is a curvature
+    sensitivity and not a fitted Kyle model. Report it as such.
+    """
     a = np.abs(np.asarray(dw, dtype=float))
     lin = (0.5 * np.asarray(spread, dtype=float) + commission_bps / 10_000.0) * a
-    imp = impact_coefficient(sigma_d, adv_usd, aum, k) * a ** 1.5
+    imp = impact_coefficient(sigma_d, adv_usd, aum, k) * a ** float(exponent)
     return lin + imp
 
 

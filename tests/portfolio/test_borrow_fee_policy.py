@@ -77,8 +77,12 @@ def test_one_percent_proxy_cost_is_8_33bp_monthly_at_short_gross_one() -> None:
 
 
 def test_legacy_25bp_fallback_is_absent() -> None:
+    # encoding is explicit on purpose: read_text() uses the platform default, which is cp1252 on
+    # the Windows checkout, so a single non-ASCII character anywhere in cost_terms.py made this
+    # test fail with a UnicodeDecodeError that looks nothing like the policy it is guarding.
     root = Path(__file__).resolve().parents[2]
-    source = (root / "src" / "alphacomb" / "portfolio" / "cost_terms.py").read_text()
+    source = (root / "src" / "alphacomb" / "portfolio" / "cost_terms.py").read_text(
+        encoding="utf-8")
     assert "fillna(0.0025)" not in source
-    base = (root / "configs" / "base.yaml").read_text()
+    base = (root / "configs" / "base.yaml").read_text(encoding="utf-8")
     assert "borrow_gc_bps_pa" not in base

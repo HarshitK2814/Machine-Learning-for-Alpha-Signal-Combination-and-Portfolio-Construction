@@ -100,7 +100,8 @@ def decile_weights(scores: pd.Series, n_groups: int, gross: float,
 def run(country: str, aum: float, n_groups: int, gross: float,
         cells: list[str], impact_k: float | None = None,
         weighting: str = "ew",
-        require_cost_inputs: bool = False) -> tuple[pd.DataFrame, pd.DataFrame]:
+        require_cost_inputs: bool = False,
+        impact_exponent: float = 1.5) -> tuple[pd.DataFrame, pd.DataFrame]:
     from alphacomb.contracts import intl, paths, read_table
     from alphacomb.portfolio.cost_terms import trade_cost_numpy
 
@@ -187,7 +188,8 @@ def run(country: str, aum: float, n_groups: int, gross: float,
                 gone = prev_s.index.difference(cur_s.index)
                 dw_arr = dw.reindex(cur_s.index).to_numpy(dtype=float)
                 c = np.zeros_like(dw_arr)
-                c[ok] = trade_cost_numpy(dw_arr[ok], sp[ok], sd[ok], ad[ok], aum, k, comm)
+                c[ok] = trade_cost_numpy(dw_arr[ok], sp[ok], sd[ok], ad[ok], aum, k, comm,
+                                         exponent=impact_exponent)
                 total = float(c.sum())
                 if len(gone):
                     # Exits are priced on the prior month's market inputs, which are the inputs
@@ -202,7 +204,7 @@ def run(country: str, aum: float, n_groups: int, gross: float,
                                 pin.loc[m, "spread"].to_numpy(dtype=float),
                                 pin.loc[m, "sigma_d"].to_numpy(dtype=float),
                                 pin.loc[m, "adv_usd"].to_numpy(dtype=float),
-                                aum, k, comm).sum())
+                                aum, k, comm, exponent=impact_exponent).sum())
                 return total
 
             gross_ret = float((wu * r).sum())
@@ -270,6 +272,11 @@ def main(argv: list[str] | None = None) -> int:
                          "vw = value-weighted by market cap. Novy-Marx & Velikov (RFS 2016) hold "
                          "that equal-weighted anomaly results mislead net of costs, so vw is the "
                          "robustness check that matters for the capacity channel")
+    ap.add_argument("--impact-exponent", type=float, default=1.5,
+                    help="power on the traded fraction in the impact term. 1.5 is the frozen "
+                         "contract (square-root per-unit impact). 2.0 is Kyle-linear impact, which "
+                         "is what Novy-Marx & Velikov use and whose curvature they argue for "
+                         "against ours. Not a recalibrated Kyle model - a curvature sensitivity")
     ap.add_argument("--impact-k", type=float, default=None,
                     help="override the square-root impact coefficient (config default is "
                          "1.0, Grinold-Kahn). The capacity channel's sign depends on it, "
@@ -293,7 +300,8 @@ def main(argv: list[str] | None = None) -> int:
     for aum in sorted(args.aum):
         res, feas, mon = run(args.country, aum, args.groups, args.gross, P_CELLS,
                              impact_k=args.impact_k, weighting=args.weighting,
-                             require_cost_inputs=args.require_cost_inputs)
+                             require_cost_inputs=args.require_cost_inputs,
+                             impact_exponent=args.impact_exponent)
         if res.empty:
             print(f"  AUM {aum:.0e}: no cells resolved")
             continue
