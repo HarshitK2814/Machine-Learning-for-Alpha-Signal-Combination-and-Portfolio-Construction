@@ -109,6 +109,41 @@ $1e9 arm chose for itself. Cap bound in all 132 months; zero held months.
 why $1bn sits near the net-optimal scale — not a convenient parameter choice but a consequence of
 the brake.
 
+## 5b. The full dose-response: three AUM arms, and no viable operating point
+
+Germany, prediction arm, 8 cells, 132 months, same stage-02 scores throughout. The $1e10 arm's
+constraints were verified against **its own** participation cap before use (0 of ~32,000 trades
+over cap on every prediction cell; its 99.2% `optimal_inaccurate` rate is a solver tolerance label,
+not a violation):
+
+| AUM | gross Sharpe | **net Sharpe** | gross p.a. | **net p.a.** | turnover | cost drag |
+|---|---|---|---|---|---|---|
+| **$1e8** | 0.654 | **−0.116** | 97.7 bps | **−19.1 bps** | 0.0521 | 116.8 bps |
+| **$1e9** | 0.423 | **+0.128** | 24.3 bps | **+7.1 bps** | 0.0135 | 17.2 bps |
+| **$1e10** | 0.469 | **+0.271** | 3.6 bps | **+2.1 bps** | 0.0016 | 1.5 bps |
+
+**Net Sharpe is monotone increasing in AUM** — −0.116 → +0.128 → +0.271. The harder capacity binds,
+the better the risk-adjusted net return, because cost drag falls 77-fold (116.8 → 1.5 bps) across
+the range while gross Sharpe does not fall nearly as much.
+
+**Net return is hump-shaped**, peaking at $1e9: −19.1 → **+7.1** → +2.1 bps p.a.
+
+Those two facts together are the paper's sharpest statement:
+
+> **There is no AUM in this range at which the strategy delivers both a respectable Sharpe ratio
+> and a non-trivial return.** At $100mn it has the best achievable signal (gross Sharpe 0.654) and
+> loses money net. At $1bn it earns its highest net return — **7.1 bps a year**, about $710k on
+> $1bn, below a management fee. At $10bn it posts its best net Sharpe, 0.271, on a net return of
+> **2.1 bps** and a book that is 1.7% invested. Every operating point is unusable, for a different
+> reason.
+
+*A correction:* gross Sharpe is **not** monotone in AUM — 0.654 → 0.423 → **0.469**. It falls as
+capacity begins to bind and then recovers slightly at $1e10, where the book is 100% ADV-capped and
+is close to proportional to ADV times the sign of the signal. So "capacity monotonically suppresses
+signal" is true from $1e8 to $1e9 and false from $1e9 to $1e10, and I had asserted the monotone
+version. What *is* monotone is the share of names at the cap (83% → 97% → 100%), the cost drag, and
+the net Sharpe.
+
 ## 6. How much this depends on the cost calibration
 
 Costs enter linearly once weights are fixed, so the crossover solves exactly:
@@ -219,10 +254,10 @@ index.**
 ## 10. Limits
 
 * Two countries complete, Japan running. Every slope rests on 16 cells.
-* Conditional on $1bn and a 5% participation limit, both pre-registered. The $1e10 arm completes
-  the curve but is 99.2% solver-degenerate and **its performance numbers must not be quoted until
-  `verify_trade_caps --strict` passes**; if it fails, "not solvable at this scale" is the honest
-  result.
+* The curve spans $1e8 to $1e10 at a 5% participation limit; the $1bn point and the limit were
+  pre-registered. The $1e10 arm passed `verify_trade_caps --aum 1e10 --strict` (0 of ~32,000 trades
+  over cap on every prediction cell), so its numbers are used; the caveat that stood before that
+  check is discharged.
 * The economic-loss arm is not a competent implementation of its objective
   (`docs/ECONOMIC_ARM_CAPABILITY_GAP.md`): its IC is an order of magnitude below the prediction
   arm's, partly because it is forced to a gross the constraint makes infeasible. The factorial's
