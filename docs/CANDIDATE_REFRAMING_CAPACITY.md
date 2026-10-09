@@ -153,3 +153,71 @@ manufactured the result.* Three answers, and the third is the real one:
 A second risk: this is a reframing arrived at *after* the registered headline failed. It must be
 presented that way — the registered tax hypothesis and its failure belong in the paper, not in a
 drawer. `docs/RESULTS_WEDGE_TEST.md` keeps both failures on the record for exactly that reason.
+
+
+---
+
+## 7. ADDED 07:00 — the dose-response is in for $1e8, and it half-refutes §5.1
+
+§5.1 predicted that at $1e8 "performance and the alpha-correlation of weights *recover*". **The
+gross side is confirmed; the net side is refuted, and the refutation is the better finding.**
+
+Germany, the same 16 cells and the same stage-02 scores, only AUM differing:
+
+| prediction-loss arm (8 cells) | $1e9 | $1e8 | change |
+|---|---|---|---|
+| capacity ceiling | 0.189–0.233 | **0.526–0.801** | 3.4x looser |
+| share of names ADV-capped | 96.8–97.6% | **83.3–87.4%** | the constraint starts to release |
+| realised gross | 0.132 | 0.423 | 3.2x |
+| **gross Sharpe** | **+0.423** | **+0.654** | **1.55x — the signal gets into the book** |
+| turnover | 0.0135 | 0.0521 | 3.86x |
+| **cost drag** | **17.2 bps** | **116.8 bps** | **6.79x** |
+| **net Sharpe** | **+0.128** | **−0.116** | **worse, and sign-flipped** |
+| best single cell, net | +0.330 | +0.155 | worse |
+
+**What is confirmed.** Capacity really does suppress the signal at institutional size. Relax it and
+gross Sharpe rises 55% from the identical scores — the alpha was always there and the constraint was
+holding it out of the book. That is the mechanism, measured rather than asserted.
+
+**What is refuted.** Relieving capacity does **not** improve net performance; it makes it worse.
+Cost drag rises **6.79x** against a turnover rise of 3.86x — superlinear, because the impact term is
+`|dw|^1.5` and the book is 3.2x larger — and the net Sharpe flips sign.
+
+### The corrected claim: a two-sided friction squeeze
+
+> At institutional size the participation constraint truncates the signal before it reaches the
+> book. Below that size the constraint releases and the signal does reach the book, but the larger
+> book the optimiser then takes carries superlinearly larger transaction costs that remove more
+> than the signal gains. **Across two orders of magnitude of AUM there is no scale at which
+> machine-learning alpha combination delivers positive net performance in these markets** — the
+> binding friction simply changes identity.
+
+This is a stronger result than §2's version, because it is a *curve* rather than a point and
+because it survives the obvious objection to §2 ("you chose a punitive AUM"): the smaller AUM is
+not better, it is differently bad.
+
+It also means the registered $1bn happens to sit near the **net-optimal** scale, which is the
+opposite of the "we picked a punitive size" criticism. Best net Sharpe is +0.330 at $1e9 against
++0.155 at $1e8.
+
+### An inconsistency this exposes, which must be resolved before publishing
+
+The optimiser at $1e8 **chose** a gross of 0.423 with a transaction-cost term in its objective, and
+the backtest then says that book was net-worse than the smaller one. Something is inconsistent
+between the two, and the candidates are specific:
+
+1. the optimiser's cost model understates realised cost (impact coefficient, or the spread
+   estimate);
+2. it is **myopic** — a one-period objective charges this month's trade but does not internalise
+   that a 3.2x larger book implies a 3.2x larger rebalance every month thereafter;
+3. `gamma = 25` lets the mean-variance term dominate the cost term at the larger scale.
+
+(2) is the most likely and the most interesting, and it is a real modelling criticism of the whole
+single-period-with-cost-penalty approach that this literature uses. **This must be diagnosed before
+the curve is reported**, because if it is (1) the cost model is simply miscalibrated and the curve
+moves.
+
+$1e10 is running and will complete the curve. The prediction for it, fixed now: gross Sharpe
+**below** +0.423, cost drag below 17.2 bps, and net Sharpe poor for the opposite reason — signal
+suppressed rather than costs paid. If that holds, net performance is hump-shaped in AUM with a low
+peak, and "no scale works" is established on three points rather than two.
