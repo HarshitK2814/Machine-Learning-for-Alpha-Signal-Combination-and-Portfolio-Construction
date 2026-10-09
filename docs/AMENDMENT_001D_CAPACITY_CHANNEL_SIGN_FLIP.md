@@ -354,6 +354,82 @@ channel, AUM-indexed, in three non-US markets, with the tax channel ruled out as
 loses the mechanism-adjudication framing that made it interesting. That is a real loss and should
 not be dressed up. `docs/STRATEGIC_ASSESSMENT_2026-10-09.md` needs a fourth pass.
 
+## 11. Japan's result (2026-10-09, 12:55 IST) — and why I am not reporting the scorecard's verdict
+
+Japan ran on the compliant universe (coverage 99.8%, so it was never exposed to §6's artefact) with
+`tools/score_amendment_001d.py`, committed before Japan reported. **The scorecard's mechanical
+output, in full:**
+
+| # | verdict | number that decided it |
+|---|---|---|
+| D1 | **PASS** | largest change between adjacent rungs +0.0102, i.e. no decrease (tolerance −0.05) |
+| D2 | **PASS** | channel at $1bn **+6.6813**, t = +11.01, p < 0.0001 |
+| D3 | **PASS** | antecedent true (gross Sharpe +1.278 > India's +1.209); a negative channel exists in $1k..$1mn |
+| D4 | FAIL | asymptotic ratio 7.1511/1.278 = **5.596**, just outside the band [3.5, 5.5] |
+| D5 | FAIL | channel at $1bn / gross = **5.228**, needed < 4.00 (Germany's value) |
+
+Its verdict line reads **"H-FLIP CONFIRMED on the pre-registered sample."**
+
+**I am not reporting that, and the reason is a defect in my own pre-registration rather than
+anything about Japan.**
+
+**D3's pass is vacuous.** It asked only for the *existence of a negative channel somewhere below
+$1mn*, with **no magnitude floor and no significance requirement**. Japan's negative reading is
+**−0.0013 with t = −1.14 and p = 0.370**, and a 95% CI of [−0.0038, +0.0003] that contains zero. It
+is a sign, not an effect — four orders of magnitude smaller than the retracted German −0.811, and
+statistically indistinguishable from zero. A test that a −0.0013 reading passes is not a test.
+Writing a sign prediction without a magnitude floor was my error, made at 11:30 when the German
+−0.811 looked real and a magnitude floor seemed superfluous.
+
+**And H-FLIP's retraction is independent of Japan.** Germany's −0.811 — the only economically
+material negative region ever observed in this project — was a cost-input coverage artefact (§6).
+Japan cannot resurrect a claim whose evidential basis was withdrawn; it can only add a fourth
+near-zero reading at a scale where the constraint does not bind.
+
+**D5's failure is the substantive one.** I predicted Japan's scaled channel at $1bn would be
+*below* Germany's 4.00, because $1bn is only 2.4x past Japan's $413mn frontier against 9.4x past
+Germany's $106mn. It came out **5.228 — higher**. So the frontier-distance heuristic behind D5 is
+wrong: at $1bn Japan's attained gross is 0.162 of 2.0, i.e. the cap is binding hard despite the
+frontier being nearer, because Japan's 1,705-name breadth means far more positions hit the cap.
+Distance past the frontier is not a sufficient statistic for how much the constraint bites.
+
+### 11a. What Japan does confirm, cleanly
+
+**D2 is a real pre-registered out-of-sample confirmation of the surviving claim.** Japan's channel
+is positive and significant on 11 of 14 rungs, with 8 of 8 cells surviving Holm from $8mn upward,
+rising monotonically to **+6.68 at $1bn (t = +11.01)** and +7.15 at $10bn. Declared before any
+Japanese portfolio existed, scored by a committed script. That is worth having and it is the third
+market to show it.
+
+### 11b. The finding that replaces the sign flip
+
+Putting all three markets' smallest rungs beside how much the cap actually binds — measured as the
+shortfall of attained gross below the 2.0 target — resolves the whole question:
+
+| country | AUM | cap slack | channel |
+|---|---|---|---|
+| Germany | $1k | **0.01%** | **+0.0008** |
+| **Japan** | **$100k** | **0.01%** | **−0.0009** |
+| Germany | $10k | 0.09% | +0.0086 |
+| India | $1k | 0.25% | +0.0175 |
+| Japan | $1mn | 0.94% | +0.0313 |
+| Germany | $100k | 6.69% | +0.0618 |
+| India | $100k | 7.01% | +0.2114 |
+| Germany | $1mn | 40.5% | +0.7954 |
+
+> **The constraint's effect on net Sharpe is zero when the constraint does not bind, and
+> monotonically positive in how much it binds. There is no scale at which it meaningfully hurts.**
+
+At ~0.01% slack the channel is ±0.001 and its **sign is arbitrary** — Germany +0.0008, Japan
+−0.0009, on the same cost model. Those are not two regimes; they are noise around zero. The
+"crossover" that §3 reported, and that Japan's bootstrap still places at $115,532 with a
+[$101k, $349k] interval, is nothing more than **the point at which the cap begins to bind at all**,
+which is where a non-binding constraint must stop having no effect. It carries no economic content.
+
+This also says, without claiming to adjudicate anyone, why @AHV2025 find no benefit from turnover
+reduction: their cost model contains **no AUM term at all**, so they sit permanently at zero slack,
+where this channel is zero by construction.
+
 ## 9. Countersignature
 
 Maham to countersign, as with 001A, 001B and 001C. Her outstanding decision on the economic arm

@@ -47,8 +47,9 @@ D1_TOLERANCE = 0.05           # D1: no decrease exceeding this between adjacent 
 ALPHA = 0.05
 
 
-def load(country: str, src: Path) -> pd.DataFrame:
-    p = src / f"capacity_channel_inference_{country}.csv"
+def load(country: str, src: Path, tag: str = "infer") -> pd.DataFrame:
+    sfx = "" if tag == "infer" else f"_{tag}"
+    p = src / f"capacity_channel_inference_{country}{sfx}.csv"
     if not p.exists():
         raise SystemExit(f"no inference table at {p}; run exp_capacity_channel_inference.py first")
     d = pd.read_csv(p)
@@ -58,9 +59,9 @@ def load(country: str, src: Path) -> pd.DataFrame:
     return comp
 
 
-def gross_sharpe(country: str, src: Path) -> float:
+def gross_sharpe(country: str, src: Path, tag: str = "infer") -> float:
     """Composite gross decile Sharpe, from the monthly dump - needed by D3, D4, D5."""
-    p = src.parent / "signal_vs_portfolio" / f"monthly_{country}_infer.csv"
+    p = src.parent / "signal_vs_portfolio" / f"monthly_{country}_{tag}.csv"
     if not p.exists():
         raise SystemExit(f"no monthly series at {p}")
     mon = pd.read_csv(p, parse_dates=["date"])
@@ -71,9 +72,9 @@ def gross_sharpe(country: str, src: Path) -> float:
     return float(g.mean() / g.std(ddof=1) * np.sqrt(12))
 
 
-def score(country: str, src: Path) -> int:
-    comp = load(country, src)
-    gs = gross_sharpe(country, src)
+def score(country: str, src: Path, tag: str = "infer") -> int:
+    comp = load(country, src, tag)
+    gs = gross_sharpe(country, src, tag)
     ch = comp.capacity_channel.to_numpy()
     aum = comp.aum.to_numpy()
     p = comp.p_value.to_numpy()
@@ -178,8 +179,12 @@ def main(argv: list[str] | None = None) -> int:
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--country", default="JPN")
     ap.add_argument("--src", type=Path, default=ROOT / "outputs" / "capacity_inference")
+    ap.add_argument("--tag", default="infer",
+                    help="which ladder to score. 'cov' is the compliant, investable-universe "
+                         "ladder and is the only one any result should be quoted from. This "
+                         "selects an INPUT PATH only; no threshold in this file depends on it")
     a = ap.parse_args(argv)
-    return score(a.country, a.src)
+    return score(a.country, a.src, a.tag)
 
 
 if __name__ == "__main__":
