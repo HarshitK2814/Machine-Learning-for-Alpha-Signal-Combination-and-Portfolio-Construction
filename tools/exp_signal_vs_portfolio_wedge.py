@@ -73,13 +73,16 @@ def decile_weights(scores: pd.Series, n_groups: int, gross: float) -> pd.Series:
 
 
 def run(country: str, aum: float, n_groups: int, gross: float,
-        cells: list[str]) -> tuple[pd.DataFrame, pd.DataFrame]:
+        cells: list[str], impact_k: float | None = None) -> tuple[pd.DataFrame, pd.DataFrame]:
     from alphacomb.contracts import intl, paths, read_table
     from alphacomb.portfolio.cost_terms import trade_cost_numpy
 
     bundle = intl.load_country_bundle(country)
     cfg_costs = __import__("alphacomb.contracts", fromlist=["load_config"]).load_config("base")["costs"]
-    k = float(cfg_costs["impact_k"])
+    # k = 1 is Grinold-Kahn. The SIGN of the capacity channel depends on kappa, so the
+    # crossover moves with k and the dependence has to be reported as a panel rather than
+    # asserted to be bounded.
+    k = float(cfg_costs["impact_k"] if impact_k is None else impact_k)
     comm = float(cfg_costs["commission_bps"])
     from alphacomb.portfolio.optimizer import OptimizerConfig
     part = OptimizerConfig.from_files().adv_participation_max
@@ -207,6 +210,10 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--gross", type=float, default=2.0,
                     help="gross of the spread portfolio; 2.0 matches the registered budget")
     ap.add_argument("--out", type=Path, default=ROOT / "outputs" / "signal_vs_portfolio")
+    ap.add_argument("--impact-k", type=float, default=None,
+                    help="override the square-root impact coefficient (config default is "
+                         "1.0, Grinold-Kahn). The capacity channel's sign depends on it, "
+                         "so the crossover location is a function of k")
     ap.add_argument("--dump-monthly", action="store_true",
                     help="also write the per-cell monthly return series (gross, net uncapped, net "
                          "capped) for every AUM rung. Required for any inference on the capacity "
@@ -219,11 +226,13 @@ def main(argv: list[str] | None = None) -> int:
 
     args.out.mkdir(parents=True, exist_ok=True)
     print(f"{args.country}: {args.groups}-group long/short spread at gross {args.gross}, "
-          f"from the same stage-02 scores as the optimised book")
+          f"from the same stage-02 scores as the optimised book"
+          + (f", impact_k={args.impact_k}" if args.impact_k is not None else ""))
     print()
     all_res, all_mon = [], []
     for aum in sorted(args.aum):
-        res, feas, mon = run(args.country, aum, args.groups, args.gross, P_CELLS)
+        res, feas, mon = run(args.country, aum, args.groups, args.gross, P_CELLS,
+                             impact_k=args.impact_k)
         if res.empty:
             print(f"  AUM {aum:.0e}: no cells resolved")
             continue
