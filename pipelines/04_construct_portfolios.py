@@ -40,6 +40,28 @@ def discover(kind: str) -> dict[str, Path]:
     return out
 
 
+def country_sources(country: str) -> dict[tuple[str, str], Path]:
+    """Stage-02 artefacts this country actually produced, from the index stage 02 wrote.
+
+    Resolving by modification time instead would silently hand one country's scores to another
+    country's optimiser, which is how a Germany re-run at a different AUM would end up built on
+    Japanese predictions. An entry naming a file that no longer exists is dropped rather than
+    passed on, so a stale index degrades to the warning path instead of failing late.
+    """
+    index = paths.outputs_root() / "source_index" / f"{country}.csv"
+    if not index.exists():
+        return {}
+    frame = pd.read_csv(index)
+    out: dict[tuple[str, str], Path] = {}
+    for _, row in frame.iterrows():
+        path = Path(str(row["artefact"]))
+        if path.exists():
+            out[(str(row["kind"]), str(row["strategy"]))] = path
+    if out:
+        log.info("source index %s: %d artefacts pinned to %s", index.name, len(out), country)
+    return out
+
+
 def build_weights(strategy: str, artefact: Path, kind: str, bundle, risk: RiskCache, cfg: OptimizerConfig,
                   run_id: str, ledger: TaxLotLedger | None = None) -> tuple[Path, dict]:
     """Construct weights month by month.
@@ -145,8 +167,17 @@ def main() -> None:
         updates["aum_usd"] = a.aum
     opt = OptimizerConfig(**{**opt.__dict__, **updates})
 
-    available = {("predictions", k): v for k, v in discover("predictions").items()}
-    available.update({("weight_proposals", k): v for k, v in discover("weight_proposals").items()})
+    available = country_sources(a.country) if a.country else {}
+    if not available:
+        if a.country:
+            log.warning(
+                "no source index at outputs/source_index/%s.csv, so stage-02 artefacts are being "
+                "resolved by MODIFICATION TIME across a directory shared by every country. If "
+                "another country has run stage 02 since %s did, these portfolios will be built "
+                "from that country's scores. Re-run stage 02 for %s, or rebuild the index from "
+                "its log, before trusting this output.", a.country, a.country, a.country)
+        available = {("predictions", k): v for k, v in discover("predictions").items()}
+        available.update({("weight_proposals", k): v for k, v in discover("weight_proposals").items()})
     if not available:
         raise SystemExit("no model outputs found; run pipelines/02_train_models.py first")
     wanted = None if a.strategies == ["all"] else set(a.strategies)

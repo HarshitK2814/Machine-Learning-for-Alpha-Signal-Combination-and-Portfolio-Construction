@@ -168,6 +168,27 @@ def main() -> None:
         manifest_rows.append(result)
 
     manifest = pd.DataFrame(manifest_rows)
+    if a.country and manifest_rows:
+        # outputs/predictions/<cell>/ and outputs/weight_proposals/<cell>/ are shared across
+        # countries and paths.latest_run resolves by modification time, so once another country has
+        # run this stage, "the latest scores" for a cell silently mean that country's. Naming this
+        # run's artefacts here is what lets stage 04 rebuild one country's portfolios later - at a
+        # different AUM, say - without consuming another country's scores.
+        index_dir = paths.outputs_root() / "source_index"
+        index_dir.mkdir(parents=True, exist_ok=True)
+        rows = []
+        for r in manifest_rows:
+            artefact = r.get("artefact")
+            if not artefact or r.get("status") != "ok":
+                continue
+            text = str(artefact).replace("\\", "/")
+            kind = "weight_proposals" if "/weight_proposals/" in text else "predictions"
+            rows.append({"country": a.country, "strategy": r.get("strategy") or r.get("cell"),
+                         "kind": kind, "artefact": artefact, "rows": r.get("rows")})
+        if rows:
+            index = index_dir / f"{a.country}.csv"
+            pd.DataFrame(rows).to_csv(index, index=False)
+            print(f"source index: {index}")
     out = Path(a.manifest) if a.manifest else paths.outputs_root() / "manifest_models.csv"
     out.parent.mkdir(parents=True, exist_ok=True)
     append_manifest(manifest, out)
