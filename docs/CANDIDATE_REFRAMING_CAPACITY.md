@@ -410,4 +410,48 @@ A 3.46x cost increase at matched gross is a large number, and if `impact_k` is o
 turnover-brake effect shrinks and the ordering could flip back. **Before publishing, `impact_k`
 needs an independent calibration check** — this is now the most load-bearing single parameter in
 the paper, and it was inherited rather than estimated here. A sensitivity curve over `impact_k`
-is cheap (no retraining; it only changes the backtest) and should accompany the result.
+is cheap (no retraining; it only changes the backtest) and should accompany the result. **It is
+now computed — see §12.**
+
+
+---
+
+## 12. How much the turnover-brake result depends on the cost calibration
+
+Costs enter linearly in the backtest once weights are fixed, so the sensitivity can be solved for
+exactly rather than swept. With all transaction costs scaled by a multiplier `c`, and the
+prediction arm's means at matched gross:
+
+| | gross p.a. | cost p.a. | vol | net Sharpe at c = 1 |
+|---|---|---|---|---|
+| $1e9 capacity | +0.002434 | 0.001721 | 0.005802 | **+0.1229** |
+| $1e8 capacity | +0.005705 | 0.005959 | 0.009200 | **−0.0276** |
+
+Setting the two net Sharpes equal gives the crossover:
+
+```
+c* = 0.5715
+```
+
+| cost multiplier | $1e9 | $1e8 matched | winner |
+|---|---|---|---|
+| 0.25 | +0.3453 | **+0.4582** | looser capacity |
+| 0.50 | +0.2712 | **+0.2963** | looser capacity |
+| **0.57** | +0.2500 | +0.2500 | tie |
+| **1.00** (as calibrated) | **+0.1229** | −0.0276 | tighter capacity |
+
+**The turnover-brake conclusion holds unless the cost model overstates transaction costs by more
+than a factor of 1.75** — that is, unless true costs are below 57% of the model's.
+
+That is a usable robustness statement in both directions, and it should be reported as such rather
+than as a clean win:
+
+* it is **not knife-edge** — the result tolerates a 43% overstatement of costs and still holds;
+* it is **not bulletproof** — a 2x overstatement would flip the ordering, and with it the claim
+  that relaxing capacity makes things worse.
+
+So the honest headline is conditional on the cost model being right to within about a factor of
+two, and `impact_k` still deserves the independent calibration check. What does **not** depend on
+the calibration at all is the gross-Sharpe comparison (+0.617 against +0.423 at matched leverage),
+the weight-level correlations in §8, and the solver-conditioning curve in §9 — those are the parts
+to lead with if the cost calibration cannot be defended.
