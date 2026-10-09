@@ -251,7 +251,7 @@ def main(argv: list[str] | None = None) -> int:
                                          if k != "channel_by_rung"}})
     sfx = "" if a.tag == "infer" else f"_{a.tag}"
     pd.DataFrame(summary).to_csv(a.out / f"crossover_intervals{sfx}.csv", index=False)
-    print(f"\nwrote {a.out / 'crossover_intervals.csv'} and per-country inference tables")
+    print(f"\nwrote {a.out / f'crossover_intervals{sfx}.csv'} and per-country inference tables")
     return 0
 
 

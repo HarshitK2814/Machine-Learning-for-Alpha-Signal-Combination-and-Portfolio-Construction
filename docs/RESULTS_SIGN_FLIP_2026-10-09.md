@@ -11,10 +11,25 @@ reported**.
 ## 1. The claim
 
 > The effect of an ADV participation constraint on net risk-adjusted performance is **monotone in
-> mandate size and changes sign**. In Germany the constraint **destroys** 0.81 Sharpe points at a
-> $100k mandate and **creates** 11.06 at $1bn, crossing zero at **$3.79mn (95% CI $1.88mn–$7.07mn)**.
-> Both tails are significant at 5% under a paired test with Holm correction across eight cells. In
-> India no crossover exists at any measurable scale: the constraint helps everywhere.
+> mandate size**, and **in Germany it changes sign**: the constraint **destroys** 0.81 Sharpe points
+> at a $100k mandate and **creates** 11.06 at $1bn, crossing zero at **$3.79mn (95% CI
+> $1.88mn–$7.07mn)**, with both tails significant at 5% under a paired test with Holm correction
+> across eight cells.
+
+**The claim's two halves have very different evidential strength, and §3e is where this is settled.
+Stated once, precisely:**
+
+* **The positive side is robust.** Both markets, both weighting schemes, four of four
+  specifications: t = +5.6 to +12.3 at $1bn, 8 of 8 cells surviving Holm from $30mn upward. That a
+  binding liquidity constraint *creates* risk-adjusted performance at institutional scale is not an
+  artefact of construction.
+* **The sign change is established in one place only: Germany under equal weighting.** Under value
+  weighting Germany's negative region is directionally the same but **not significant**
+  (t = −1.65, p = 0.117), and India shows no negative region under either weighting. The paper may
+  not claim that both markets flip.
+
+Japan's pre-registered test (`AMENDMENT_001D` D3) is therefore a test of whether the sign change
+generalises beyond a single market and a single weighting, which is the thing most in doubt.
 
 This matters because the literature disagrees about this sign **in print**, and all parties are US:
 
@@ -112,7 +127,54 @@ The asymptotic channel scaled by the composite gross Sharpe: Germany 12.655/2.76
 5.822/1.209 = **4.82**. Agreement within 5% on n = 2. Pre-registered as a secondary prediction
 (D4) only; it should not be leaned on.
 
-## 3e. The impact coefficient: the mechanism predicts its own sensitivity, and is confirmed
+## 3e. Value weighting: the positive side is robust, the sign change is not
+
+Novy-Marx & Velikov (RFS 2016) argue equal-weighted anomaly results are misleading net of costs
+because they load on small illiquid names. Those are exactly the names our cap removes, so this is
+the robustness check that could have killed the result. It does not kill it, but it does narrow it,
+and the narrowing is sharper than a first pass suggested.
+
+**First, their critique lands on our gross numbers.** Value weighting cuts the composite gross
+decile Sharpe by about 80%: Germany **+2.763 → +0.473**, India **+1.209 → +0.215**. Any gross
+Sharpe we quote has to carry this.
+
+**Second, the sign change.** Composite channel, paired test:
+
+| | Germany EW | Germany VW | India EW | India VW |
+|---|---|---|---|---|
+| channel, bottom rung | **−0.811** | −0.179 | +0.004 | −0.002 |
+| t | **−6.10** | −1.65 | +0.13 | −0.06 |
+| p | **0.0000** | 0.117 | 0.893 | 0.959 |
+| crossover | **$3.79mn** | $1.11mn | none | $107k |
+| 95% CI | [$1.88mn, $7.07mn] | [$0.18mn, $3.94mn] | — | [$0.10mn, $1.06mn] |
+| draws with no sign change | **0.0%** | 2.1% | 50.8% | 51.8% |
+| channel at $1bn | **+11.06** (t +12.27) | **+4.15** (t +10.21) | **+5.55** (t +5.66) | **+4.73** (t +5.61) |
+
+Read honestly:
+
+* **The positive side is robust in every cell of that table.** Both markets, both weightings,
+  t = +5.6 to +12.3 at $1bn, 8 of 8 cells surviving Holm from $30mn upward. That the cap *creates*
+  risk-adjusted performance at institutional scale is not a construction artefact.
+* **The negative side is established in exactly one place: Germany under equal weighting.** Under
+  value weighting Germany's bottom rung is t = −1.65, p = 0.117 — the point estimate is negative
+  and 97.9% of replications still show a sign change, but it is not significant. India's negative
+  side is nil under both weightings.
+
+**So the paper may claim the sign change, but only as: established in Germany under equal
+weighting, directionally consistent under value weighting, and not established in India.** It may
+*not* claim that both markets flip. An earlier draft of this document said they did, reading point
+estimates off the per-cell ladder before the composite inference existed; that was an overstatement
+and this section replaces it.
+
+**One inference caveat for the record.** At Germany VW $100k the percentile CI on the difference
+excludes zero ([−0.424, −0.0085]) while the studentized p is 0.117. We report the **studentized p
+as primary**, following Ledoit-Wolf, because the percentile interval is not studentized and is the
+less reliable of the two under serial dependence. It is flagged for workstream C in handoff 21 §6.
+
+Data: `outputs/capacity_inference/capacity_channel_inference_{DEU,IND}_vw.csv`,
+`crossover_intervals_vw.csv`.
+
+## 3f. The impact coefficient: the mechanism predicts its own sensitivity, and is confirmed
 
 `k = 1` is Grinold-Kahn and is an assumption, not an estimate. Because the channel's sign depends
 on `kappa ∝ k·sqrt(AUM/ADV)`, the crossover must move with `k` — and the mechanism says exactly
@@ -221,7 +283,7 @@ tracker §C8.1.
 * **Japan**, per `AMENDMENT_001D` D1–D5. D2 (channel significantly positive at $1bn) and D3
   (conditional: Japan resembles Germany if its gross Sharpe exceeds India's) are the real tests.
   D3 can come out void, and then the flip rests on **Germany alone** and must be reported so.
-* ~~**The impact coefficient.**~~ **DISCHARGED, see §3e.** Swept over `k ∈ {0.5, 1, 2, 3}`: the
+* ~~**The impact coefficient.**~~ **DISCHARGED, see §3f.** Swept over `k ∈ {0.5, 1, 2, 3}`: the
   sign flip exists at every value, `crossover × k²` is constant to within ±15% for `k ≤ 2` exactly
   as the mechanism predicts, and the depth of the negative region is almost invariant to `k`. The
   crossover CI in §3a remains conditional on `k = 1`, and that conditioning must be stated.
