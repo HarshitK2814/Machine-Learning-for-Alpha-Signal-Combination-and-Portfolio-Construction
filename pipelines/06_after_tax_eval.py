@@ -89,6 +89,10 @@ def main() -> None:
                         "instead of by modification time. Stage 06 reads outputs/weights/, which "
                         "is shared across countries and AUM arms, so without this it silently "
                         "evaluates whichever arm ran stage 04 most recently.")
+    p.add_argument("--out", default=None,
+                   help="where to write the summary. Defaults to outputs/summary_after_tax.csv, "
+                        "which is a FIXED path: concurrent runs overwrite each other, so pass this "
+                        "whenever sweeping AUM or country in parallel")
     p.add_argument("--save-returns", action="store_true", help="write the full monthly C12 tables")
     p.add_argument("--dated", action="store_true",
                    help="resolve the tax rule on each event's own date through the frozen C14 "
@@ -214,7 +218,11 @@ def main() -> None:
     if len(unknown):
         log.warning("held_share unknown for %s - manifest predates the check; re-run stage 04 "
                     "before reporting these.", ", ".join(sorted(unknown)))
-    out = paths.outputs_root() / "summary_after_tax.csv"
+    # A FIXED output path means two concurrent invocations - say the same country at two AUMs -
+    # silently overwrite each other, and the survivor is whichever finished last. That happened on
+    # 2026-10-09 with DEU at 1e8 and 1e10. --out exists so a sweep can keep its runs apart.
+    out = Path(a.out) if a.out else paths.outputs_root() / "summary_after_tax.csv"
+    out.parent.mkdir(parents=True, exist_ok=True)
     report.to_csv(out, index=False)
     pd.set_option("display.width", 250)
     print(report.round(4).to_string(index=False))
