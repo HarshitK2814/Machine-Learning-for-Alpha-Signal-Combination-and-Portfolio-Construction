@@ -521,3 +521,51 @@ def inference_report(returns: pd.DataFrame, n_trials: int, benchmark: str | None
         others = returns.drop(columns=[benchmark])
         out["spa"] = hansen_spa(returns[benchmark].to_numpy(), others)
     return out
+
+
+def mean_difference_test(returns_a, returns_b, periods: int = 12, n_boot: int = 4000,
+                         block: int = 6, seed: int = 0) -> TestResult:
+    """Studentized stationary-bootstrap test for the annualised difference of mean returns.
+
+    Paired counterpart of :func:`sharpe_difference_test` in return units. The statistic is
+    ``periods * (mean(a) - mean(b))`` on the months where both are finite. It has no denominator
+    other than the HAC standard error used to studentize, so it is defined whenever the two series
+    exist; it says nothing about risk.
+
+    Calibration follows ``sharpe_difference_test``: Newey-West SE, Politis-Romano stationary
+    bootstrap with expected block ``block``, centred at the null of zero difference, two-sided p.
+    ``detail`` carries the means, the HAC SE, the studentized statistic and a percentile 95%
+    interval for the (uncentred) statistic.
+    """
+    a = np.asarray(returns_a, dtype=float)
+    b = np.asarray(returns_b, dtype=float)
+    if a.shape != b.shape:
+        raise ValueError(f"paired series must be the same length, got {a.shape} and {b.shape}")
+    ok = np.isfinite(a) & np.isfinite(b)
+    d = (a - b)[ok]
+    T = d.size
+    if T < 12:
+        raise ValueError(f"need at least 12 paired observations, got {T}")
+    stat = float(periods * d.mean())
+    se = float(periods * newey_west_se(d))
+    stud = stat / se if se > 0 else float("nan")
+
+    rng = np.random.default_rng(seed)
+    boot = np.empty(n_boot)
+    boot_stud = np.empty(n_boot)
+    for i in range(n_boot):
+        db = d[_stationary_bootstrap_index(T, block, rng)]
+        boot[i] = periods * db.mean()
+        s = periods * newey_west_se(db)
+        boot_stud[i] = (boot[i] - stat) / s if s > 0 else np.nan
+    fin = np.isfinite(boot_stud)
+    if fin.sum() < 100 or not np.isfinite(stud):
+        p = 2.0 * min((boot <= 0).mean(), (boot >= 0).mean())
+    else:
+        p = float((np.abs(boot_stud[fin]) >= abs(stud)).mean())
+    lo, hi = np.percentile(boot, [2.5, 97.5])
+    return TestResult("mean_difference", stat, float(min(max(p, 0.0), 1.0)),
+                      {"mean_a": float(a[ok].mean()), "mean_b": float(b[ok].mean()),
+                       "se_hac": se, "studentized": float(stud),
+                       "ci95_low": float(lo), "ci95_high": float(hi),
+                       "n_obs": int(T), "n_boot": int(n_boot), "block": int(block)})

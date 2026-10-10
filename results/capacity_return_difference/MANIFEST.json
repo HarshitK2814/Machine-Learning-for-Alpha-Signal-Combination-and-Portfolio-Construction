@@ -1,0 +1,42 @@
+{
+  "purpose": "Inputs and outputs of the capacity return-difference analysis B(A) (docs/CAPACITY_RETURN_DIFFERENCE_SPEC_2026-10-10.md)",
+  "note": "inputs snapshotted from git-ignored outputs/",
+  "git_head_when_written": "b8e21bad959e068f58a06c2e8ddd1509a345072b",
+  "git_dirty_when_written": true,
+  "python": "3.12.6",
+  "pandas": "2.2.3",
+  "numpy": "2.3.5",
+  "inference": {
+    "test": "mean_difference_test",
+    "n_boot": 4000,
+    "block": 6,
+    "seed": 0,
+    "holm_family": "valid rungs within country"
+  },
+  "regeneration": {
+    "wedge_series_cov": "python tools/exp_signal_vs_portfolio_wedge.py --country C --dump-monthly --require-cost-inputs --tag cov --aum <14 rungs> (needs frozen data/, not in git)",
+    "weights_for_tierB": "python tools/exp_signal_vs_portfolio_wedge.py --country C --dump-monthly --dump-weights --require-cost-inputs --tag tierb --aum <valid rungs>",
+    "tierB_monthly": "python tools/exp_capacity_return_difference.py --stage pipeline --country C",
+    "tables": "python tools/exp_capacity_return_difference.py --stage tables (uses only tracked files in this directory)"
+  },
+  "not_regenerable_from_git_alone": "inputs/monthly_*_cov.csv and tierB_monthly_*.csv.gz derive from frozen data/ and stage-02 predictions, which are not tracked",
+  "sha256": {
+    "inputs/monthly_DEU_cov.csv": "66f4d8d7b67c8e63281304fece3b3c8d71e7f2e914d2170de0aa6500a73580b0",
+    "inputs/monthly_IND_cov.csv": "21b6cac9d422b89909c8bbabbf0500d72354865638abffda0de8239552e67cc0",
+    "inputs/monthly_JPN_cov.csv": "90828cbd6f1208ef577e7e1c14f74b42796c8f9838ec704dcefe0d9e86d3a111",
+    "inputs/uncapped_solvency.csv": "e63ecc7e799c114b7e5f9eff1ae129bceb2e59d0e71a55ae06304473a32f075b",
+    "reconciliation_DEU.csv": "ff0497c6fef5f050ebf10cf4d28f3d719623808e0cf4584ad82042cf3a14732c",
+    "reconciliation_IND.csv": "86c0455ecf8a934797a4a8483188a3f6e84e7c7797875d7f87b6ad8ff611b897",
+    "reconciliation_JPN.csv": "2416b1ceaa5344e1e536bee79fba8c877cecb42a60ce9a1059510a29095090c4",
+    "tables.md": "ec653eff6ec22c67539cafd732ca64d1cc35d326bcbe9233451846c97bd4c144",
+    "tierA_DEU.csv": "effbbc440c7a81a7f8919d92cf3a9403df7c4693c688b3670cac11fad2033537",
+    "tierA_IND.csv": "2ccc319d20f51f2cccb614bc3f5a20cdbaaa170224ec783d4fb068ae612bef92",
+    "tierA_JPN.csv": "92c691ca325491f3f22e0fdac90631c5ea3695e7b7886d9ed8c68198e0dc8bfa",
+    "tierB_DEU.csv": "2618527603eae3ed0ebc95f148230e51e95238d0ed6ff53be268531e16884834",
+    "tierB_IND.csv": "de607ac9a49d957a707df310caeef1444aad30f6512297278bcf207e4a446386",
+    "tierB_JPN.csv": "7554c70ec52f155d2d27d3e892f656118d99bace4a7ba93ada951404b149da63",
+    "tierB_monthly_DEU.csv.gz": "e62f70bc5fc1575eaa953416a550f840ac521d45cd1b3de0123a1462dd0f242c",
+    "tierB_monthly_IND.csv.gz": "15b8f1e4ad03dd06686532d3adf1b7027de441a90a7bbceab7b21be711705ff1",
+    "tierB_monthly_JPN.csv.gz": "1a2ed01f39b2a76baee2a07a6ed4591fddb8e8a7e7177d546743a9bd63ba4382"
+  }
+}
