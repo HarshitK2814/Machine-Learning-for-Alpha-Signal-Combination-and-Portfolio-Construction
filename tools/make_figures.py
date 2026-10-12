@@ -222,7 +222,7 @@ def build(out: Path, overwrite: bool = False) -> dict:
         fn(out / name)
     manifest = {
         "purpose": "figures regenerated from committed snapshots only",
-        "git_head_when_written": git("rev-parse", "HEAD"), "git_dirty_when_written": bool(git("status", "--porcelain")),
+        "git_head_when_written": git("rev-parse", "HEAD"), "git_dirty_when_written": bool(git("status", "--porcelain", "--", ".", ":(exclude)results/figures")),
         "python": sys.version.split()[0], "matplotlib": matplotlib.__version__, "pandas": pd.__version__, "numpy": np.__version__,
         "solvency_rule": SOLVENCY_RULE,
         "near_ruined_display_flag": f"uncapped terminal wealth < {NEAR_RUINED_WEALTH}; display only, no exclusion",
