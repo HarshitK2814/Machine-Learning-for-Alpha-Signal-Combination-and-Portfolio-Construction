@@ -141,7 +141,11 @@ def main(argv: list[str] | None = None) -> int:
                          "docs/RESULTS_CAPACITY_CHANNEL_2026-10-09.md section 6")
     ap.add_argument("--aum-tag", default="1e9",
                     help="which optimised-book after-tax summary to use for the tax column")
+    ap.add_argument("--overwrite", action="store_true",
+        help="discard an earlier output written by a different run (or of unknown origin); by default such a collision is refused (alphacomb.output_guard)")
     a = ap.parse_args(argv)
+    from alphacomb.output_guard import claim_run
+    claim_run([a.out / "horse_race_decile_panel.csv", a.out / "horse_race_tax_panel.csv"], a)
     a.out.mkdir(parents=True, exist_ok=True)
 
     dec_all, tax_all = [], []

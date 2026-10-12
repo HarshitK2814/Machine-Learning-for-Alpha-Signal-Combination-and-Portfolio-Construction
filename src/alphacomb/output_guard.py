@@ -68,3 +68,17 @@ def claim_output(path: str | os.PathLike, params: dict[str, Any], *, is_dir: boo
                               indent=2, sort_keys=True, default=str), encoding="utf-8")
     os.replace(tmp, side)
     return fp
+
+
+def claim_run(paths, args, *, exclude: tuple[str, ...] = ("overwrite",)) -> str:
+    """Claim every path in ``paths`` for the run described by an ``argparse`` namespace.
+
+    The parameters are all parsed arguments except those in ``exclude`` (``--overwrite`` itself by default); ``--overwrite``
+    on the namespace is honoured. Convenience wrapper for tools that write a handful of fixed-name files.
+    """
+    params = {k: (str(v) if isinstance(v, Path) else v) for k, v in vars(args).items() if k not in exclude}
+    ow = bool(getattr(args, "overwrite", False))
+    fp = ""
+    for p in paths:
+        fp = claim_output(p, params, overwrite=ow)
+    return fp

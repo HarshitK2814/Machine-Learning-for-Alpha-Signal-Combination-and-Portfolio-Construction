@@ -16,9 +16,34 @@ parameters, or an existing output with no record: refused with `OutputCollision`
 output deliberately. The tag is part of the parameters as given, so `""` and `"default"` collide. It changes nothing a
 run computes.
 
-**Where it is applied.** The wedge tool (all three outputs) and the figure tool. **Not yet applied** to the other
-fixed-path writers named in the audit (stage 06 summaries, theme-liquidity, matched-book accounting); those remain as
-before and should be wrapped the same way when next touched.
+**Where it is applied (actual coverage, 13 October update).**
+
+| Guarded (claim before any work, `--overwrite` to discard) | Outputs |
+|---|---|
+| `tools/exp_signal_vs_portfolio_wedge.py` | `wedge_<C>_<tag>.csv`, `monthly_<C>_<tag>.csv`, `decile_weights/<C>/<tag or default>/` |
+| `tools/exp_design_identifiability.py` | per-country files and `design_identifiability_all.csv` |
+| `tools/exp_friction_horse_race.py` | `horse_race_decile_panel.csv`, `horse_race_tax_panel.csv` |
+| `tools/exp_112a_event_study.py` | `tax_year_panel.csv`, `event_112a.csv` |
+| `tools/exp_wedge_test.py` | `wedge_test.csv` |
+| `tools/exp_tals_overhang.py` | `exp_tals_overhang.csv`, `exp_tals_overhang_trajectory.csv` |
+| `pipelines/07_adaptive_combine.py` | `adaptive_weights.csv`, `summary_adaptive.csv`, `adaptive_report.json`, `adaptive_refit_schedule.csv` |
+| `pipelines/06_after_tax_eval.py` | the `--out` summary, or the default `summary_after_tax.csv` |
+| `tools/make_figures.py` | the figure directory |
+
+These are the six fixed-path writers named in the finalization audit (section 1.3, item 5), plus the wedge tool, the
+stage 06 summary and the figure tool. Nothing any of them computes changed; none was re-run.
+
+**NOT guarded (still exposed to silent overwrites):** `tools/exp_matched_book_accounting.py` (one `matched_book_<aum>.csv`
+for all countries), `tools/exp_theme_liquidity_terciles.py`, `tools/exp_capacity_channel_inference.py`,
+`tools/exp_after_tax_inference.py`, `tools/gate1_liquidity.py`, `tools/gate2_power.py`,
+`tools/exp_book_characteristics.py`, `tools/exp_capacity_dose_response.py`, `tools/exp_factorial_prediction_arm.py`,
+`tools/exp_e02_e03_signal_diagnostics.py`, `tools/exp_e29_attribution.py`, `tools/exp_leverage_matched.py`,
+`tools/exp_complexity_tax.py`, `tools/dev_backtest.py`, `tools/exhibit_provenance.py`, the `verify_*` and index tools
+(`weights_index.py`, `repair_source_index.py`), `pipelines/02_train_models.py` (its source-index writer merges rather than
+overwrites, from an earlier fix) and `pipelines/04_construct_portfolios.py`, and the Phase 2 and diagnostic tools that
+write deterministic files into `results/` (`exp_capacity_return_difference.py`, `diag_cost_parity.py`,
+`diag_dtv_support.py`; their outputs are tracked in git and so are protected by version control instead). Guard coverage is
+therefore **partial**: the audit's named list, not every writer in the repository.
 
 **Consequences to know.** Outputs written before the guard have no record, so re-running the same command into an
 existing legacy output now needs `--overwrite` or a new tag. The Phase 2 manifest's regeneration commands for the wedge

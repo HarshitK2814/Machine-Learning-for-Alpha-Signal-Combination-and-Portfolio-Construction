@@ -278,7 +278,11 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--include-truncated-year", action="store_true",
                     help="keep India's FY2019-20, which the evaluation window cuts at 9 months")
     ap.add_argument("--out", type=Path, default=ROOT / "outputs" / "event_112a")
+    ap.add_argument("--overwrite", action="store_true",
+        help="discard an earlier output written by a different run (or of unknown origin); by default such a collision is refused (alphacomb.output_guard)")
     args = ap.parse_args(argv)
+    from alphacomb.output_guard import claim_run
+    claim_run([args.out / "tax_year_panel.csv", args.out / "event_112a.csv"], args)
 
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
     cfg = load_config("base")

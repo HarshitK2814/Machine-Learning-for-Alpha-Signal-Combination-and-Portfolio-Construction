@@ -181,7 +181,11 @@ def main(argv: list[str] | None = None) -> int:
                     help="stage-06 summary CSVs, one per country (each must carry a 'country' col)")
     ap.add_argument("--as-of", default="2016-06-30")
     ap.add_argument("--out", type=Path, default=ROOT / "outputs" / "wedge_test")
+    ap.add_argument("--overwrite", action="store_true",
+        help="discard an earlier output written by a different run (or of unknown origin); by default such a collision is refused (alphacomb.output_guard)")
     args = ap.parse_args(argv)
+    from alphacomb.output_guard import claim_run
+    claim_run([args.out / "wedge_test.csv"], args)
 
     frames = []
     for path in args.inputs:

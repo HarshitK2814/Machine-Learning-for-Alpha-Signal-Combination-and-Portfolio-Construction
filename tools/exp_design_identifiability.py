@@ -127,7 +127,12 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--n-boot", type=int, default=1500)
     ap.add_argument("--block", type=int, default=6)
     ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--overwrite", action="store_true",
+        help="discard an earlier output written by a different run (or of unknown origin); by default such a collision is refused (alphacomb.output_guard)")
     a = ap.parse_args(argv)
+    from alphacomb.output_guard import claim_run
+    claim_run([a.out / f"design_identifiability_{c}.csv" for c in a.country]
+              + [a.out / "design_identifiability_all.csv"], a)
     a.out.mkdir(parents=True, exist_ok=True)
 
     allr = []

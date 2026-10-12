@@ -99,7 +99,11 @@ def main() -> None:
                         "dated engine instead of holding one statutory regime fixed. Requires "
                         "--country and forces year_end accounting (frozen decision 3A). This is "
                         "what makes India's section 112A change visible inside the sample.")
+    p.add_argument("--overwrite", action="store_true",
+        help="discard an earlier output written by a different run (or of unknown origin); by default such a collision is refused (alphacomb.output_guard)")
     a = p.parse_args()
+    from alphacomb.output_guard import claim_run
+    claim_run([Path(a.out) if a.out else paths.outputs_root() / "summary_after_tax.csv"], a)
 
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
     cfg = load_config("base")

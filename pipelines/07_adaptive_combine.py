@@ -69,7 +69,13 @@ def main() -> None:
     p.add_argument("--share", type=float, default=0.02, help="Herbster-Warmuth fixed share")
     p.add_argument("--warmup", type=int, default=12, help="months of equal weighting before adapting")
     p.add_argument("--aum", type=float, default=None)
+    p.add_argument("--overwrite", action="store_true",
+        help="discard an earlier output written by a different run (or of unknown origin); by default such a collision is refused (alphacomb.output_guard)")
     a = p.parse_args()
+    from alphacomb.output_guard import claim_run
+    _o = paths.outputs_root()
+    claim_run([_o / "adaptive_weights.csv", _o / "summary_adaptive.csv", _o / "adaptive_report.json",
+               _o / "adaptive_refit_schedule.csv"], a)
 
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
     cfg = load_config("base")
