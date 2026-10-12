@@ -67,7 +67,7 @@ against. Neither tier follows the carry convention.
 
 | Field | Value |
 |---|---|
-| Ruling owner | the owner of the evaluation pipeline (to be named by the team; the data owner for C6 and the protocol owner for the contract should be consulted) |
+| Ruling owner | **Absar Wani, PROPOSED and not yet accepted** (see `GOVERNANCE_EXIT_POLICY_OWNERSHIP_PROPOSED_2026-10-12.md`); implementing maintainer Harshit; Maham reviews if a preregistered or confirmatory result changes. Until written acceptance is recorded the owner is unresolved. |
 | Ruling | **NOT OBTAINED** |
 | Date | n/a |
 | Outcome recorded here | **UNRESOLVED** |
