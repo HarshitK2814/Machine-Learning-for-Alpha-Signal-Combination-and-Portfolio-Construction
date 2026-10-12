@@ -308,9 +308,26 @@ def main(argv: list[str] | None = None) -> int:
                     help="suffix for the output filename; set it when sweeping a "
                          "different AUM ladder or group count so a later run cannot "
                          "silently overwrite an earlier one (this has happened)")
+    ap.add_argument("--overwrite", action="store_true",
+                    help="discard an earlier output written by a different run (or of unknown origin). By "
+                         "default such a collision is refused; see alphacomb.output_guard")
     args = ap.parse_args(argv)
 
     args.out.mkdir(parents=True, exist_ok=True)
+    # Refuse to overwrite another run's output before doing any work. The parameters include the tag AS GIVEN, so
+    # tag "" and tag "default" (which share a weights directory) are distinct runs and collide.
+    from alphacomb.output_guard import claim_output
+    run_params = {"country": args.country, "aum": sorted(args.aum), "groups": args.groups, "gross": args.gross,
+                  "require_cost_inputs": args.require_cost_inputs, "weighting": args.weighting,
+                  "impact_k": args.impact_k, "impact_exponent": args.impact_exponent,
+                  "dump_monthly": args.dump_monthly, "dump_weights": args.dump_weights, "tag": args.tag}
+    sfx = f"_{args.tag}" if args.tag else ""
+    claim_output(args.out / f"wedge_{args.country}{sfx}.csv", run_params, overwrite=args.overwrite)
+    if args.dump_monthly:
+        claim_output(args.out / f"monthly_{args.country}{sfx}.csv", run_params, overwrite=args.overwrite)
+    if args.dump_weights:
+        claim_output(args.out.parent / "decile_weights" / args.country / (args.tag or "default"), run_params,
+                     is_dir=True, overwrite=args.overwrite)
     print(f"{args.country}: {args.groups}-group long/short spread at gross {args.gross}, "
           f"from the same stage-02 scores as the optimised book"
           + (f", impact_k={args.impact_k}" if args.impact_k is not None else ""))
