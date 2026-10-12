@@ -1,0 +1,22 @@
+{
+  "purpose": "Cost-accounting parity diagnostic (docs/COST_PARITY_DIAGNOSTIC_SPEC_2026-10-10.md)",
+  "git_head_when_written": "ac669f21868f9c364299d72c24823554b017c70c",
+  "git_dirty_when_written": true,
+  "python": "3.12.6",
+  "pandas": "2.2.3",
+  "numpy": "2.3.5",
+  "regeneration": {
+    "parity_monthly_*.csv.gz": "python tools/diag_cost_parity.py --stage run --country C  (needs the frozen data/, stage-02 predictions and the git-ignored decile weights; not in git)",
+    "dtv_support.csv": "python tools/diag_dtv_support.py  (same upstream requirements as the monthly files)",
+    "summary_and_report": "python tools/diag_cost_parity.py --stage summarize  (tracked files only: these monthly files plus results/capacity_return_difference/)"
+  },
+  "sha256": {
+    "dtv_support.csv": "31d6450eaddee080f6cdf0fc4af6bd43b677c1668496f20a5a87c4a087b7d547",
+    "parity_monthly_DEU.csv.gz": "91cede11a421eba7ba66a39f8d8f724d79b5c362ef71d22028e45d0bb03e64c4",
+    "parity_monthly_IND.csv.gz": "ce1f9c96fe57ed9e6682d4b71d9f62e2c596d6d8d2c15e8dce69dce793ab52ba",
+    "parity_monthly_JPN.csv.gz": "afad3e801a2c7eef8500b1b275ffe6532d668710717e3288dd7ac45db0ee2130",
+    "parity_report.txt": "d2d036886b989e000d1f327cec357d7035ffc217089673ddc70ef2a52af411c4",
+    "parity_summary.csv": "10ac68985530445fff1e5f6d76102451a028112fafb9cb7b17b80feee0e3eb64",
+    "tables.md": "aafeaad7644b9e73d8b0ae6de8b333e60f9836ccb53089a7cb4f913962924153"
+  }
+}
