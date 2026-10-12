@@ -1,7 +1,7 @@
 # Cost-accounting parity diagnostic: results (Workstream A)
 
-**Date:** 2026-10-10. **Status:** executed as specified in `COST_PARITY_DIAGNOSTIC_SPEC_2026-10-10.md`; **not committed,
-pending review.** Phase 1 (`b8e21ba`) and Phase 2 (`ac669f2`) are untouched. Accounting only: no model, parameter,
+**Date:** 2026-10-10. **Status:** executed as specified in `COST_PARITY_DIAGNOSTIC_SPEC_2026-10-10.md`; **committed as `316464d`
+(reviewed).** Phase 1 (`b8e21ba`) and Phase 2 (`ac669f2`) are untouched. Accounting only: no model, parameter,
 cost setting, AUM rung or result was changed. Code: `tools/diag_cost_parity.py`, `tools/diag_dtv_support.py`; tracked
 outputs, report and a SHA-256 manifest: `results/cost_parity_diagnostic/`.
 

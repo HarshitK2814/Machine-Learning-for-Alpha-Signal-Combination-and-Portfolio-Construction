@@ -1,6 +1,6 @@
 # Research-readiness review memo (Phase 2 frozen)
 
-**Date:** 2026-10-10. **Status:** review memo only. Not committed; no experiment run; no paper text changed.
+**Date:** 2026-10-10. **Status:** review memo only. Committed as `7ce1308`; no experiment run; no paper text changed.
 Commits under review: `b8e21ba` (Phase 1), `ac669f2` (Phase 2).
 
 > **Update:** section 2's candidate causes were tested afterwards; see `COST_PARITY_DIAGNOSTIC_RESULTS_2026-10-10.md`.

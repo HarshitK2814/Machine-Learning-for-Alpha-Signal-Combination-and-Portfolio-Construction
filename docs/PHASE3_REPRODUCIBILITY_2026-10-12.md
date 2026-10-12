@@ -16,7 +16,7 @@ parameters, or an existing output with no record: refused with `OutputCollision`
 output deliberately. The tag is part of the parameters as given, so `""` and `"default"` collide. It changes nothing a
 run computes.
 
-**Where it is applied (actual coverage, 13 October update).**
+**Where it is applied (actual coverage, 12 October update).**
 
 | Guarded (claim before any work, `--overwrite` to discard) | Outputs |
 |---|---|
