@@ -1,0 +1,19 @@
+{
+  "claimed_utc": "2026-10-12T08:55:46.923728+00:00",
+  "fingerprint": "ef2bfdc39f9cbcce334ef1a081f4223230b1da107b36f410a94dde960a4461d9",
+  "params": {
+    "inputs": {
+      "results/capacity_return_difference/tierA_DEU.csv": "effbbc440c7a81a7f8919d92cf3a9403df7c4693c688b3670cac11fad2033537",
+      "results/capacity_return_difference/tierA_IND.csv": "2ccc319d20f51f2cccb614bc3f5a20cdbaaa170224ec783d4fb068ae612bef92",
+      "results/capacity_return_difference/tierA_JPN.csv": "92c691ca325491f3f22e0fdac90631c5ea3695e7b7886d9ed8c68198e0dc8bfa",
+      "results/capacity_return_difference/tierB_DEU.csv": "2618527603eae3ed0ebc95f148230e51e95238d0ed6ff53be268531e16884834",
+      "results/capacity_return_difference/tierB_IND.csv": "de607ac9a49d957a707df310caeef1444aad30f6512297278bcf207e4a446386",
+      "results/capacity_return_difference/tierB_JPN.csv": "7554c70ec52f155d2d27d3e892f656118d99bace4a7ba93ada951404b149da63",
+      "results/cost_parity_diagnostic/dtv_support.csv": "31d6450eaddee080f6cdf0fc4af6bd43b677c1668496f20a5a87c4a087b7d547",
+      "results/cost_parity_diagnostic/parity_summary.csv": "10ac68985530445fff1e5f6d76102451a028112fafb9cb7b17b80feee0e3eb64"
+    },
+    "near_ruined_wealth": 0.1,
+    "script": "a0ee84d8cb1b1f2e9e79d0336932458a470ab8d88b41db7550c7a512f70ff513",
+    "solvency_rule": "no cell-month of either book at or below -100% net return, over the whole horizon"
+  }
+}
