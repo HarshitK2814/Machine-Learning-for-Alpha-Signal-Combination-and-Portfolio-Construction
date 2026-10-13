@@ -259,11 +259,13 @@ class TaxLotLedger:
         self._recent_buys = [b for b in self._recent_buys if b[0] >= cutoff]
         self._pending_losses = [p for p in self._pending_losses if p.date >= cutoff]
 
-    def mark_to_market(self, date) -> float:
+    def mark_to_market(self, date, skip=()) -> float:
         """s475(f): treat every open lot as sold and re-bought at today's value. Returns the gain."""
         date = pd.Timestamp(date)
         total = 0.0
         for permno, lots in self.lots.items():
+            if permno in skip:   # a stale mark is not a market value
+                continue
             for lot in lots:
                 gain = lot.unrealised
                 if abs(gain) > 1e-12:
@@ -273,6 +275,16 @@ class TaxLotLedger:
                 lot.open_date = date
                 lot.washed_from = None
         return total
+
+    def liquidate_name(self, permno: int, date) -> list[RealisedGain]:
+        """Close every lot of one name on both sides (a confirmed terminal event), exactly once."""
+        date = pd.Timestamp(date)
+        out: list[RealisedGain] = []
+        for side in (1, -1):
+            value = sum(lot.value for lot in self.lots.get(permno, []) if lot.side == side)
+            if value > 1e-10:
+                out += self.sell(permno, date, value, side=side)
+        return out
 
     def liquidate(self, date) -> list[RealisedGain]:
         """Close every position, so the deferred tax on unrealised gains is brought into the sum."""

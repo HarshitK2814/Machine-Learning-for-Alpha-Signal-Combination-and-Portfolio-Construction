@@ -48,6 +48,22 @@ from .lots import LotMethod, TaxLotLedger
 from .regimes import TaxRegime, get_regime
 
 
+EXIT_POLICIES = ("as_run", "carry_v1")
+EXIT_EVIDENCE_KINDS = ("delisting", "mandatory_corporate_action_exit")
+
+
+def _validate_exit_evidence(ev: pd.DataFrame) -> None:
+    missing = {"permno", "event_date", "kind"} - set(ev.columns)
+    if missing:
+        raise ValueError(f"exit_evidence is missing columns {sorted(missing)}")
+    bad = set(ev["kind"].unique()) - set(EXIT_EVIDENCE_KINDS)
+    if bad:
+        raise ValueError(f"exit_evidence kinds {sorted(bad)} are not documented terminal events "
+                         f"{EXIT_EVIDENCE_KINDS}; a missing row or a disappearance is not evidence")
+    if ev.duplicated(["permno", "event_date"]).any():
+        raise ValueError("exit_evidence has duplicate (permno, event_date) rows")
+
+
 @dataclass
 class TaxConfig:
     """Everything about the after-tax run that is not a statutory rate."""
@@ -61,8 +77,27 @@ class TaxConfig:
     dated_engine: DatedC12Patch | None = None
     dated_country: str | None = None
     dated_local_currency: str | None = None
+    # ``as_run`` reproduces the accounting used for Phase 1 and Phase 2 byte for byte (and is the
+    # default so nothing historical can drift). ``carry_v1`` implements the 2026-10-13 exit-policy
+    # ruling; see docs/EXIT_POLICY_CARRY_V1_SPEC_2026-10-13.md. Real (non-synthetic) panels only.
+    exit_policy: str = "as_run"
+    # Documented terminal-event evidence: columns permno, event_date, kind in EXIT_EVIDENCE_KINDS,
+    # and optionally liquidation_cost_frac (fraction of closed value). None means no evidence exists
+    # (true of every promoted C1/C4/C6 table today), so every panel leaver is unresolved.
+    exit_evidence: pd.DataFrame | None = None
+    # carry_v1 only. C4 defines div_next as a non-negative fraction for every row (CRSP RET - RETX), so
+    # a missing value is missing information, not a known zero distribution. "unsupported" (default)
+    # makes the after-tax return of any month with a missing dividend on an exposed name NaN;
+    # "flag_only" keeps the zero-filled after-tax return but still counts and labels the months.
+    dividend_missing: str = "unsupported"
 
     def __post_init__(self) -> None:
+        if self.dividend_missing not in ("unsupported", "flag_only"):
+            raise ValueError("dividend_missing must be 'unsupported' or 'flag_only'")
+        if self.exit_policy not in EXIT_POLICIES:
+            raise ValueError(f"exit_policy must be one of {EXIT_POLICIES}, got {self.exit_policy!r}")
+        if self.exit_evidence is not None:
+            _validate_exit_evidence(self.exit_evidence)
         if self.dated_engine is not None and not self.dated_country:
             raise ValueError("dated_country is required when dated_engine is configured")
         if self.dated_engine is not None and not self.dated_local_currency:
@@ -256,6 +291,18 @@ def after_tax_backtest(weights: pd.DataFrame, bundle, cfg: dict, tax_cfg: TaxCon
     # the generator's planted gaps rely on; a real one fails closed and uses the
     # frozen-sleeve treatment instead.
     _synthetic = str(getattr(bundle, "source", "")).startswith("synthetic")
+    carry = tax_cfg.exit_policy == "carry_v1"
+    if carry and _synthetic:
+        raise ValueError("exit_policy='carry_v1' is defined for real-panel bundles only; the synthetic "
+                         "generator plants market gaps on purpose and keeps the as_run path")
+    # carry_v1 state. stale: held names whose valuation is unavailable (kept at last mark, never
+    # rolled forward, never traded). unresolved_exit: panel leavers with no documented terminal
+    # event (lots retained, not valued, not closed). used_events: evidence rows already consumed.
+    stale: set = set()
+    unresolved_exit: set = set()
+    used_events: set = set()
+    exit_log: list[dict] = []
+    chain_broken = False
     tax_year_end_month = 12
     if tax_cfg.dated_engine is not None:
         if tax_cfg.accounting != "year_end":
@@ -300,7 +347,27 @@ def after_tax_backtest(weights: pd.DataFrame, bundle, cfg: dict, tax_cfg: TaxCon
         target_w = pd.Series(group["w"].to_numpy(dtype=float), index=group["permno"].to_numpy())
         held = pd.Index([p for p in ledger.lots if abs(ledger.position(p)) > 1e-8])
         idx = target_w.index.union(held)
-        if not _synthetic:
+        closing: list = []
+        if carry:
+            priced = priced_at(date, bundle.cost_inputs)
+            leavers = [p for p in held if p not in priced and p not in unresolved_exit]
+            for p in leavers:
+                if p in stale:
+                    # Its valuation was already unknown (e.g. the terminal return itself is missing),
+                    # so closing it at the last mark would fabricate the terminal value.
+                    unresolved_exit.add(p)
+                    exit_log.append(dict(date=date, permno=int(p), status="unresolved",
+                                         reason="valuation was stale before the name left the panel"))
+                    continue
+                ev = _confirmed_event(p, date, tax_cfg.exit_evidence, used_events)
+                if ev is None:
+                    unresolved_exit.add(p)
+                    exit_log.append(dict(date=date, permno=int(p), status="unresolved",
+                                         reason="left the panel with no documented terminal event"))
+                else:
+                    closing.append((p, ev))
+            idx = idx.intersection(priced).difference(pd.Index(sorted(unresolved_exit)), sort=False)
+        elif not _synthetic:
             # A name with no C6 row at this date has left the panel; its position was closed by
             # the delisting return the targets table already applies, so it is not part of this
             # month's cost base. Only for real panels: the synthetic generator plants missing
@@ -310,13 +377,28 @@ def after_tax_backtest(weights: pd.DataFrame, bundle, cfg: dict, tax_cfg: TaxCon
         w_full = target_w.reindex(idx).fillna(0.0)
         prev_dollars = pd.Series([ledger.position(p) for p in idx], index=idx, dtype=float)
         prev_w = prev_dollars / nav if nav > 0 else prev_dollars * 0.0
+        fixed: set = set()
+        n_blocked = 0
+        if carry:
+            # A position that cannot be traded at a certified cost (alive but uncertified) or valued
+            # (stale) is carried at its ledger holding: no sale, no purchase, no cost, no realisation.
+            elig = set(eligible_cost_input_permnos(date, bundle.cost_inputs, idx))
+            fixed = {p for p in idx if p not in elig or p in stale}
+            for p in fixed:
+                if abs(float(w_full[p])) > 1e-12 and abs(float(prev_w[p])) <= 1e-12:
+                    n_blocked += 1      # a new position in an uncertified name is not opened
+                w_full[p] = prev_w[p]
 
         # ---- trade to target, lot by lot -------------------------------------------------
         target_dollars = w_full * nav
         ledger.expire_wash_window(date)
         realised_st = realised_lt = disallowed = 0.0
-        for permno in idx:
-            gains = ledger.trade_to(int(permno), date, float(target_dollars[permno]))
+        exit_cost_frac = 0.0
+        exit_cost_unsupported = False
+        n_exit_closed = 0
+
+        def _absorb(gains):
+            nonlocal realised_st, realised_lt, disallowed
             for g in gains:
                 if isinstance(book, _DatedYearBook):
                     if g.dated_event is None:
@@ -327,10 +409,39 @@ def after_tax_backtest(weights: pd.DataFrame, bundle, cfg: dict, tax_cfg: TaxCon
                 else:
                     realised_st += g.allowed
                 disallowed += g.disallowed
+
+        for permno in idx:
+            if permno in fixed:
+                continue
+            _absorb(ledger.trade_to(int(permno), date, float(target_dollars[permno])))
+        for permno, ev in closing:
+            # Confirmed terminal event: the C4 terminal return already reached the lots when they were
+            # rolled forward, so this realises the position once at that value. The terminal return
+            # and the liquidation cost are separate things; the cost is charged only if the evidence
+            # supplies one, and is otherwise unsupported, never zero.
+            closed_value = sum(lot.value for lot in ledger.lots.get(permno, []))
+            _absorb(ledger.liquidate_name(permno, date))
+            used_events.add((int(permno), pd.Timestamp(ev["event_date"])))
+            n_exit_closed += 1
+            frac = ev.get("liquidation_cost_frac") if hasattr(ev, "get") else None
+            if frac is not None and pd.notna(frac):
+                exit_cost_frac += float(frac) * closed_value / nav
+            else:
+                exit_cost_unsupported = True
+            exit_log.append(dict(date=date, permno=int(permno), status="closed", kind=ev["kind"],
+                                 liquidation_cost="evidenced" if frac is not None and pd.notna(frac)
+                                 else "unsupported"))
         if isinstance(book, _YearBook):
             book.st += realised_st
             book.lt += realised_lt
         ledger.snapshot_statutory_references(date)
+
+        if carry:
+            # Valuation staleness is established before borrow and dividends are accrued, so a
+            # name whose forward return is missing is excluded from every resolved-only item.
+            _r_pre = returns.reindex(pd.MultiIndex.from_product([[date], idx]))
+            _r_pre.index = idx
+            stale |= set(idx[_r_pre.isna().to_numpy() & (w_full.abs() > 1e-12).to_numpy()])
 
         # ---- trading costs ----------------------------------------------------------------
         # Same non-tradeability treatment as tools/dev_backtest and the C11 optimiser, so the
@@ -364,7 +475,8 @@ def after_tax_backtest(weights: pd.DataFrame, bundle, cfg: dict, tax_cfg: TaxCon
         else:
             borrow_rate = (borrow_fee_proxy.annual_rate if borrow_fee_proxy is not None
                            else float(np.nanmax(ci["borrow_fee"].to_numpy())) if len(ci) else 0.0)
-            borrow_cost = float((borrow_rate / 12.0 * np.clip(-w_full.to_numpy(), 0, None)).sum())
+            _w_b = w_full.where(~idx.isin(sorted(stale)), 0.0) if carry else w_full
+            borrow_cost = float((borrow_rate / 12.0 * np.clip(-_w_b.to_numpy(), 0, None)).sum())
         transaction_tax_cost = 0.0
         if tax_cfg.dated_engine is not None:
             transaction_tax_cost = tax_cfg.dated_engine.transaction_tax(
@@ -375,14 +487,28 @@ def after_tax_backtest(weights: pd.DataFrame, bundle, cfg: dict, tax_cfg: TaxCon
             ).total
 
         # ---- hold for one month ------------------------------------------------------------
-        r = returns.reindex(pd.MultiIndex.from_product([[date], idx])).fillna(0.0)
+        r = returns.reindex(pd.MultiIndex.from_product([[date], idx]))
         r.index = idx
+        if carry:
+            # No zero-return imputation on a held name: a missing return makes the valuation stale.
+            # It stays at its last mark, is excluded from this and every later month's return, and
+            # makes those months unresolved. (A name with no position and no return is harmless.)
+            exposed = (w_full.abs() > 1e-12).to_numpy()
+            stale |= set(idx[r.isna().to_numpy() & exposed])
+            stale_mask = idx.isin(sorted(stale))
+            r = r.where(~stale_mask, 0.0)
+        r = r.fillna(0.0)
         if div_col:
-            q = dividends.reindex(pd.MultiIndex.from_product([[date], idx])).fillna(0.0)
+            q = dividends.reindex(pd.MultiIndex.from_product([[date], idx]))
             q.index = idx
+            q_missing = q.isna()
+            q = q.fillna(0.0)
         else:
             q = pd.Series(monthly_div, index=idx)
+            q_missing = pd.Series(False, index=idx)
         q = q.clip(lower=0.0)
+        if carry and stale:
+            q = q.where(~idx.isin(sorted(stale)), 0.0)
 
         w_arr = w_full.to_numpy()
         r_arr = r.to_numpy()
@@ -413,11 +539,18 @@ def after_tax_backtest(weights: pd.DataFrame, bundle, cfg: dict, tax_cfg: TaxCon
             book.div_ordinary += div_received - qualified
             book.short_div_paid += div_paid
 
-        ledger.accrue_returns(r - q)   # price return only; the dividend already came out as cash
+        if carry:
+            # accrue_returns drops a lot whose value reaches zero, which would discard a total loss
+            # without ever realising it (as_run does exactly that). Clamp the price return at -100%
+            # plus one part in 1e9 so the lot survives to be closed, with its basis, by the normal
+            # exit path; gross_ret above still uses the true -100% return.
+            ledger.accrue_returns((r - q).clip(lower=-1.0 + 1e-9))
+        else:
+            ledger.accrue_returns(r - q)   # price return only; the dividend already came out as cash
 
         # ---- tax accrual --------------------------------------------------------------------
         if regime.mark_to_market and date.month == 12 and isinstance(book, _YearBook):
-            book.st += ledger.mark_to_market(date)
+            book.st += ledger.mark_to_market(date, skip=(stale | unresolved_exit) if carry else ())
         tax_due = 0.0
         if regime.taxable:
             if tax_cfg.accounting == "accrual":
@@ -453,15 +586,54 @@ def after_tax_backtest(weights: pd.DataFrame, bundle, cfg: dict, tax_cfg: TaxCon
                 deferred_cash = [(yr, amt) for yr, amt in deferred_cash
                                  if not (yr == date.year and date.month == regime.payment_month)]
 
-        costs_dollars = (spread_cost + impact_cost + borrow_cost + transaction_tax_cost) * nav
+        exit_cost = exit_cost_frac if carry else 0.0
+        costs_dollars = (spread_cost + impact_cost + borrow_cost + transaction_tax_cost + exit_cost) * nav
         pnl = nav * gross
         nav_next = nav + pnl - costs_dollars - tax_due
-        net_ret = gross - spread_cost - impact_cost - borrow_cost - transaction_tax_cost
+        net_ret = gross - spread_cost - impact_cost - borrow_cost - transaction_tax_cost - exit_cost
         tax_ret = tax_due / nav if nav > 0 else 0.0
 
+        carry_cols: dict = {}
+        if carry:
+            n_stale = sum(1 for p in stale if abs(ledger.position(p)) > 1e-8)
+            n_unres = sum(1 for p in unresolved_exit if abs(ledger.position(p)) > 1e-8)
+            stale_gross = sum(abs(ledger.position(p)) for p in stale) / nav
+            unres_gross = sum(abs(ledger.position(p)) for p in unresolved_exit) / nav
+            frozen_now = [p for p in fixed if p not in stale and abs(ledger.position(p)) > 1e-8]
+            val_unres = (n_stale + n_unres) > 0
+            cost_unsup = exit_cost_unsupported
+            div_miss = (q_missing.to_numpy() & (w_full.abs().to_numpy() > 1e-12)
+                        & ~idx.isin(sorted(stale)))
+            n_div_missing = int(div_miss.sum())
+            div_missing_gross = float(w_full.abs().to_numpy()[div_miss].sum())
+            tax_unsup = tax_cfg.dividend_missing == "unsupported" and n_div_missing > 0
+            _short_unres = (sum(-ledger.position(p) for p in stale if ledger.position(p) < 0)
+                            + sum(-ledger.position(p) for p in unresolved_exit if ledger.position(p) < 0)) / nav
+            chain_broken = chain_broken or val_unres or cost_unsup or tax_unsup
+            after_ret = net_ret - tax_ret
+            carry_cols = {
+                "valuation_status": "unresolved" if val_unres else "resolved",
+                "cost_status": "unsupported" if cost_unsup else "supported",
+                "n_frozen": len(frozen_now),
+                "frozen_gross": sum(abs(ledger.position(p)) for p in frozen_now) / nav,
+                "n_stale": n_stale, "stale_gross": stale_gross,
+                "n_exit_closed": n_exit_closed, "n_exit_unresolved": n_unres,
+                "unresolved_exit_gross": unres_gross, "n_blocked_trades": n_blocked,
+                "cost_exit": exit_cost,
+                "tax_status": ("unsupported" if tax_unsup else "incomplete_flagged" if n_div_missing else "supported"),
+                "n_div_missing": n_div_missing, "div_missing_gross": div_missing_gross,
+                "unresolved_short_gross": _short_unres,
+                "gross_ret_diag": gross, "net_ret_diag": net_ret, "after_tax_ret_diag": after_ret,
+            }
+            gross_out = np.nan if val_unres else gross
+            net_out = np.nan if (val_unres or cost_unsup) else net_ret
+            after_out = np.nan if (val_unres or cost_unsup or tax_unsup) else after_ret
+        else:
+            gross_out, net_out, after_out = gross, net_ret, net_ret - tax_ret
+
         rows.append({
-            "date": date, "gross_ret": gross, "net_ret": net_ret,
-            "after_tax_ret": net_ret - tax_ret,
+            "date": date, "gross_ret": gross_out, "net_ret": net_out,
+            "after_tax_ret": after_out,
             "turnover": float(np.abs(dw).sum() / 2),
             "cost_spread": spread_cost, "cost_impact": impact_cost, "cost_borrow": borrow_cost,
             "cost_transaction_tax": transaction_tax_cost,
@@ -476,7 +648,9 @@ def after_tax_backtest(weights: pd.DataFrame, bundle, cfg: dict, tax_cfg: TaxCon
                                      str(tax_cfg.dated_local_currency))
                 if isinstance(book, _DatedYearBook) else book.carryforward
             ) / nav,
-            "nav": nav_next,
+            "nav": (np.nan if (carry and chain_broken) else nav_next),
+            **carry_cols,
+            **({"nav_diag": nav_next} if carry else {}),
         })
 
         if date.month == tax_year_end_month:
@@ -484,7 +658,8 @@ def after_tax_backtest(weights: pd.DataFrame, bundle, cfg: dict, tax_cfg: TaxCon
         if nav_next <= 0:
             break
         # rescale lots so the book keeps matching NAV after costs and tax are paid out of capital
-        _rescale(ledger, nav + pnl, nav_next)
+        _rescale(ledger, nav + pnl, nav_next,
+                 skip=(stale | unresolved_exit) if carry else ())
         nav = nav_next
 
     frame = pd.DataFrame(rows)
@@ -495,10 +670,34 @@ def after_tax_backtest(weights: pd.DataFrame, bundle, cfg: dict, tax_cfg: TaxCon
             )
         else:
             frame.attrs["deferred_tax_ret"] = _deferred_tax(ledger, book, nav, dates[-1])
+    if carry:
+        frame.attrs["exit_policy"] = "carry_v1"
+        frame.attrs["exit_log"] = exit_log
+        frame.attrs["unresolved_exit_permnos"] = sorted(int(p) for p in unresolved_exit)
+        frame.attrs["stale_permnos"] = sorted(int(p) for p in stale)
+        frame.attrs["short_availability_evidence"] = (
+            "none: borrow cost is the modelled flat proxy; it is not evidence that a short was available")
+        frame.attrs["dividend_source"] = "targets.div_next" if div_col else "flat_yield_assumption"
+        frame.attrs["borrow_excluded_for"] = "stale and unresolved-exit shorts (notional unverified)"
+        frame.attrs["deferred_tax_includes_unresolved_lots"] = bool(stale or unresolved_exit)
     frame.attrs["regime"] = regime.name
     frame.attrs["lot_method"] = tax_cfg.lot_method.value
     frame.attrs["accounting"] = tax_cfg.accounting
     return frame
+
+
+def _confirmed_event(permno, date, evidence, used_events):
+    """The documented terminal event for ``permno`` at ``date``, once; None if there is none.
+
+    A missing C6 row, or a disappearance from the scored cross-section, is NOT evidence.
+    """
+    if evidence is None:
+        return None
+    rows = evidence[(evidence["permno"] == permno) & (pd.to_datetime(evidence["event_date"]) <= date)]
+    for _, row in rows.sort_values("event_date").iterrows():
+        if (int(permno), pd.Timestamp(row["event_date"])) not in used_events:
+            return row
+    return None
 
 
 def _qualifies(ledger: TaxLotLedger, idx, date, regime: TaxRegime) -> float:
@@ -521,14 +720,16 @@ def _qualifies(ledger: TaxLotLedger, idx, date, regime: TaxRegime) -> float:
     return (aged / total) if total > 0 else 0.0
 
 
-def _rescale(ledger: TaxLotLedger, value_before: float, value_after: float) -> None:
+def _rescale(ledger: TaxLotLedger, value_before: float, value_after: float, skip=()) -> None:
     """Costs and tax are paid from capital; shrink the book proportionally, keeping basis ratios."""
     if value_before <= 0 or value_after <= 0:
         return
     factor = value_after / value_before
     if abs(factor - 1.0) < 1e-12:
         return
-    for lots in ledger.lots.values():
+    for permno, lots in ledger.lots.items():
+        if permno in skip:          # a stale mark is not a market value: leave it where it was
+            continue
         for lot in lots:
             lot.value *= factor
             lot.basis *= factor
@@ -610,6 +811,15 @@ def summarise_after_tax(frame: pd.DataFrame, periods: int = 12) -> dict:
 
     gross, net = frame["gross_ret"], frame["net_ret"]
     after = frame["after_tax_ret"]
+    diagnostic = False
+    nav_col = "nav"
+    if "valuation_status" in frame.columns and (
+            (frame["valuation_status"] != "resolved").any() or (frame["cost_status"] != "supported").any()
+            or (frame["tax_status"] != "supported").any()):
+        # Full-portfolio returns do not exist for these months. The numbers below are resolved-only
+        # DIAGNOSTICS and must be reported as such, never as portfolio performance.
+        gross, net, after = frame["gross_ret_diag"], frame["net_ret_diag"], frame["after_tax_ret_diag"]
+        diagnostic, nav_col = True, "nav_diag"
     cum = (1 + after).cumprod()
     dd = float((cum / cum.cummax() - 1).min())
     deferred = float(frame.attrs.get("deferred_tax_ret", 0.0))
@@ -636,8 +846,15 @@ def summarise_after_tax(frame: pd.DataFrame, periods: int = 12) -> dict:
         "lt_share_of_gains": _lt_share(frame),
         "deferred_tax_ret": deferred,
         "after_tax_liq_mean_ann": float(after.mean() * periods - deferred / max(years, 1e-9)),
-        "terminal_nav_multiple": float(frame["nav"].iloc[-1] / frame["nav"].iloc[0]) if len(frame) else float("nan"),
+        "terminal_nav_multiple": float(frame[nav_col].iloc[-1] / frame[nav_col].iloc[0]) if len(frame) else float("nan"),
     }
+    if diagnostic:
+        out["basis"] = "RESOLVED_ONLY_DIAGNOSTIC_NOT_FULL_PORTFOLIO_PERFORMANCE"
+        out["n_unresolved_months"] = int((frame["valuation_status"] != "resolved").sum())
+        out["n_unsupported_cost_months"] = int((frame["cost_status"] != "supported").sum())
+        out["n_unsupported_tax_months"] = int((frame["tax_status"] != "supported").sum())
+    elif "valuation_status" in frame.columns:
+        out["basis"] = "FULL_PORTFOLIO_ALL_MONTHS_RESOLVED"
     out["tax_share_of_gross"] = (out["tax_drag_ann_bps"] / (out["gross_mean_ann"] * 10_000)
                                  if out["gross_mean_ann"] > 0 else float("nan"))
     return out

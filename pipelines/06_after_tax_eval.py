@@ -99,10 +99,31 @@ def main() -> None:
                         "dated engine instead of holding one statutory regime fixed. Requires "
                         "--country and forces year_end accounting (frozen decision 3A). This is "
                         "what makes India's section 112A change visible inside the sample.")
+    p.add_argument("--exit-policy", default="as_run", choices=["as_run", "carry_v1"],
+                   help="as_run reproduces Phase 1/2 accounting exactly. carry_v1 implements the "
+                        "2026-10-13 exit-policy ruling (docs/EXIT_POLICY_CARRY_V1_SPEC_2026-10-13.md); "
+                        "its output is a REVISED analysis and must be written to a new --out path. "
+                        "No documented terminal-event table exists for the promoted panels, so every "
+                        "panel leaver is reported unresolved.")
     p.add_argument("--overwrite", action="store_true",
         help="discard an earlier output written by a different run (or of unknown origin); by default such a collision is refused (alphacomb.output_guard)")
     a = p.parse_args()
     from alphacomb.output_guard import claim_run
+    if a.exit_policy != "as_run":
+        # A revised analysis must never land where Phase 1/2 artefacts or the mtime-resolved
+        # outputs/ directories live. All checks run before any data is loaded.
+        if not a.out:
+            raise SystemExit("--exit-policy carry_v1 requires an explicit --out in a new versioned "
+                             "directory; it must never share the default Phase 1/2 summary path")
+        _out = Path(a.out).resolve()
+        if _out.parent == paths.outputs_root().resolve():
+            raise SystemExit("--exit-policy carry_v1: --out may not sit directly in outputs/; use a new "
+                             "versioned directory")
+        if a.overwrite:
+            raise SystemExit("--exit-policy carry_v1 refuses --overwrite: a revised analysis may not "
+                             "replace an existing result")
+        if _out.exists():
+            raise SystemExit(f"--exit-policy carry_v1: {_out} already exists; choose a new path")
     claim_run([Path(a.out) if a.out else paths.outputs_root() / "summary_after_tax.csv"], a)
 
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
@@ -184,6 +205,7 @@ def main() -> None:
             for method_name in a.lot_methods:
                 tc = TaxConfig(regime=get_regime(regime_name), lot_method=LotMethod(method_name),
                                accounting=a.accounting, dividend_yield_annual=a.dividend_yield,
+                               exit_policy=a.exit_policy,
                                initial_nav=float(cfg["costs"]["aum_usd_2020"]),
                                **({} if dated_engine is None or regime_name == "tax_exempt" else
                                   {"dated_engine": dated_engine, "dated_country": a.country,
@@ -201,12 +223,23 @@ def main() -> None:
                 if summary["dated"]:
                     summary["wedge"] = float("nan")
                 summary["country"] = a.country or ""
+                summary["exit_policy"] = a.exit_policy
                 log.info("%s | %s | %s: after-tax Sharpe %.3f, tax drag %.0f bps, "
                          "lt_share %.3f, wedge %.5f",
                          folder.name, reg.name, method_name, summary["after_tax_sharpe"],
                          summary["tax_drag_ann_bps"], summary.get("lt_share_of_gains", float("nan")),
                          reg.rate_spread)
-                if a.save_returns:
+                if a.save_returns and a.exit_policy != "as_run":
+                    # NaN-bearing carry_v1 frames fail the C12 contract and must not enter the shared,
+                    # mtime-resolved outputs/returns/ tree. They go beside the summary, with attrs.
+                    import json
+                    rdir = Path(a.out).resolve().parent / (Path(a.out).stem + "_returns")
+                    rdir.mkdir(parents=True, exist_ok=True)
+                    stem = f"{folder.name}__{regime_name}__{method_name}"
+                    frame.to_parquet(rdir / f"{stem}.parquet", index=False)
+                    (rdir / f"{stem}.attrs.json").write_text(
+                        json.dumps(frame.attrs, default=str, indent=2), encoding="utf-8")
+                elif a.save_returns:
                     run_id = new_run_id(f"tax_{folder.name}_{regime_name}_{method_name}")
                     write_table(frame, paths.returns_path(folder.name, run_id), "returns")
 
