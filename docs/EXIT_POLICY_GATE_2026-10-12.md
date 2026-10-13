@@ -67,12 +67,12 @@ against. Neither tier follows the carry convention.
 
 | Field | Value |
 |---|---|
-| Ruling owner | **Absar Wani, PROPOSED and not yet accepted** (see `GOVERNANCE_EXIT_POLICY_OWNERSHIP_PROPOSED_2026-10-12.md`); implementing maintainer Harshit; Maham reviews if a preregistered or confirmatory result changes. Until written acceptance is recorded the owner is unresolved. |
-| Ruling | **NOT OBTAINED** |
-| Date | n/a |
-| Outcome recorded here | **UNRESOLVED** |
+| Ruling owner | **Absar Wani, accepted in writing 2026-10-13** (see `GOVERNANCE_EXIT_POLICY_OWNERSHIP_PROPOSED_2026-10-12.md`); implementing maintainer Harshit; Maham reviews if a preregistered or confirmatory result changes. |
+| Ruling | **OBTAINED 2026-10-13**: option 1 (carry), fail closed where information is missing; full text in `EXIT_POLICY_RULING_AND_001E_RESPONSE_2026-10-13.md` |
+| Date | 2026-10-13 |
+| Outcome recorded here | **RULED (interpretation of the existing contract); implementation and Maham's review pending** |
 | Effect on committed work | none; Phase 1 and Phase 2 stay as-run |
-| Effect on planned work | cost sensitivities blocked; Phase 2 limitations text must carry this item |
+| Effect on planned work | cost sensitivities remain blocked (not authorised); the carry evaluation is a separate reviewed change producing a new labelled analysis; Phase 2 limitations text must carry this item |
 
 If liquidation or marking cannot be supported by the available data and an approved convention, the outcome stays
 "unresolved" and the limitation is stated in the paper. No value is to be fabricated for positions that cannot be priced.

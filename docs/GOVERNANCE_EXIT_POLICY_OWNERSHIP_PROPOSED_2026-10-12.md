@@ -70,13 +70,13 @@ Until acceptance and required approvals are recorded, the exit-policy ownership 
 
 | Item | Recorded value |
 |---|---|
-| Decision owner accepts (Absar Wani) | **NOT RECORDED** |
+| Decision owner accepts (Absar Wani) | **ACCEPTED in writing, 2026-10-13** (`EXIT_POLICY_RULING_AND_001E_RESPONSE_2026-10-13.md`) |
 | Implementing maintainer acknowledges (Harshit Kumar) | **NOT RECORDED** |
 | Protocol authority acknowledges (Maham) | **NOT RECORDED** |
-| Ruling (document and date) | **NOT ISSUED** |
-| Interprets or amends the existing contract | n/a |
-| Required countersignatures | n/a |
+| Ruling (document and date) | **ISSUED 2026-10-13** by Absar, recorded in `EXIT_POLICY_RULING_AND_001E_RESPONSE_2026-10-13.md`; implementation and Maham's review outstanding |
+| Interprets or amends the existing contract | **Interprets** (per Absar); Maham to confirm |
+| Required countersignatures | Maham review required if a confirmatory result changes; not yet given |
 | Effective date | n/a |
 | Changes to the frozen contract | none recorded |
 
-Status of the exit-policy ownership decision: **UNRESOLVED**.
+Status of the exit-policy ownership decision: **OWNER ACCEPTED, RULING ISSUED; acknowledgments by Harshit and Maham, and Maham's review, NOT YET RECORDED.** Updated 2026-10-13.
