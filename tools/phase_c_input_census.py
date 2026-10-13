@@ -88,7 +88,7 @@ def main() -> None:
     inputs = {str(c6_path.relative_to(ROOT)): sha(c6_path)}
 
     flows, coverage, last_month = [], [], {}
-    c4_sets = {}
+    c4_sets, c1_sets, c6_sets = {}, {}, {}
     for ctry in COUNTRIES:
         p1 = ROOT / f"data/intl_c1/production/{ctry}/universe.parquet"
         p4 = ROOT / f"data/intl_c4/production/{ctry}/targets.parquet"
@@ -101,6 +101,8 @@ def main() -> None:
         tt = t[["month", "permno"]].drop_duplicates()
         cc = c6[c6["country"] == ctry][["month", "permno"]].drop_duplicates()
         c4_sets[ctry] = {m: set(g["permno"]) for m, g in tt.groupby("month")}
+        c1_sets[ctry] = {m: set(g["permno"]) for m, g in uu.groupby("month")}
+        c6_sets[ctry] = {m: set(g["permno"]) for m, g in cc.groupby("month")}
         last_month[ctry] = tt.groupby("permno")["month"].max()
         for name, pan in (("C1_in_universe", uu), ("C4_row_present", tt), ("C6_row_present", cc)):
             f = membership_flows(pan)
@@ -147,11 +149,18 @@ def main() -> None:
             for m, g in w.groupby("month"):
                 held = set(g["permno"])
                 absent = {p for p in held if m in nxt and p not in sets[nxt[m]]}
+                s1, s6 = c1_sets[ctry], c6_sets[ctry]
+                nx1 = sum(1 for p in held if p not in s1.get(m + 1, set()))
+                nx6 = sum(1 for p in held if p not in s6.get(m + 1, set()))
+                nc1 = sum(1 for p in held if p not in s1.get(m, set()))
+                nc6 = sum(1 for p in held if p not in s6.get(m, set()))
                 perm = {p for p in absent if last[p] == m} if absent else set()
                 per.append({"index": stem, "country": ctry, "aum": r.aum, "strategy": r.strategy, "month": str(m),
                             "n_held": len(held), "n_held_not_in_next_c4": len(absent),
                             "n_held_not_in_next_c4_permanent": len(perm),
-                            "n_held_not_in_c4_this_month": len(held - sets.get(m, set()))})
+                            "n_held_not_in_c4_this_month": len(held - sets.get(m, set())),
+                            "n_held_not_in_next_c1_universe": nx1, "n_held_not_in_next_c6": nx6,
+                            "n_held_not_in_c1_universe_this_month": nc1, "n_held_not_in_c6_this_month": nc6})
                 if absent and first is None:
                     first = m
             held_rows.extend(per)
