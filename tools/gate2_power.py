@@ -77,7 +77,11 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--aum", type=float, default=1e9)
     ap.add_argument("--n-boot", type=int, default=800)
     ap.add_argument("--out", type=Path, default=ROOT / "outputs" / "gate2")
+    ap.add_argument("--overwrite", action="store_true",
+        help="discard an earlier output written by a different run (or of unknown origin); by default such a collision is refused (alphacomb.output_guard)")
     a = ap.parse_args(argv)
+    from alphacomb.output_guard import claim_run
+    claim_run([a.out / f"gate2_power_{a.aum:.0e}.csv"], a)
     a.out.mkdir(parents=True, exist_ok=True)
 
     rows = []

@@ -120,7 +120,11 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--country", default="DEU", choices=["DEU", "IND", "JPN"])
     ap.add_argument("--aum", nargs="+", type=float, default=[1e8, 1e9, 1e10])
     ap.add_argument("--out", type=Path, default=ROOT / "outputs" / "capacity_dose_response")
+    ap.add_argument("--overwrite", action="store_true",
+        help="discard an earlier output written by a different run (or of unknown origin); by default such a collision is refused (alphacomb.output_guard)")
     args = ap.parse_args(argv)
+    from alphacomb.output_guard import claim_run
+    claim_run([args.out / f"dose_panel_{args.country}.csv", args.out / f"dose_summary_{args.country}.csv"], args)
 
     from alphacomb.contracts import intl
     from alphacomb.contracts.provenance import MissingProvenance

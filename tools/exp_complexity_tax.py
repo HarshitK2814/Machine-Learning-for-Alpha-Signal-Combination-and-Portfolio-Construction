@@ -129,7 +129,11 @@ def main() -> None:
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--regimes", nargs="+",
                    default=["tax_exempt", "taxable_us_top_bracket", "trader_475f_mtm"])
+    p.add_argument("--overwrite", action="store_true",
+        help="discard an earlier output written by a different run (or of unknown origin); by default such a collision is refused (alphacomb.output_guard)")
     a = p.parse_args()
+    from alphacomb.output_guard import claim_run
+    claim_run([paths.outputs_root() / "exp_complexity_tax.csv"], a)      # before any work
 
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
     cfg = load_config("base")

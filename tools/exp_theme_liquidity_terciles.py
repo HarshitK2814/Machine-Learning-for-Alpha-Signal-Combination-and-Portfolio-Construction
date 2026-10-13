@@ -237,7 +237,12 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--weighting", choices=["ew", "vw"], default="ew")
     ap.add_argument("--liquidity", choices=["adv", "adv_resid"], default="adv")
     ap.add_argument("--out", type=Path, default=ROOT / "outputs" / "theme_liquidity")
+    ap.add_argument("--overwrite", action="store_true",
+        help="discard an earlier output written by a different run (or of unknown origin); by default such a collision is refused (alphacomb.output_guard)")
     a = ap.parse_args(argv)
+    from alphacomb.output_guard import claim_run_items
+    _sfx = "" if (a.weighting, a.liquidity) == ("ew", "adv") else f"_{a.weighting}_{a.liquidity}"
+    claim_run_items([(a.out / f"theme_liquidity_{c}{_sfx}.csv", {"country": c}) for c in a.country], a)
     a.out.mkdir(parents=True, exist_ok=True)
 
     allr = []

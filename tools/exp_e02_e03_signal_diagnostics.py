@@ -90,12 +90,18 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--countries", nargs="*", default=None)
     ap.add_argument("--max-signals", type=int, default=None)
     ap.add_argument("--out", type=Path, default=ROOT / "outputs" / "e02_e03")
+    ap.add_argument("--overwrite", action="store_true",
+        help="discard an earlier output written by a different run (or of unknown origin); by default such a collision is refused (alphacomb.output_guard)")
     args = ap.parse_args(argv)
 
     countries = args.countries or intl.available_countries()
     if not countries:
         print("no country resolves under data/intl_c*")
         return 2
+    from alphacomb.output_guard import claim_run_items
+    claim_run_items([(args.out / n, {"countries": countries}) for n in ("e02_e03_summary.csv", "provenance.json")]
+                    + [(args.out / f"{stem}_{c}.csv", {"countries": None, "country": c})
+                       for c in countries for stem in ("e02_signal_quality", "e03_per_theme", "e02_coverage")], args)
 
     summaries = [run_country(c, args.max_signals, args.out) for c in countries]
     summary = pd.DataFrame(summaries)

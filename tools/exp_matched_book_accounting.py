@@ -96,7 +96,11 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--tag", default="matched")
     ap.add_argument("--n-boot", type=int, default=1000)
     ap.add_argument("--out", type=Path, default=ROOT / "outputs" / "matched_book")
+    ap.add_argument("--overwrite", action="store_true",
+        help="discard an earlier output written by a different run (or of unknown origin); by default such a collision is refused (alphacomb.output_guard)")
     a = ap.parse_args(argv)
+    from alphacomb.output_guard import claim_run
+    claim_run([a.out / f"matched_book_{a.aum:.0e}.csv"], a)      # before any work
     a.out.mkdir(parents=True, exist_ok=True)
 
     cfg0 = load_config("base")

@@ -123,7 +123,12 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--block", type=int, default=6)
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--out", type=Path, default=ROOT / "outputs" / "after_tax_inference")
+    ap.add_argument("--overwrite", action="store_true",
+        help="discard an earlier output written by a different run (or of unknown origin); by default such a collision is refused (alphacomb.output_guard)")
     a = ap.parse_args(argv)
+    from alphacomb.output_guard import claim_run
+    _tag = f"{a.aum:.0e}".replace("e+0", "e").replace("e+", "e")
+    claim_run([a.out / f"after_tax_inference_{_tag}.csv"], a)
     a.out.mkdir(parents=True, exist_ok=True)
 
     rows = []

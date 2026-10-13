@@ -72,7 +72,11 @@ def describe(kind: str, strategy: str) -> dict:
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--out", type=Path, default=ROOT / "outputs" / "e29" / "e29_artefact_chain.csv")
+    ap.add_argument("--overwrite", action="store_true",
+        help="discard an earlier output written by a different run (or of unknown origin); by default such a collision is refused (alphacomb.output_guard)")
     args = ap.parse_args(argv)
+    from alphacomb.output_guard import claim_run
+    claim_run([args.out], args)
 
     rows = []
     for code in CELLS:

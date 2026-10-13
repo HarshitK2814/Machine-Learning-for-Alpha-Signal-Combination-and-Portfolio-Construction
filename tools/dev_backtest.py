@@ -141,7 +141,11 @@ def main() -> None:
     p.add_argument("--country", default=None, choices=["DEU", "IND", "JPN"],
                    help="price against the promoted international panel for one country")
     p.add_argument("--cost-multiplier", type=float, default=1.0)
+    p.add_argument("--overwrite", action="store_true",
+        help="discard an earlier output written by a different run (or of unknown origin); by default such a collision is refused (alphacomb.output_guard)")
     a = p.parse_args()
+    from alphacomb.output_guard import claim_run
+    claim_run([paths.outputs_root() / "summary_dev_backtest.csv"], a)      # before any work
 
     cfg = load_config("base")
     if a.country:

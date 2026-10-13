@@ -101,7 +101,11 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--aum", nargs="*", type=float, default=[1e9, 1e10])
     ap.add_argument("--dates", nargs="*", default=["2009-06-30", "2014-06-30", "2019-06-30"])
     ap.add_argument("--out", type=Path, default=ROOT / "outputs" / "book_characteristics")
+    ap.add_argument("--overwrite", action="store_true",
+        help="discard an earlier output written by a different run (or of unknown origin); by default such a collision is refused (alphacomb.output_guard)")
     args = ap.parse_args(argv)
+    from alphacomb.output_guard import claim_run
+    claim_run([args.out / f"capacity_{args.country}.csv", args.out / f"realised_books_{args.country}.csv"], args)
 
     bundle = intl.load_country_bundle(args.country)
     cfg = OptimizerConfig.from_files()

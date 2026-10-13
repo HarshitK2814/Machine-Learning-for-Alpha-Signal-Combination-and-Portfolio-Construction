@@ -82,3 +82,32 @@ def claim_run(paths, args, *, exclude: tuple[str, ...] = ("overwrite",)) -> str:
     for p in paths:
         fp = claim_output(p, params, overwrite=ow)
     return fp
+
+
+def claim_run_items(items, args, *, exclude: tuple[str, ...] = ("overwrite",)) -> list[str]:
+    """Claim several outputs, each with its own parameter fingerprint.
+
+    ``items`` is an iterable of ``(path, overrides)``. A path's parameters are the parsed arguments minus ``exclude`` minus
+    the keys in ``overrides``, plus ``overrides`` itself. Use it when one invocation writes several per-item files (for
+    example one file per country): a later run that covers a different country list does not collide with an earlier run
+    over the files they share, but the same file written under different settings does. All claims are validated before
+    any is recorded, so a refusal part-way through leaves no new record behind. ``--overwrite`` on the namespace is honoured.
+    """
+    base = {k: (str(v) if isinstance(v, Path) else v) for k, v in vars(args).items() if k not in exclude}
+    ow = bool(getattr(args, "overwrite", False))
+    prepared = []
+    for path, overrides in items:
+        overrides = dict(overrides or {})
+        params = {k: v for k, v in base.items() if k not in overrides}
+        params.update({k: (str(v) if isinstance(v, Path) else v) for k, v in overrides.items()})
+        prepared.append((Path(path), params))
+    if not ow:
+        for p, params in prepared:                       # validate everything first
+            side = sidecar_path(p)
+            if side.exists():
+                if json.loads(side.read_text(encoding="utf-8")).get("fingerprint") != fingerprint(params):
+                    raise OutputCollision(f"{p} was written by a different run. Use a distinct --out or pass --overwrite.")
+            elif p.exists():
+                raise OutputCollision(f"{p} already exists and has no run record, so its origin is unknown. "
+                                      "Use a distinct --out or pass --overwrite to discard it.")
+    return [claim_output(p, params, overwrite=ow) for p, params in prepared]

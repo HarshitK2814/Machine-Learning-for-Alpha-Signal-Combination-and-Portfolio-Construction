@@ -93,7 +93,11 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--suffix", default="", help="cell-name suffix, e.g. _g013")
     ap.add_argument("--periods", type=int, default=12)
     ap.add_argument("--out", type=Path, default=ROOT / "outputs" / "factorial_prediction_arm")
+    ap.add_argument("--overwrite", action="store_true",
+        help="discard an earlier output written by a different run (or of unknown origin); by default such a collision is refused (alphacomb.output_guard)")
     args = ap.parse_args(argv)
+    from alphacomb.output_guard import claim_run
+    claim_run([args.out / f"factorial_P_{args.country}{args.suffix}.csv"], args)
 
     from alphacomb.validation.inference import newey_west_se
 

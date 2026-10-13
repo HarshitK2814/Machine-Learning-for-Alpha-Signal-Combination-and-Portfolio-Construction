@@ -211,7 +211,13 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--n-boot", type=int, default=2000)
     ap.add_argument("--block", type=int, default=6, help="expected bootstrap block, months")
     ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--overwrite", action="store_true",
+        help="discard an earlier output written by a different run (or of unknown origin); by default such a collision is refused (alphacomb.output_guard)")
     a = ap.parse_args(argv)
+    from alphacomb.output_guard import claim_run_items
+    _sfx = "" if a.tag == "infer" else f"_{a.tag}"
+    claim_run_items([(a.out / f"capacity_channel_inference_{c}{_sfx}.csv", {"country": c}) for c in a.country]
+                    + [(a.out / f"crossover_intervals{_sfx}.csv", None)], a)
 
     summary = []
     for c in a.country:

@@ -150,7 +150,12 @@ def main(argv: list[str] | None = None) -> int:
                     help="attribute only series stamped with this data_source (e.g. real_DEU). "
                          "Without it, every strategy's newest series is taken whatever its "
                          "provenance, which is only safe when the whole tree was built in one go.")
+    ap.add_argument("--overwrite", action="store_true",
+        help="discard an earlier output written by a different run (or of unknown origin); by default such a collision is refused (alphacomb.output_guard)")
     args = ap.parse_args(argv)
+    from alphacomb.output_guard import claim_output
+    claim_output(args.out, {k: (str(v) if isinstance(v, Path) else v) for k, v in vars(args).items() if k != "overwrite"},
+                 is_dir=True, overwrite=args.overwrite)
 
     cfg = load_config()
     files = latest_per_strategy(paths.outputs_root() / "returns")
