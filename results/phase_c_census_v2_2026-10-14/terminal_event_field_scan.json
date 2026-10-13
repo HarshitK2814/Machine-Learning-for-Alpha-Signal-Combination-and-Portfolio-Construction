@@ -1,0 +1,46 @@
+{
+  "terminal_event_fields_found": [],
+  "fields_scanned": {
+    "C1": [
+      "date",
+      "permno",
+      "in_universe",
+      "me",
+      "price",
+      "exchcd",
+      "ff49",
+      "nyse_size_pct"
+    ],
+    "C4": [
+      "date",
+      "permno",
+      "r_1m",
+      "r_3m",
+      "r_6m",
+      "r_12m",
+      "ret_next",
+      "div_next"
+    ],
+    "C6": [
+      "country",
+      "date",
+      "permno",
+      "spread",
+      "sigma_d",
+      "adv_usd",
+      "borrow_fee",
+      "spread_source",
+      "borrow_fee_source",
+      "edge_21_strict",
+      "ar_21_strict",
+      "return_obs_21",
+      "volume_obs_21",
+      "ohlc_complete_21",
+      "pair_obs_20",
+      "usd_per_local",
+      "curcdd",
+      "endpoint_date"
+    ]
+  },
+  "full_resolution_eligibility": "Under the frozen carry_v1 rule a panel exit is resolved only with exit evidence from schema/contract metadata. No such field exists in C1/C4/C6, so no exit is resolvable: eligibility for full resolution holds only for cells with zero held panel exits (see projected_tier_counts.csv)."
+}

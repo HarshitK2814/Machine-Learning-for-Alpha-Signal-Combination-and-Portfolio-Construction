@@ -1,0 +1,7 @@
+country,book,tier,n_strategies
+DEU,capped,>25%,88
+DEU,uncapped,>25%,88
+IND,capped,>25%,80
+IND,uncapped,>25%,80
+JPN,capped,>25%,112
+JPN,uncapped,>25%,112

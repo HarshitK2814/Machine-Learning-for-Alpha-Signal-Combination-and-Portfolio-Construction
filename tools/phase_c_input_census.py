@@ -6,7 +6,8 @@ Reads IDENTIFIERS AND MEMBERSHIP ONLY. Columns accessed (nothing else is ever lo
   C4 targets    : date, permno                      (row presence only; ret_next/div_next are NOT read)
   C6 cost inputs: country, date, permno             (row presence only; no cost value is read)
   weights files : date, permno, w                   (w only as the held / not-held test ``w != 0``)
-  weights_index : country, aum, strategy, weights   (paths)
+Weights are the frozen Phase 2 (capacity return-difference, Tier B) decile weights:
+  outputs/decile_weights/<country>/tierb/aum_*/{capped,uncapped}_<cell>.parquet
 No return, price, dividend, cost, tax, NAV or performance value is read. A missing row is NOT treated as a
 delisting: "panel exit" below means only "present at month t, absent at month t+1".
 
@@ -28,14 +29,14 @@ import pyarrow.parquet as pq
 ROOT = Path(__file__).resolve().parents[1]
 WINDOW = (pd.Timestamp("2009-01-01"), pd.Timestamp("2019-12-31"))      # AMENDMENT_001A section 2
 COUNTRIES = ["DEU", "IND", "JPN"]
-# weights_index files that correspond one-to-one (by file name) to outputs/summary_after_tax_<country>_<aum>.csv
-INDEX_FILES = ["DEU_1e8", "DEU_1e9", "DEU_1e10", "IND_1e9", "JPN_1e8", "JPN_1e9", "JPN_1e10"]
+FORBIDDEN_COLUMNS = {"r_1m", "r_3m", "r_6m", "r_12m", "ret_next", "div_next", "price", "me", "spread", "sigma_d",
+                     "adv_usd", "borrow_fee", "usd_per_local", "edge_21_strict", "ar_21_strict", "return_obs_21",
+                     "volume_obs_21", "endpoint_date", "nav", "net_ret", "gross_ret"}
 ACCESSED = {
     "C1 universe": ["date", "permno", "in_universe"],
     "C4 targets": ["date", "permno"],
     "C6 cost inputs": ["country", "date", "permno"],
     "weights": ["date", "permno", "w"],
-    "weights_index": ["country", "aum", "strategy", "weights"],
 }
 
 
@@ -73,13 +74,10 @@ def membership_flows(panel: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
-def main() -> None:
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--out", required=True)
-    a = ap.parse_args()
-    out = (ROOT / a.out) if not Path(a.out).is_absolute() else Path(a.out)
+def run_census(ROOT: Path, out: Path, command: str = "") -> None:
     if out.exists():
         sys.exit(f"refusing to overwrite existing {out}")
+    assert not (set().union(*ACCESSED.values()) & FORBIDDEN_COLUMNS), "whitelist overlaps forbidden outcome columns"
     out.mkdir(parents=True)
 
     c6_path = ROOT / "data/intl_c6/production/C6_COST_INPUTS_WORKING_CANDIDATE.csv.gz"
@@ -126,64 +124,62 @@ def main() -> None:
 
     # held names affected by panel exits (identifiers/membership only)
     held_rows, first_rows = [], []
-    for stem in INDEX_FILES:
-        ip = ROOT / f"outputs/weights_index/{stem}.csv"
-        inputs[str(ip.relative_to(ROOT))] = sha(ip)
-        idx = pd.read_csv(ip, usecols=ACCESSED["weights_index"])
-        for r in idx.itertuples(index=False):
-            wp = Path(r.weights)
-            wp = wp if wp.is_absolute() else ROOT / wp
-            if not wp.exists():
-                held_rows.append({"index": stem, "strategy": r.strategy, "note": "weights file missing"})
-                continue
-            inputs[str(wp.relative_to(ROOT)) if wp.is_relative_to(ROOT) else str(wp)] = sha(wp)
-            w = pq.read_table(wp, columns=ACCESSED["weights"]).to_pandas()
-            w = w[w["w"].to_numpy() != 0.0][["date", "permno"]]
-            w["month"] = month_key(w["date"])
-            w = w[(w["month"] >= lo) & (w["month"] <= hi)]
-            ctry = r.country
-            sets, last = c4_sets[ctry], last_month[ctry]
-            months = sorted(sets)
-            nxt = {m: months[i + 1] for i, m in enumerate(months[:-1])}
-            per, first = [], None
-            for m, g in w.groupby("month"):
-                held = set(g["permno"])
-                absent = {p for p in held if m in nxt and p not in sets[nxt[m]]}
-                s1, s6 = c1_sets[ctry], c6_sets[ctry]
-                nx1 = sum(1 for p in held if p not in s1.get(m + 1, set()))
-                nx6 = sum(1 for p in held if p not in s6.get(m + 1, set()))
-                nc1 = sum(1 for p in held if p not in s1.get(m, set()))
-                nc6 = sum(1 for p in held if p not in s6.get(m, set()))
-                perm = {p for p in absent if last[p] == m} if absent else set()
-                per.append({"index": stem, "country": ctry, "aum": r.aum, "strategy": r.strategy, "month": str(m),
-                            "n_held": len(held), "n_held_not_in_next_c4": len(absent),
-                            "n_held_not_in_next_c4_permanent": len(perm),
-                            "n_held_not_in_c4_this_month": len(held - sets.get(m, set())),
-                            "n_held_not_in_next_c1_universe": nx1, "n_held_not_in_next_c6": nx6,
-                            "n_held_not_in_c1_universe_this_month": nc1, "n_held_not_in_c6_this_month": nc6})
-                if absent and first is None:
-                    first = m
-            held_rows.extend(per)
-            nm = w["month"].nunique()
-            if first is not None:
-                months_win = sorted(w["month"].unique())
-                n_after = sum(1 for m in months_win if m >= first)
-            else:
-                n_after = 0
-            first_rows.append({"index": stem, "country": ctry, "aum": r.aum, "strategy": r.strategy,
-                               "months_with_weights": nm, "first_month_with_held_panel_exit": str(first) if first else "",
-                               "months_from_first_exit_to_end": n_after,
-                               "projected_unresolved_share_if_first_held_exit_is_unresolved":
-                                   round(n_after / nm, 4) if nm else np.nan})
+    for ctry in COUNTRIES:
+        sets, last = c4_sets[ctry], last_month[ctry]
+        s1, s6 = c1_sets[ctry], c6_sets[ctry]
+        months = sorted(sets)
+        nxt = {m: months[i + 1] for i, m in enumerate(months[:-1])}
+        for adir in sorted((ROOT / "outputs/decile_weights" / ctry / "tierb").glob("aum_*")):
+            aum = float(adir.name.split("_", 1)[1])
+            for wp in sorted(adir.glob("*.parquet")):
+                book, cell = wp.stem.split("_", 1)
+                inputs[str(wp.relative_to(ROOT))] = sha(wp)
+                w = pq.read_table(wp, columns=ACCESSED["weights"]).to_pandas()
+                w = w[w["w"].to_numpy() != 0.0][["date", "permno"]]
+                w["month"] = month_key(w["date"])
+                w = w[(w["month"] >= lo) & (w["month"] <= hi)]
+                first, first6, months_win = None, None, sorted(w["month"].unique())
+                for m, g in w.groupby("month"):
+                    held = set(g["permno"])
+                    absent = {p for p in held if m in nxt and p not in sets[nxt[m]]}
+                    perm = {p for p in absent if last[p] == m}
+                    absent6 = [p for p in held if p not in s6.get(m + 1, set())] if (m + 1) in s6 else []
+                    held_rows.append({
+                        "country": ctry, "aum": aum, "book": book, "cell": cell, "month": str(m),
+                        "n_held": len(held), "n_held_not_in_next_c4": len(absent),
+                        "n_held_not_in_next_c4_permanent": len(perm),
+                        "n_held_without_terminal_event_evidence": len(absent),
+                        "n_held_not_in_c4_this_month": len(held - sets.get(m, set())),
+                        "n_held_not_in_next_c1_universe": sum(1 for p in held if p not in s1.get(m + 1, set())),
+                        "n_held_not_in_next_c6": sum(1 for p in held if p not in s6.get(m + 1, set())),
+                        "n_held_not_in_c1_universe_this_month": sum(1 for p in held if p not in s1.get(m, set())),
+                        "n_held_not_in_c6_this_month": sum(1 for p in held if p not in s6.get(m, set()))})
+                    if absent and first is None:
+                        first = m
+                    if absent6 and first6 is None:
+                        first6 = m
+                nm = len(months_win)
+                # engine rule (src/alphacomb/portfolio/cost_terms.py::priced_at): a held name with no C6 row at the
+                # date has left the panel. Unresolved from the first such date, i.e. the month after the lapse.
+                n_after = sum(1 for m in months_win if first6 is not None and m >= first6 + 1)
+                first_rows.append({
+                    "country": ctry, "aum": aum, "book": book, "cell": cell, "months_with_weights": nm,
+                    "first_month_with_held_c4_panel_exit": str(first) if first else "",
+                    "first_month_held_c6_lapse": str(first6) if first6 else "",
+                    "first_unresolved_month_if_no_evidence": str(first6 + 1) if first6 else "",
+                    "months_unresolved_if_no_evidence": n_after,
+                    "projected_unresolved_share_if_first_held_exit_is_unresolved": round(n_after / nm, 4) if nm else np.nan})
     held = pd.DataFrame(held_rows)
     firsts = pd.DataFrame(first_rows)
     held.to_csv(out / "held_names_affected_by_panel_exits.csv", index=False)
+    # first month in which ANY indicator (C4 / C1 universe / C6 next-month) shows a held-name membership lapse
+    pass
     firsts.to_csv(out / "projected_unresolved_share_by_strategy.csv", index=False)
 
     def tier(x):
         return "0%" if x == 0 else "(0,5%]" if x <= 0.05 else "(5%,25%]" if x <= 0.25 else ">25%"
     col = "projected_unresolved_share_if_first_held_exit_is_unresolved"
-    tiers = firsts.assign(tier=firsts[col].map(tier)).groupby(["country", "aum", "tier"]).size().rename("n_strategies").reset_index()
+    tiers = firsts.assign(tier=firsts[col].map(tier)).groupby(["country", "book", "tier"]).size().rename("n_strategies").reset_index()
     tiers.to_csv(out / "projected_tier_counts.csv", index=False)
 
     scan = {"terminal_event_fields_found": [], "fields_scanned": {
@@ -193,10 +189,15 @@ def main() -> None:
     names = [n.lower() for v in scan["fields_scanned"].values() for n in v]
     scan["terminal_event_fields_found"] = [n for n in names if any(k in n for k in ("delist", "terminal", "dlst", "event", "exit"))]
     # 'endpoint_date' in C6 is a price-endpoint field, not a terminal-event field; it is listed here, never read.
+    scan["full_resolution_eligibility"] = (
+        "Under the frozen carry_v1 rule a panel exit is resolved only with exit evidence from schema/contract metadata. "
+        "No such field exists in C1/C4/C6, so no exit is resolvable: eligibility for full resolution holds only for "
+        "cells with zero held panel exits (see projected_tier_counts.csv).")
     (out / "terminal_event_field_scan.json").write_text(json.dumps(scan, indent=2))
 
     manifest = {
         "label": "OUTCOME-FREE INPUT CENSUS - not a result; revised analysis, not confirmatory",
+        "command": command,
         "spec": "docs/PHASE_C_REVISED_ANALYSIS_SPEC_2026-10-14.md + PHASE_C_SPEC_ADDENDUM_1_2026-10-14.md",
         "git_head": subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True).stdout.strip(),
         "git_dirty": bool(subprocess.run(["git", "status", "--porcelain", "--", "tools/phase_c_input_census.py"],
@@ -206,13 +207,22 @@ def main() -> None:
         "values_not_read": "returns, prices, dividends, cost values, tax results, NAV, Sharpe, any performance summary",
         "definition_panel_exit": "present at month t and absent at month t+1 in the named panel; NOT inferred to be a delisting",
         "definition_held": "weights-file row with w != 0 (identifier membership test only)",
-        "projection_note": "projected_unresolved_share assumes only the carry_v1 rule that a held name absent from C4 with no exit evidence "
-                           "makes that month and all later months unresolved; it is derived from membership alone and is not a result",
+        "projection_note": "projected_unresolved_share applies the carry_v1 rule: a held name with no C6 row at a date (the engine's priced_at test) "
+                           "and no exit evidence is unresolved from that date on, and NAV is NaN from the first unresolved month. Derived from "
+                           "membership alone; it counts only names with a non-zero weight in a scored month, so it is an approximation, and is not a result",
         "pandas": pd.__version__, "numpy": np.__version__,
         "input_sha256": inputs,
     }
     (out / "MANIFEST.json").write_text(json.dumps(manifest, indent=2))
     print("done", out)
+
+
+def main() -> None:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--out", required=True)
+    a = ap.parse_args()
+    out = Path(a.out) if Path(a.out).is_absolute() else ROOT / a.out
+    run_census(ROOT, out, command="python tools/phase_c_input_census.py " + " ".join(sys.argv[1:]))
 
 
 if __name__ == "__main__":
