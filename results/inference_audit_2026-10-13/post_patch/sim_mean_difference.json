@@ -1,0 +1,56 @@
+{
+  "T=132,phi=0": {
+    "reps": 400,
+    "size_at_5pct": {
+      "rate": 0.055,
+      "mc_se": 0.011399013115177999,
+      "n": 400
+    },
+    "coverage_95_percentile_CI(code)": {
+      "rate": 0.9275,
+      "mc_se": 0.012965699942540704,
+      "n": 400
+    },
+    "coverage_95_studentised_CI(proposed)": {
+      "rate": 0.93,
+      "mc_se": 0.01275735082217307,
+      "n": 400
+    }
+  },
+  "T=132,phi=.3": {
+    "reps": 400,
+    "size_at_5pct": {
+      "rate": 0.0625,
+      "mc_se": 0.012103072956898178,
+      "n": 400
+    },
+    "coverage_95_percentile_CI(code)": {
+      "rate": 0.915,
+      "mc_se": 0.013944084767384337,
+      "n": 400
+    },
+    "coverage_95_studentised_CI(proposed)": {
+      "rate": 0.925,
+      "mc_se": 0.01316956719106592,
+      "n": 400
+    }
+  },
+  "T=60,phi=.3": {
+    "reps": 400,
+    "size_at_5pct": {
+      "rate": 0.09,
+      "mc_se": 0.014309088021254185,
+      "n": 400
+    },
+    "coverage_95_percentile_CI(code)": {
+      "rate": 0.8425,
+      "mc_se": 0.018213576666871335,
+      "n": 400
+    },
+    "coverage_95_studentised_CI(proposed)": {
+      "rate": 0.8725,
+      "mc_se": 0.016676611616272652,
+      "n": 400
+    }
+  }
+}

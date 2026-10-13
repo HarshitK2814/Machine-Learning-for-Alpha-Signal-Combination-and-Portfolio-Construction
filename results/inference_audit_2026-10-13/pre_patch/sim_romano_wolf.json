@@ -1,0 +1,9 @@
+{
+  "reps": 300,
+  "familywise_rejection_rate (all nulls true, K=8)": {
+    "rate": 0.06,
+    "mc_se": 0.013711309200802086,
+    "n": 300
+  },
+  "share_of_non_rejected_hypotheses_with_reported_p_adjusted_exactly_1.0": 0.8741554054054054
+}

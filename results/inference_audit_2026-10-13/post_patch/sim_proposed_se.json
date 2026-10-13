@@ -1,0 +1,34 @@
+{
+  "phi=-0.2": {
+    "ratio_proposed_se_over_empirical_sd": 1.0226373911029207,
+    "sharpe_test_size_at_5pct_with_proposed_se": {
+      "rate": 0.0525,
+      "mc_se": 0.004987171041783107,
+      "n": 2000
+    }
+  },
+  "phi=0.0": {
+    "ratio_proposed_se_over_empirical_sd": 0.9778363812506611,
+    "sharpe_test_size_at_5pct_with_proposed_se": {
+      "rate": 0.061,
+      "mc_se": 0.005351588549206675,
+      "n": 2000
+    }
+  },
+  "phi=0.2": {
+    "ratio_proposed_se_over_empirical_sd": 0.928895591857276,
+    "sharpe_test_size_at_5pct_with_proposed_se": {
+      "rate": 0.0785,
+      "mc_se": 0.006014056451347958,
+      "n": 2000
+    }
+  },
+  "phi=0.4": {
+    "ratio_proposed_se_over_empirical_sd": 0.854153556297889,
+    "sharpe_test_size_at_5pct_with_proposed_se": {
+      "rate": 0.1025,
+      "mc_se": 0.006782099601155972,
+      "n": 2000
+    }
+  }
+}

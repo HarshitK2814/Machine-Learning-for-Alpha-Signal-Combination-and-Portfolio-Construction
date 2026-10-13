@@ -1,0 +1,50 @@
+{
+  "phi=-0.2": {
+    "empirical_sd_of_annualised_naive_SR": 0.24490796190167016,
+    "mean_sharpe_se_code": 0.39019314333455174,
+    "ratio_code_se_over_empirical_sd": 1.593223594303615,
+    "ratio_iid_formula_over_empirical_sd": 1.2242377205135122,
+    "sharpe_test_size_at_5pct (true SR=0)": {
+      "rate": 0.0065,
+      "mc_se": 0.0017969070649312946,
+      "n": 2000
+    },
+    "newey_west_se_over_empirical_sd_of_mean": 1.0340834958988077
+  },
+  "phi=0.0": {
+    "empirical_sd_of_annualised_naive_SR": 0.29962895807696494,
+    "mean_sharpe_se_code": 0.3251270364910514,
+    "ratio_code_se_over_empirical_sd": 1.0850988455112434,
+    "ratio_iid_formula_over_empirical_sd": 0.9996807030397826,
+    "sharpe_test_size_at_5pct (true SR=0)": {
+      "rate": 0.0435,
+      "mc_se": 0.004561126505590478,
+      "n": 2000
+    },
+    "newey_west_se_over_empirical_sd_of_mean": 0.98727101774297
+  },
+  "phi=0.2": {
+    "empirical_sd_of_annualised_naive_SR": 0.3677263886793331,
+    "mean_sharpe_se_code": 0.2723193926516036,
+    "ratio_code_se_over_empirical_sd": 0.7405489544267467,
+    "ratio_iid_formula_over_empirical_sd": 0.8142789660314319,
+    "sharpe_test_size_at_5pct (true SR=0)": {
+      "rate": 0.161,
+      "mc_se": 0.008218241904446474,
+      "n": 2000
+    },
+    "newey_west_se_over_empirical_sd_of_mean": 0.9438196470330618
+  },
+  "phi=0.4": {
+    "empirical_sd_of_annualised_naive_SR": 0.46965704555021903,
+    "mean_sharpe_se_code": 0.22222142576099285,
+    "ratio_code_se_over_empirical_sd": 0.4731568021100439,
+    "ratio_iid_formula_over_empirical_sd": 0.6385093537329107,
+    "sharpe_test_size_at_5pct (true SR=0)": {
+      "rate": 0.347,
+      "mc_se": 0.01064403588870312,
+      "n": 2000
+    },
+    "newey_west_se_over_empirical_sd_of_mean": 0.8753667622825477
+  }
+}

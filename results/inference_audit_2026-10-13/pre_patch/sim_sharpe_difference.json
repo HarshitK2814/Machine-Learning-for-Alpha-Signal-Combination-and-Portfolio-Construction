@@ -1,0 +1,82 @@
+{
+  "T=132,phi=0,corr=.9,equal vol": {
+    "reps": 400,
+    "n_boot": 399,
+    "size_at_5pct": {
+      "rate": 0.0575,
+      "mc_se": 0.011639775556255371,
+      "n": 400
+    },
+    "coverage_95_percentile_CI(code)": {
+      "rate": 0.935,
+      "mc_se": 0.012326293035621046,
+      "n": 400
+    },
+    "coverage_95_studentised_CI(proposed)": {
+      "rate": 0.9325,
+      "mc_se": 0.0125442965127583,
+      "n": 400
+    },
+    "seconds": 52.1
+  },
+  "T=132,phi=.3,corr=.9,equal vol": {
+    "reps": 400,
+    "n_boot": 399,
+    "size_at_5pct": {
+      "rate": 0.0625,
+      "mc_se": 0.012103072956898178,
+      "n": 400
+    },
+    "coverage_95_percentile_CI(code)": {
+      "rate": 0.91,
+      "mc_se": 0.014309088021254182,
+      "n": 400
+    },
+    "coverage_95_studentised_CI(proposed)": {
+      "rate": 0.9275,
+      "mc_se": 0.012965699942540704,
+      "n": 400
+    },
+    "seconds": 52.4
+  },
+  "T=132,phi=.3,corr=.9,vol_b=.5 (equal Sharpe)": {
+    "reps": 400,
+    "n_boot": 399,
+    "size_at_5pct": {
+      "rate": 0.0625,
+      "mc_se": 0.012103072956898178,
+      "n": 400
+    },
+    "coverage_95_percentile_CI(code)": {
+      "rate": 0.91,
+      "mc_se": 0.014309088021254182,
+      "n": 400
+    },
+    "coverage_95_studentised_CI(proposed)": {
+      "rate": 0.9275,
+      "mc_se": 0.012965699942540704,
+      "n": 400
+    },
+    "seconds": 50.7
+  },
+  "T=60,phi=.3,corr=.9,equal vol": {
+    "reps": 400,
+    "n_boot": 399,
+    "size_at_5pct": {
+      "rate": 0.0875,
+      "mc_se": 0.014128318194321643,
+      "n": 400
+    },
+    "coverage_95_percentile_CI(code)": {
+      "rate": 0.8725,
+      "mc_se": 0.016676611616272652,
+      "n": 400
+    },
+    "coverage_95_studentised_CI(proposed)": {
+      "rate": 0.885,
+      "mc_se": 0.01595109714094927,
+      "n": 400
+    },
+    "seconds": 34.9
+  }
+}

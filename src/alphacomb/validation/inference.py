@@ -76,12 +76,23 @@ def newey_west_se(x: np.ndarray, lags: int | None = None) -> float:
 
 def sharpe_se(returns: np.ndarray, periods: int = 12, autocorr: bool = True,
               higher_moments: bool = True) -> float:
-    """Standard error of an annualised Sharpe ratio.
+    """Standard error of the annualised Sharpe ratio ``sqrt(P) * mean / sd`` (the estimator ``sharpe_test`` uses).
 
     The textbook ``sqrt((1 + S^2/2)/T)`` assumes iid normal returns. Strategy returns are neither.
-    Lo (2002) corrects for autocorrelation; Mertens (2002) and Christie (2005) correct for skewness
-    and excess kurtosis. Ignoring both typically **understates** the standard error, which is the
-    direction that manufactures significance.
+    Mertens (2002) and Christie (2005) correct for skewness and excess kurtosis; serial dependence is
+    handled by a HAC variance. Ignoring either typically **understates** the standard error when
+    returns are positively autocorrelated, which is the direction that manufactures significance.
+
+    ``autocorr=True`` (default) returns the Newey-West standard error of the mean of the Sharpe
+    influence function ``sqrt(P) [z - (S/2)(z^2 - 1)]``, ``z = (r - mean)/sd``, ``S`` the per-period
+    Sharpe ratio. That is the delta-method standard error of the naive annualised estimator, it carries
+    the Mertens skewness/kurtosis terms through ``z^2``, and it is the same estimator
+    ``sharpe_difference_test`` uses for a difference. ``autocorr=False`` keeps the iid
+    (Mertens/Christie) formula.
+
+    History: before 2026-10-13 the autocorrelation branch multiplied the iid SE by Lo's ``eta(q)/sqrt(q)``.
+    ``eta(q)`` deflates the point estimate of an annualised Sharpe ratio, which ``sharpe_test`` does not do,
+    so the SE *shrank* under positive autocorrelation (audit D1, docs/INFERENCE_AUDIT_2026-10-13.md).
     """
     r = np.asarray(returns, dtype=float)
     r = r[np.isfinite(r)]
@@ -93,21 +104,17 @@ def sharpe_se(returns: np.ndarray, periods: int = 12, autocorr: bool = True,
         return float("nan")
     sr = r.mean() / sd                                    # per-period Sharpe
 
+    if autocorr:
+        z = (r - r.mean()) / sd
+        psi = np.sqrt(periods) * (z - 0.5 * sr * (z ** 2 - 1.0))
+        return float(newey_west_se(psi))
+
     var = 1.0 + 0.5 * sr ** 2
     if higher_moments:
         skew = float(stats.skew(r, bias=False))
         kurt = float(stats.kurtosis(r, fisher=True, bias=False))
         var = 1.0 - skew * sr + 0.25 * (kurt + 2.0) * sr ** 2
     se = np.sqrt(max(var, 1e-12) / T)
-
-    if autocorr:
-        # Lo (2002): scale by the ratio of the true multi-period factor to sqrt(q)
-        q = min(periods, T // 4)
-        if q >= 2:
-            rho = np.array([_autocorr(r, k) for k in range(1, q)])
-            denom = q + 2.0 * float(np.sum((q - np.arange(1, q)) * rho))
-            if denom > 0:
-                se *= np.sqrt(q) / np.sqrt(denom) * np.sqrt(q) / np.sqrt(q)
     return float(se * np.sqrt(periods))
 
 
@@ -274,6 +281,11 @@ def romano_wolf(returns: pd.DataFrame, n_boot: int = 2000, alpha: float = 0.05,
         bse = np.where(bse > 0, bse, np.inf)
         boot_max[b] = bmean / bse
 
+    # Romano-Wolf (2005) step-down: hypothesis k (largest remaining statistic) is compared with the
+    # bootstrap maximum over the hypotheses still remaining, and the adjusted p-values are made
+    # monotone. Every hypothesis receives its own step-down value; a reject decision is simply
+    # ``p_adjusted < alpha``. (Until 2026-10-13 the loop stopped at the first non-rejection and left
+    # every later hypothesis at 1.0: audit D2. Decisions were unaffected, the reported p's were.)
     order = np.argsort(-t_obs)
     p_adj = np.ones(K)
     remaining = list(order)
@@ -286,10 +298,6 @@ def romano_wolf(returns: pd.DataFrame, n_boot: int = 2000, alpha: float = 0.05,
         p = max(p, prev_p)                                # enforce monotonicity
         p_adj[k] = p
         prev_p = p
-        if p > alpha:
-            for j in remaining[1:]:
-                p_adj[j] = max(p, p_adj[j])
-            break
         remaining = remaining[1:]
 
     return pd.DataFrame({"strategy": names, "mean": means, "t_stat": t_obs,
@@ -326,6 +334,19 @@ def benjamini_hochberg(p_values, alpha: float = 0.05) -> pd.DataFrame:
     return out.reindex(p.index)
 
 
+def _spa_recentre(dbar: np.ndarray, ses: np.ndarray, T: int) -> np.ndarray:
+    """Hansen (2005) consistent recentring ``mu_c = dbar * 1{sqrt(n) dbar / omega <= -A_n}`` as a subtraction.
+
+    A candidate is "clearly inferior" when its standardised statistic ``sqrt(n) dbar / omega`` is at or
+    below ``-A_n``, ``A_n = sqrt(2 log log n)``. ``ses`` is the standard error **of the mean**
+    (``omega / sqrt(n)``), so the condition is ``dbar <= -A_n * ses``. Clearly inferior candidates keep
+    their negative mean in the bootstrap null (returned ``g = 0``); all others are centred at zero
+    (``g = dbar``). Until 2026-10-13 the threshold carried an extra ``1/sqrt(T)`` (audit D5).
+    """
+    threshold = -np.sqrt(2.0 * np.log(np.log(max(T, 3)))) * ses
+    return np.where(dbar > threshold, dbar, 0.0)
+
+
 def hansen_spa(benchmark, candidates: pd.DataFrame, n_boot: int = 2000, block: int = 6,
                seed: int = 0) -> TestResult:
     """Hansen's Superior Predictive Ability test.
@@ -351,8 +372,7 @@ def hansen_spa(benchmark, candidates: pd.DataFrame, n_boot: int = 2000, block: i
     t_obs = float(np.max(np.sqrt(T) * dbar / ses))
 
     # Hansen's recentring: only candidates that are not clearly inferior contribute to the null
-    threshold = -np.sqrt(2.0 * np.log(np.log(max(T, 3)))) * ses / np.sqrt(T)
-    g = np.where(dbar >= threshold, dbar, 0.0)
+    g = _spa_recentre(dbar, ses, T)
 
     boot = np.empty(n_boot)
     for b in range(n_boot):
@@ -401,7 +421,9 @@ def sharpe_difference_test(returns_a, returns_b, periods: int = 12, n_boot: int 
     TestResult
         ``statistic`` is the annualised Sharpe difference, ``p_value`` is two-sided. ``detail``
         carries the two Sharpe ratios, the HAC standard error of the difference, the studentized
-        statistic, and a bootstrap percentile confidence interval for the difference itself.
+        statistic, a bootstrap percentile interval (``ci95_low/high``) and the studentised
+        (percentile-t) interval ``ci95_stud_low/high``, which matches the studentised p-value and is
+        the interval to report (docs/INFERENCE_AUDIT_2026-10-13.md, D4).
     """
     a = np.asarray(returns_a, dtype=float)
     b = np.asarray(returns_b, dtype=float)
@@ -459,6 +481,7 @@ def sharpe_difference_test(returns_a, returns_b, periods: int = 12, n_boot: int 
             boot_stud[i] = np.nan
 
     fin = np.isfinite(boot_stud)
+    slo = shi = float("nan")
     if fin.sum() < 100 or not np.isfinite(stud):
         # Fall back to a percentile test on the difference itself.
         bd = boot_diff[np.isfinite(boot_diff)]
@@ -468,11 +491,15 @@ def sharpe_difference_test(returns_a, returns_b, periods: int = 12, n_boot: int 
         p = float((np.abs(boot_stud[fin]) >= abs(stud)).mean())
         bd = boot_diff[np.isfinite(boot_diff)]
         lo, hi = np.percentile(bd, [2.5, 97.5])
+        # Studentised (percentile-t) interval, the construction that matches the studentised p-value.
+        tq = np.percentile(boot_stud[fin], [2.5, 97.5])
+        slo, shi = diff - tq[1] * se, diff - tq[0] * se
 
     return TestResult("sharpe_difference", float(diff), float(min(max(p, 0.0), 1.0)),
                       {"sharpe_a": sr_a, "sharpe_b": sr_b, "se_hac": se,
                        "studentized": float(stud) if np.isfinite(stud) else float("nan"),
                        "ci95_low": float(lo), "ci95_high": float(hi),
+                       "ci95_stud_low": float(slo), "ci95_stud_high": float(shi),
                        "n_obs": T, "n_boot": int(n_boot), "block": int(block)})
 
 
@@ -564,8 +591,13 @@ def mean_difference_test(returns_a, returns_b, periods: int = 12, n_boot: int = 
     else:
         p = float((np.abs(boot_stud[fin]) >= abs(stud)).mean())
     lo, hi = np.percentile(boot, [2.5, 97.5])
+    slo = shi = float("nan")
+    if fin.sum() >= 100 and np.isfinite(stud):
+        tq = np.percentile(boot_stud[fin], [2.5, 97.5])
+        slo, shi = stat - tq[1] * se, stat - tq[0] * se       # studentised (percentile-t) interval
     return TestResult("mean_difference", stat, float(min(max(p, 0.0), 1.0)),
                       {"mean_a": float(a[ok].mean()), "mean_b": float(b[ok].mean()),
                        "se_hac": se, "studentized": float(stud),
                        "ci95_low": float(lo), "ci95_high": float(hi),
+                       "ci95_stud_low": float(slo), "ci95_stud_high": float(shi),
                        "n_obs": int(T), "n_boot": int(n_boot), "block": int(block)})

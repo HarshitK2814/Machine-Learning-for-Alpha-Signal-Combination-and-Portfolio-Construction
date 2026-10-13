@@ -1,0 +1,41 @@
+{
+  "1 candidate at 0, 19 at -1 se": {
+    "reps": 300,
+    "rejection_rate_code (H0 true)": {
+      "rate": 0.023333333333333334,
+      "mc_se": 0.008715673408461504,
+      "n": 300
+    },
+    "rejection_rate_threshold_in_hansen_units": {
+      "rate": 0.0033333333333333335,
+      "mc_se": 0.003327773140415986,
+      "n": 300
+    }
+  },
+  "all 20 at 0": {
+    "reps": 300,
+    "rejection_rate_code (H0 true)": {
+      "rate": 0.08666666666666667,
+      "mc_se": 0.01624351722539955,
+      "n": 300
+    },
+    "rejection_rate_threshold_in_hansen_units": {
+      "rate": 0.06666666666666667,
+      "mc_se": 0.01440164599646191,
+      "n": 300
+    }
+  },
+  "1 at 0, 19 at -3 se": {
+    "reps": 300,
+    "rejection_rate_code (H0 true)": {
+      "rate": 0.06,
+      "mc_se": 0.013711309200802086,
+      "n": 300
+    },
+    "rejection_rate_threshold_in_hansen_units": {
+      "rate": 0.03333333333333333,
+      "mc_se": 0.010363754503432016,
+      "n": 300
+    }
+  }
+}
