@@ -47,6 +47,9 @@ CASES = {
     "exhibit_provenance": ("tools/exhibit_provenance.py", lambda t: ["--out", str(t / "chain.csv")], "chain.csv", True, False),
     "complexity_tax": ("tools/exp_complexity_tax.py", lambda t: [], "exp_complexity_tax.csv", False, False),
     "dev_backtest": ("tools/dev_backtest.py", lambda t: [], "summary_dev_backtest.csv", False, False),
+    "verify_projection_fidelity": ("tools/verify_projection_fidelity.py", lambda t: ["--out", str(t / "fid.csv")], "fid.csv", True, False),
+    "verify_workstream_a_receipt": ("tools/verify_workstream_a_receipt.py", lambda t: ["--json", str(t / "receipt.json")],
+                                    "receipt.json", True, False),
 }
 
 
@@ -80,6 +83,20 @@ def test_unknown_origin_output_is_refused_before_any_work(name, tmp_path, monkey
     assert sorted(p.name for p in tmp_path.iterdir()) == before               # nothing created, no record fabricated
     assert not sidecar_path(f).exists()
     assert not (tmp_path / ".run.json").exists()
+
+
+def test_verify_arm_information_refuses_a_legacy_output_before_work(tmp_path, monkeypatch, capsys):
+    mod = _load("tools/verify_arm_information.py")
+    monkeypatch.setattr(mod, "ROOT", tmp_path)                       # keep the repository's real outputs out of the test
+    legacy = tmp_path / "outputs" / "arm_information" / "arm_information_DEU.csv"
+    legacy.parent.mkdir(parents=True)
+    legacy.write_text("earlier output")
+    with pytest.raises(SystemExit):
+        mod.main(["--help"])
+    assert "--overwrite" in capsys.readouterr().out
+    with pytest.raises(OutputCollision):
+        mod.main(["--country", "DEU", "--from-weights-index"])
+    assert legacy.read_text() == "earlier output" and not sidecar_path(legacy).exists()
 
 
 # --------------------------------------------------------------------------------------- claim_run_items

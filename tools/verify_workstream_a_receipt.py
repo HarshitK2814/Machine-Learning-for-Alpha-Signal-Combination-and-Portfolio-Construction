@@ -189,7 +189,12 @@ def main(argv: list[str] | None = None) -> int:
              "line endings normalised, which distinguishes 'content differs' from 'endings "
              "were rewritten in transit'.",
     )
+    ap.add_argument("--overwrite", action="store_true",
+        help="discard an earlier output written by a different run (or of unknown origin); by default such a collision is refused (alphacomb.output_guard)")
     args = ap.parse_args(argv)
+    if args.json:
+        from alphacomb.output_guard import claim_run
+        claim_run([args.json], args)
 
     manifest_path = args.manifest or (args.repo / DEFAULT_MANIFEST)
     if not manifest_path.exists():

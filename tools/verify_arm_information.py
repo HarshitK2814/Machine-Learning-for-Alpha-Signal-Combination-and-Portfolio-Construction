@@ -94,7 +94,11 @@ def main(argv: list[str] | None = None) -> int:
                     help="must match the stage-02 run (amendment 001B)")
     ap.add_argument("--min-ic-t", type=float, default=1.96,
                     help="an arm is reported as not having learned below this |t|")
+    ap.add_argument("--overwrite", action="store_true",
+        help="discard an earlier output written by a different run (or of unknown origin); by default such a collision is refused (alphacomb.output_guard)")
     args = ap.parse_args(argv)
+    from alphacomb.output_guard import claim_run
+    claim_run([ROOT / "outputs" / "arm_information" / f"arm_information_{args.country}.csv"], args)
 
     from alphacomb.contracts import intl
 

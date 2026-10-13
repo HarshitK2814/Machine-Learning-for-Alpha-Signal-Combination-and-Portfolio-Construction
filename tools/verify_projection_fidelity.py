@@ -90,7 +90,12 @@ def main(argv: list[str] | None = None) -> int:
                     help="fail under --strict if gross-weighted sign agreement falls below this")
     ap.add_argument("--strict", action="store_true")
     ap.add_argument("--out", type=Path, default=None)
+    ap.add_argument("--overwrite", action="store_true",
+        help="discard an earlier output written by a different run (or of unknown origin); by default such a collision is refused (alphacomb.output_guard)")
     args = ap.parse_args(argv)
+    if args.out:
+        from alphacomb.output_guard import claim_run
+        claim_run([args.out], args)
 
     rows = [r for r in (check_cell(c) for c in (args.cells or ECONOMIC_CELLS)) if r]
     if not rows:
