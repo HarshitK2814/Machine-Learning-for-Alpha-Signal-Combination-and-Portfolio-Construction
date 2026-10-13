@@ -13,7 +13,7 @@ Consequence for `docs/PHASE_C_REVISED_ANALYSIS_SPEC_2026-10-14.md`: wherever it 
 | Field | Value | Source |
 |---|---|---|
 | Entry point | `tools/exp_capacity_return_difference.py --stage pipeline --country C`, then `--stage tables` | script docstring; `stage_pipeline`, `main` |
-| Evaluation window | monthly dates 2009-01-31 to 2019-12-31 (132 month-ends); ledger cold-starts 2009-01-01 | `prereg/AMENDMENT_001A...md` section 2; date range of the Tier B weight files (date column only) |
+| Evaluation window | monthly dates 2009-01-31 to 2019-12-31 (132 month-ends); ledger cold-starts 2009-01-01 | `prereg/AMENDMENT_001A_international_scenario_freeze_2026-10-08.md` section 2; date range of the Tier B weight files (date column only) |
 | Countries | DEU, IND, JPN | `COUNTRIES` constant |
 | Weights (frozen inputs) | `outputs/decile_weights/<C>/tierb/aum_<rung>/{capped,uncapped}_<cell>.parquet`, 8 cells x 2 books per rung, columns `date, permno, w` | `stage_pipeline`; 35 rung directories present (DEU 11, IND 10, JPN 14), matching the "35 valid rungs" of the commit message |
 | Strategy cells | 8 per rung, `L-C-P-0`, `L-C-P-U`, `L-S-P-0`, ... (file stems) | weight file names |
