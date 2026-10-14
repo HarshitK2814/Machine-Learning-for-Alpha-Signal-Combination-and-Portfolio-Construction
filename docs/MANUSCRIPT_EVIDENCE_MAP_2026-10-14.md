@@ -112,3 +112,7 @@ None of these has been edited.
 5. A coverage asymmetry can manufacture a significant cross-country contrast; here is the worked case and the check that catches it.
 
 Nothing in this map relies on, or restores, a withdrawn Sharpe-point capacity gain.
+
+## Status update (2026-10-14, later the same day)
+
+L1, L2 and L3 have been addressed by dated qualifications (not by rewriting); see `docs/LIVE_DOCUMENT_CORRECTIONS_2026-10-14.md`. `handoff/21` was left unedited on purpose and is marked superseded there. L4-L8 remain open. The rows above are the record as written on 2026-10-14 morning and are not edited.

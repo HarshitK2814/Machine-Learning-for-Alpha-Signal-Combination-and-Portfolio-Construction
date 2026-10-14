@@ -4,6 +4,8 @@
 **Supersedes:** `docs/RESULTS_SIGN_FLIP_2026-10-09.md`, whose central claim — a sign flip with a
 measurable crossover — **was retracted the same day as a cost-input coverage artefact.** That
 document is kept as the record; §6 here explains what happened and why it matters methodologically.
+**Qualification added 2026-10-14:** wherever this document calls the Sharpe-point capacity figures (+6.80 / +3.19 / +6.92) established on
+**solvent** rungs, read it with this proviso: the uncapped comparator at those rungs is near-ruined: the uncapped comparator's compounded terminal wealth at these rungs is 7.7e-10 (Germany $100mn), 2.6e-06 (India $30mn) and 6.7e-06 (Japan $1bn), and 1.1e-17 at Japan $10bn (Tier B, `RESULTS_CAPACITY_RETURN_DIFFERENCE_2026-10-10.md`). "Solvent" is the minimal criterion. The figures are an accounting difference against a near-ruined comparator and are not established as an economic gain; the like-for-like object is B(A) (`RESULTS_CAPACITY_RETURN_DIFFERENCE_2026-10-10.md`). The text below is kept unedited as the record.
 **Status:** exploratory on Germany and India; **Japan is a pre-registered out-of-sample
 confirmation** of the positive channel (§3c, `AMENDMENT_001D` D2), reported 12:55 IST.
 **Audience:** referee-facing. Every number is reproducible from §7.

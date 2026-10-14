@@ -17,7 +17,9 @@ handoff to Workstream B is complete.
 > * The gross decile signals are real (gross SR +2.31 / +1.20 / +1.28, t = +7.14 / +3.19 / +4.11); the
 >   executable capped decile book has a negative net Sharpe (matched-book t = -2.40 / -1.81 / -2.74),
 >   with the caveat that it attains only a few percent of its target gross.
-> * **Capacity channel**: the participation constraint's effect on net performance is zero where it is
+> * **Capacity channel** [qualified 2026-10-14: the Sharpe-point figures below are measured against uncapped comparators that are
+>   near-ruined (terminal wealth 7.7e-10 / 2.6e-06 / 6.7e-06; Phase 2 Tier B); they are an accounting difference, not an established
+>   economic gain; "solvent" is a minimal criterion only]: the participation constraint's effect on net performance is zero where it is
 >   slack and increases with how hard it binds. On the pipeline's own accounting of both books, at the
 >   largest mandate where the uncapped comparison book is still **solvent**: **+6.80** (Germany,
 >   $100mn), **+3.19** (India, $30mn), **+6.92** (Japan, $1bn). Japan is a pre-registered

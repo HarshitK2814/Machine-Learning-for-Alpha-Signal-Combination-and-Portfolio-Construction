@@ -42,7 +42,7 @@ PATTERNS = [
     # t-statistic elsewhere. The asymptotic-channel claim it came from is caught by wording below.
     ("non-compliant-ladder capacity figures", r"\+8\.77\b|\+10\.02\b|\+11\.06\b"),
     ("asymptotic-channel regularity", r"asymptotic (channel|ratio)|4\.58.{0,20}4\.82|4\.375"),
-    ("survival framing", r"first-order for survival|goes negative after tax|unviable after tax"),
+    ("survival framing", r"first-order for survival|decisive for\s+survival|goes negative after tax|unviable after tax"),
     ("share-of-net-Sharpe-kept figures", r"keeps? 98%|keeps? \*\*98%|98% of its net"),
     ("tax-placebo exact match", r"within \*\*1%\*\*|within 1%"),
     ("US-frontier comparison", r"10x to 100x|10[–-]100[x×]"),

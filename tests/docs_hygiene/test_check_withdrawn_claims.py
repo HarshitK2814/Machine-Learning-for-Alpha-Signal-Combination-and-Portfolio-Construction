@@ -26,7 +26,8 @@ def test_withdrawn_figure_presented_as_current_fails():
 
 def test_each_pattern_family_is_detected_when_unlabelled():
     for claim in ("The asymptotic channel is stable.", "within 1% of Japan", "costs beat taxes 53x",
-                  "crossover at $3.79mn", "taxes are first-order for survival", "India keeps 98% of it"):
+                  "crossover at $3.79mn", "taxes are first-order for survival", "India keeps 98% of it",
+                  "second-order as a channel but decisive for survival"):
         assert hits(claim + "\n"), claim
 
 

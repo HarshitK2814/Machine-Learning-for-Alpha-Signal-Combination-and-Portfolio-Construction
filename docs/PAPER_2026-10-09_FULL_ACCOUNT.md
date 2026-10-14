@@ -47,7 +47,7 @@ Four results survive.
    uncapped comparison book is still solvent (§8.8), and on the pipeline's own accounting of both
    books (§8.9), the capacity channel is **+6.80** (Germany, $100mn), **+3.19** (India, $30mn) and
    **+6.92** (Japan, $1bn) Sharpe points (the wedge tool gave +7.63 / +3.64 / +6.68, with
-   inference t = +10.21 / +5.00 / +11.01); Japan's comparison book is solvent through $10bn. Beyond those rungs
+   inference t = +10.21 / +5.00 / +11.01); Japan's comparison book is solvent through $10bn. **[Qualification added 2026-10-14: "solvent" is only the minimal criterion. These comparators are near-ruined: the uncapped comparator's compounded terminal wealth at these rungs is 7.7e-10 (Germany $100mn), 2.6e-06 (India $30mn) and 6.7e-06 (Japan $1bn), and 1.1e-17 at Japan $10bn (Tier B, `RESULTS_CAPACITY_RETURN_DIFFERENCE_2026-10-10.md`). The Sharpe-point figures are therefore an accounting difference against a near-ruined comparator; they are **not** established as an economic gain, and the like-for-like object is B(A) in `RESULTS_CAPACITY_RETURN_DIFFERENCE_2026-10-10.md`. The claim that the constraint helps net performance at realistic comparators is not established by these numbers.]** Beyond those rungs
    the German and Indian uncapped books are bankrupt, and the larger figures quoted elsewhere are
    not interpretable as performance gains. Japan is a **pre-registered out-of-sample
    confirmation**. The effect is zero where
@@ -135,8 +135,9 @@ audit called this "the only uncontested ground we hold" and said "it should be t
 **That design was run and it failed twice** (§8.1, §8.2). What replaced it was a capacity finding,
 and the capacity finding then had to be narrowed twice more (§8.3, §8.5). The paper that remains is
 the one in §1: a measurement of where ML alpha goes, with the tax machinery serving as the
-instrument that *rules the tax channel out as a channel* while showing it is nevertheless decisive
-for survival.
+instrument that *rules the tax channel out as a channel*. [Corrected 2026-10-14: an earlier draft added "while showing
+it is nevertheless decisive for survival". That framing is **withdrawn** (§6.3.3); no role for taxes in survival is
+established.]
 
 We state this history because seven of the nine entries in §8 happened in a single day, and
 because the shape of the errors (§9) is itself one of the paper's contributions.
@@ -147,7 +148,7 @@ because the shape of the errors (§9) is itself one of the paper's contributions
 |---|---|
 | Capacity channel measured as an **AUM-indexed dose-response** over seven orders of magnitude, in three non-US markets, with standard errors | @NMV2016's price impact is **Kyle-linear**, so their cost is linear in invested dollars, their capacity is a single break-even point and their "SR/$B" is a constant slope. They report one number per strategy. We report the curve and show it is strongly nonlinear |
 | **Implementability frontier** — the AUM at which the mandate's target gross becomes infeasible | @KS2004 and @NMV2016 both define capacity where **profit** vanishes. Implementability binds earlier and is what an allocator writing an IMA faces. Nobody reports it |
-| Tax channel measured with a **lot-level engine across three statutory regimes**, and shown second-order as a channel but decisive for survival | None of @KS2004, @NMV2016, @GP2013, @CV2023 contains a tax engine. @NMV2016 and @AHV2025 do not mention tax |
+| Tax channel measured with a **lot-level engine across three statutory regimes**, and shown second-order as a channel ("decisive for survival" was an earlier phrasing and is withdrawn, §6.3.3; corrected 2026-10-14) | None of @KS2004, @NMV2016, @GP2013, @CV2023 contains a tax engine. @NMV2016 and @AHV2025 do not mention tax |
 | **Turnover, not the statutory rate, orders the cross-country tax drag** | Requires three jurisdictions to separate the two orderings. The tax-aware literature (@SS2018, @IM2012, @HUANG2019) is single-jurisdiction |
 | **Design-axis null with power**, across 14 mandate sizes and two books | @CHK2024 and @LAL2025 document design dispersion gross; nobody reports its detectability on an executable book as a function of scale |
 | **Coverage-asymmetry hazard**, demonstrated with a worked false positive | New, and specific to non-US work where coverage is never complete |
@@ -915,6 +916,8 @@ dates and the identical investable universe (`tools/exp_matched_book_accounting.
 
 At $1bn the engine itself reports the German and Indian uncapped books insolvent (NAV exhausted
 after **1 of 132** months in all 8 cells), independently confirming §8.8.
+
+> **[Qualification added 2026-10-14]** The capacity column is measured against an uncapped comparator that is near-ruined: the uncapped comparator's compounded terminal wealth at these rungs is 7.7e-10 (Germany $100mn), 2.6e-06 (India $30mn) and 6.7e-06 (Japan $1bn), and 1.1e-17 at Japan $10bn (Tier B, `RESULTS_CAPACITY_RETURN_DIFFERENCE_2026-10-10.md`). It is an accounting difference against a near-ruined book, not an established economic gain; the like-for-like object is B(A).
 
 **Ordering on one book: capacity (+3.2 to +6.9) and cost (−5.2 to −9.6) are two orders of magnitude
 above tax (−0.005 to −0.170).** That is now a like-for-like comparison, and it retires the
