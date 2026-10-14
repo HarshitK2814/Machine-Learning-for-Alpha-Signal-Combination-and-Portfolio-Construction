@@ -1,0 +1,30 @@
+{
+  "label": "OUTCOME-FREE PRESENCE CHECK - not a result",
+  "fields": {
+    "C4": [
+      "date",
+      "permno",
+      "ret_next",
+      "div_next"
+    ],
+    "C1": [
+      "date",
+      "permno",
+      "in_universe",
+      "price"
+    ]
+  },
+  "reduction": "ret_next/div_next -> isfinite flag; price -> notna flag; values discarded at load",
+  "window": [
+    "2009-01",
+    "2019-12"
+  ],
+  "input_sha256": {
+    "data\\intl_c4\\production\\DEU\\targets.parquet": "ba903a1a75fc04cf8659a25e1e40ae818bd218b4fae3fa5feb244ebfd344a2d2",
+    "data\\intl_c1\\production\\DEU\\universe.parquet": "f0652cafccc1a5f4ba6fb283ebc916be186c993cf1710b147e607b807d659695",
+    "data\\intl_c4\\production\\IND\\targets.parquet": "835b955c3e33df162f839741300f9064a21f7adc2635a99bca1cbb351094fd1f",
+    "data\\intl_c1\\production\\IND\\universe.parquet": "dac4c9f2577cbc46e288ab1052fec2bec9185c446ee4d5ca51c57b7ba483554c",
+    "data\\intl_c4\\production\\JPN\\targets.parquet": "d7984e5e3b2a1ff74d026f74ed0a7a28dcb762fb721045c9117165af8b6df432",
+    "data\\intl_c1\\production\\JPN\\universe.parquet": "aa0b91952e2662b2941b5927d9e376074849b526a7dbe4328243e467ad56d70c"
+  }
+}
