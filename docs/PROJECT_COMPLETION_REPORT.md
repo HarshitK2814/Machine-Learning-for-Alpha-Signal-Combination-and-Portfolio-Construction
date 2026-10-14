@@ -1,6 +1,6 @@
-# Project completion report (updated 2026-10-14, after the manuscript-lockdown sprint)
+# Project completion report (updated 2026-10-14, after the bounded submission sprint)
 
-Internal researcher-led report; not an external review. No approval by Maham or Absar beyond their documented responses is claimed; Maham's acknowledgement of the exit ruling is outstanding and 001A-001E are not countersigned. Sprint history on `feat/completion-sprint-2026-10-14`: `24e9a4c` (start) -> `f295d3d` (sprint 1) -> `5f206fd` (sprint 2) -> `8ad2f3c` (lockdown) -> novelty-gate and 001C-scorecard sprint (this update).
+Internal researcher-led report; not an external review. No approval by Maham or Absar beyond their documented responses is claimed; Maham's acknowledgement of the exit ruling is outstanding and 001A-001E are not countersigned. Sprint history on `feat/completion-sprint-2026-10-14`: `24e9a4c` (start) -> `f295d3d` (sprint 1) -> `5f206fd` (sprint 2) -> `8ad2f3c` (lockdown) -> novelty-gate and 001C-scorecard sprint (`53a04b3`) -> bounded submission sprint (this update: follow-up literature search, venue comparison, decision register).
 
 **Overall state: not submission-ready.** A narrowed, internally consistent, traceable as-run candidate exists. It is blocked from submission by prerequisites that need external access or author decisions (below); passing the available checks does not change that.
 
@@ -27,9 +27,11 @@ Further manuscript consistency fixes: removed "real" for the gross signal (the g
 
 Full texts (some version) read for Azevedo et al., Novy-Marx and Velikov, Korajczyk and Sadka, Jensen et al., Gârleanu and Pedersen, Gu et al., Chen and Velikov (working paper), Liao et al., and, since the novelty-gate sprint, **Avramov-Cheng-Metzker (the published article from the author-hosted PDF, accessed 2026-10-14; the PDF is not committed and the online appendix was not accessed)**. The detailed comparison and per-statement statuses (`SUPPORTED_BY_COMPARISON`, `NARROW_REQUIRED`, `UNRESOLVED_PRIOR_ART`, `REMOVE`) are in `docs/FINAL_PRIOR_ART_REVIEW.md` section 1: that paper has no AUM-indexed cost, capacity, participation constraint, tax or non-US analysis, but a new geography is a difference in coverage, not a method, and the candidate's novelty wording was narrowed accordingly. Statements that depend on the unread tax and international papers remain `UNRESOLVED_PRIOR_ART`. Bibliographic metadata for all 21 candidate entries were verified against Crossref or arXiv where reachable (`BIB_PROVENANCE.csv`); two project-record errors (BY2003 DOI, HUANG2019 arXiv id) were not propagated.
 
+**Follow-up search (bounded submission sprint, 2026-10-14; detail in `docs/FINAL_PRIOR_ART_REVIEW.md` section 8).** Read in full: Choi-Jiang-Zhang (international ML, 32 markets incl. Japan and India; March 2023 working paper; gross of costs; no capacity or tax; the published RAPS article was not read), Israel-Moskowitz, Krasner-Sosner (published article), Moehle et al. (2021 author version; lot-level tax-aware construction, so the lot-level engine is a tool, not a contribution) and Huang. **Still unreadable:** Cakici et al. (CAPTCHA, not bypassed), Chen-Hanauer-Kalsbach (SSRN 403), Lalwani et al. (403), Novy-Marx-Velikov 2019, Sialm-Sosner and Berkin-Ye (publisher-restricted), Chaudhuri et al. (empty response), Dai et al. (bot protection). The candidate now says exactly this; its novelty wording was not strengthened. Choi et al. was added to the bibliography (22 entries).
+
 ## 4. Is the central contribution defensible?
 
-As a narrow non-US as-run measurement with a methods caution: yes, on the evidence that is traceable, and with the qualifications stated. It adds no mechanism and no method; the AUM dimension is established for the US by Jensen et al.; the capacity object is an accounting difference against an infeasible comparator; the zero long-term share under flat statutes is mechanical; the design null is a low-power bound; and every number carries an unresolved exit-treatment qualification. Whether it is publishable, and where, is an author decision; the central novelty comparison against Avramov-Cheng-Metzker is not done.
+As a narrow non-US as-run measurement with a methods caution: yes, on the evidence that is traceable, and with the qualifications stated. It adds no mechanism and no method; the AUM dimension is established for the US by Jensen et al.; the capacity object is an accounting difference against an infeasible comparator; the zero long-term share under flat statutes is mechanical; the design null is a low-power bound; and every number carries an unresolved exit-treatment qualification. Whether it is publishable, and where, is an author decision. The comparison against Avramov-Cheng-Metzker is done and no overlap was found in AUM, capacity, tax or non-US scope; no methodological novelty remains, and eight cited works are still unread.
 
 ## 5. Submission-dependency checklist
 
@@ -48,22 +50,28 @@ As a narrow non-US as-run measurement with a methods caution: yes, on the eviden
 | 5 | Fill author, affiliation, contribution, acknowledgement, funding, conflict, data/code availability and any venue-required statements | author decisions |
 | 6 | Re-run the candidate check, screens and tests on the final text | done for the current text; repeat after any edit |
 
-### AUTHOR_DECISION_REQUIRED
+### Author decision register (single source: the same table is in `submission_candidate_as_run_only/SUBMISSION_PREPARATION.md` section 6)
 
-| ID | Decision |
-|---|---|
-| A | Journal and template. Shortlist with evidence status: `SUBMISSION_PREPARATION.md` section 1 (official author instructions were not retrievable: HTTP 403; verify on each journal's site) |
-| B | Author list, order, affiliations, contributions, acknowledgements, funding, conflicts of interest |
-| C | Data and code availability: licence terms for the derived tables, whether the repository is public and may remain so, a licence (none exists), a release tag or archive. Draft conservative wording and the confirmations it needs: `SUBMISSION_PREPARATION.md` section 4. Nothing may be stated as "will be made available" until confirmed |
-| D | Whether to submit now or only after items 1-3 above |
-| E | Whether to accept the "exit-treatment sensitivity unknown" disclosure permanently, or to rule on a different treatment (a different ruling needs its own addendum and is not implied here) |
-| F | Whether a future reproduction of Germany's historical statistic is ever wanted (conditions are recorded in the traceability document; currently declined) |
-| G | Whether the cost-calibration or finite-unit capacity runs should ever be added; they would be needed only for a stronger capacity claim than the candidate makes |
-| H | **001C scorecard.** (i) For P1, P3 and P4: approve or decline a descriptive aggregation of Japan's existing optimised-weights files (untracked, not committed snapshots) and, if approved, fix the exact definitions in writing **before** any number is read (which book, months and statistic; for P4 what "materially below" means). (ii) For P5: approve or decline deriving Japan's $100mn axis contrasts from stored cell series, and the multiplicity rule. (iii) How the manuscript reports the scorecard. (iv) Whether the reviewer named in the amendment will countersign or comment. Without these, the four predictions stay `NOT_SCOREABLE`. |
+Statuses: `AUTHOR DECISION REQUIRED`, `EXTERNAL DEPENDENCY`, `COMPLETE`. Nothing is decided for the authors; no author detail is invented.
 
-### EXTERNAL_DEPENDENCY
-
-* Library or publisher access to the closest prior art; Maham's acknowledgement of the exit ruling's consequence and the countersignatures of 001A-001D (001E draft status); journal author instructions that were not retrievable; a TeX distribution or Overleaf account for the build; vendor access and documentation for any data-recovery work.
+| # | Item | Status |
+|---|---|---|
+| 1 | Venue selection (three-venue comparison, `SUBMISSION_PREPARATION.md` section 1; each journal's live instructions must be read first) | AUTHOR DECISION REQUIRED |
+| 2 | Author list, order, affiliations, corresponding author, contributions | AUTHOR DECISION REQUIRED |
+| 3 | Acknowledgements, funding, conflicts of interest | AUTHOR DECISION REQUIRED |
+| 4 | Data availability (vendor-licence terms; which derived tables may be shared) | AUTHOR DECISION REQUIRED and EXTERNAL DEPENDENCY |
+| 5 | Code availability (repository visibility, licence file, permissions) | AUTHOR DECISION REQUIRED |
+| 6 | Accept the permanently qualified exit-treatment disclosure | AUTHOR DECISION REQUIRED |
+| 7 | Submit the narrowed manuscript despite its modest contribution, or first read the eight unread works | AUTHOR DECISION REQUIRED |
+| 8 | Reviewer or coauthor comments; countersignature or acknowledgement of 001A-001E and of the exit ruling (none exists; none claimed) | AUTHOR DECISION REQUIRED |
+| 9 | Separate authorisation, with definitions fixed in writing first, for a narrowly defined descriptive calculation scoring any of 001C's P1, P3, P4, P5 | AUTHOR DECISION REQUIRED |
+| 10 | Whether Germany's historical statistic is ever regenerated (currently declined); whether cost-calibration or finite-unit runs are ever added | AUTHOR DECISION REQUIRED |
+| 11 | Library or publisher access to the unread works | EXTERNAL DEPENDENCY |
+| 12 | TeX or Overleaf environment and the chosen venue's template (no PDF exists) | EXTERNAL DEPENDENCY |
+| 13 | Vendor access and documentation for Phase C (blocked, unrun) | EXTERNAL DEPENDENCY |
+| 14 | 001C Japan scorecard recorded and reported (P2 `NOT_MET`; P1, P3, P4, P5 `NOT_SCOREABLE`; whole-hypothesis conditions reported separately; wording verified verbatim against the amendment) | COMPLETE |
+| 15 | ACM full-text comparison and candidate-wording check | COMPLETE |
+| 16 | Follow-up literature search and venue comparison, to the extent accessible | COMPLETE (limits recorded) |
 
 ### OPTIONAL_IMPROVEMENT
 
@@ -83,8 +91,8 @@ All of: (1) external vendor access by someone entitled to it, with the vendor's 
 |---|---|---|
 | Candidate checker | `python tools/check_submission_candidate.py` | PASS (consistency only) |
 | Withdrawn-claims screen | `python tools/check_withdrawn_claims.py` | PASS (a screen, not verification) |
-| Focused tests | `python -m pytest tests/tools tests/docs_hygiene -q` | 54 passed |
-| Full suite | `python -m pytest tests -o addopts="" -p no:cacheprovider -q -rfE` | **685 passed, 0 failed, 337 warnings, 431 s** (novelty-gate sprint; the previous sprint's run was 684 passed); log `C:/Temp/claude/full_suite_gates_2026-10-14.log` |
+| Focused tests | `python -m pytest tests/tools tests/docs_hygiene -o addopts="" -p no:cacheprovider -q` | 54 passed |
+| Full suite | `python -m pytest tests -o addopts="" -p no:cacheprovider -q -rfE` | **not completed this sprint**: the run was stopped by Claude Code because the machine was low on memory and was not restarted. The last complete run (685 passed, 0 failed, 431 s) predates this sprint's edits to the candidate, checker inputs and documents |
 | Whitespace | `git diff --check` | clean apart from CRLF warnings |
 | Manuscript build | none possible | no TeX/Pandoc, no template |
 

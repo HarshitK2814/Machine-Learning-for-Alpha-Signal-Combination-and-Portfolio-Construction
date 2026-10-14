@@ -1,22 +1,23 @@
 key,status,verified_against,full_text_read,note
 ACM2023,metadata verified,HUJI repository record and the cover page of the publisher PDF (Management Science 69(5) 2587-2619; DOI 10.1287/mnsc.2022.4449),"yes (published article, 34 PDF pages including a download cover; author-hosted copy accessed 2026-10-14; not committed)",Online appendix and data files not accessed; see docs/FINAL_PRIOR_ART_REVIEW.md section 1
 AHV2023,metadata partly verified,Author PDF on the AFA programme site (title, authors, abstract); first SSRN posting date not verified,yes (26 pp author version built 2024-03-12),Text contains no capacity / AUM / price-impact / tax discussion; costs use the Chen-Velikov effective spread
-CFMZ2023,metadata verified,Crossref,no,Open copy at open.icm.edu.pl returned 403; abstract-level only
-CHK2024,metadata partly verified,Web search result pages that list SSRN 5031755; no publisher record,no,SSRN not accessible
+CFMZ2023,metadata verified,Crossref,no,Open copy at open.icm.edu.pl returned an HTTP 403 earlier and a CAPTCHA page on 2026-10-14 (not bypassed); abstract-level only
+CHK2024,metadata partly verified,Web search result pages that list SSRN 5031755; no publisher record,no,"SSRN returned HTTP 403 on 2026-10-14; abstract content seen only through secondary summaries (1,056 model variants; non-standard error exceeding standard error by 59 percent: unverified)"
 CV2023,metadata verified,Crossref,partly (Fed FEDS 2020-039 working-paper version; the published JFQA version differs: 120 vs 204 anomalies),FEDS version read; published article not read
 GKX2020,metadata verified,Crossref,yes (NBER w25398 revised Sept 2019 version),Sample US 1957-2016; no transaction costs or taxes in the text
 GP2013,metadata verified,Crossref,yes (CBS accepted author manuscript),Quadratic trading costs; text has no AUM or capacity discussion
 JKMP2026,metadata verified,Crossref (RFS 39(10) 3035-3078 published 2026-03-15),yes (AFA author version 2023-02-12; not the published article),US CRSP common stocks; wealth-dependent market impact with a multivariate Kyle lambda; no tax
 KS2004,metadata verified,PDF header (JF LIX(3) June 2004 1039-1082) and Crossref DOI in project record,yes (Kellogg-hosted PDF),US CRSP 1967-1999
-LAL2025,metadata verified,Crossref,no,Wiley full text returned 403
+LAL2025,metadata verified,Crossref,no,Wiley full text returned 403; a focused search on 2026-10-14 found only the authors earlier Applied Economics 2022 paper; not read
 LMNS2025,metadata verified,arXiv abs 2503.00549,yes (arXiv PDF 2025-03-04 version),Confidence intervals for neural-network return forecasts; no capacity
 NMV2016,metadata verified,Crossref,yes (Rochester-hosted Aug 2015 draft; not the published RFS article),23 anomalies; Kyle lambda from linear regression; footnote on concave impact
-NMV2019,metadata verified,Crossref,no,Not accessed
-SS2018,metadata verified,Crossref (the project's note recording doi v74.n1.4 is wrong: that DOI is a different paper),no,
-IM2012,metadata partly verified,Crossref record of the SSRN working paper,no,Venue claims in the project tracker (Chicago Booth 12-20; NBER w18382) not verified
-BY2003,metadata verified,Crossref (the project's research/_build/lit_tax_online.py records doi v59.n4.2546 which is a different paper),no,
-CBLO2020,metadata verified,Crossref,no,
-KS2024,metadata verified,Crossref (project tracker says Summer 2024; Crossref lists issue 1),no,Authors: Krasner and Sosner as in Crossref
-HUANG2019,metadata verified,arXiv abs 1907.12093 (the project's primary id 1907.12085 is a cosmology paper),no,
-MKBA2021,metadata verified,Crossref and arXiv 2008.04985,no,
-DLLY2026,metadata verified,Crossref,no,Project tracker said online Feb 2026; Crossref lists Management Science 72(10) Oct 2026
+NMV2019,metadata verified,Crossref,no,A focused search on 2026-10-14 found no accessible copy; not read
+SS2018,metadata verified,Crossref (the project's note recording doi v74.n1.4 is wrong: that DOI is a different paper),no,Publisher full text restricted; no free PDF found on 2026-10-14; Crossref note: the project record DOI v74.n1.4 is a different paper
+IM2012,metadata partly verified,Chicago Booth working paper No. 77 / 12-20 cover page (SSRN 2089459) in the PDF read,"yes (working paper, 53 pp., third-party-hosted copy; accessed 2026-10-14; not committed)","US styles 1974-2010 and CRSP portfolios from 1927; after-tax, gross of transaction costs; no capacity text; no journal version verified"
+BY2003,metadata verified,Crossref (the project's research/_build/lit_tax_online.py records doi v59.n4.2546 which is a different paper),no,Publisher full text not retrieved; no free PDF found on 2026-10-14; Crossref note: the project record DOI v59.n4.2546 is a different paper
+CBLO2020,metadata verified,Crossref,no,Author manuscript at MIT DSpace (SSRN id 3351382) returned an empty response on 2026-10-14; publisher version not accessed
+KS2024,metadata verified,"Crossref and the article first page (Journal of Wealth Management, Summer 2024, vol. 27 no. 1)","yes (publisher-format article, 19 pp., AQR-hosted copy; accessed 2026-10-14; not committed)","Russell 1000 benchmark; 10 bps transaction-cost assumption; capacity raised as a question in the text, not analysed"
+HUANG2019,metadata verified,arXiv abs 1907.12093 and the PDF first page (the project primary id 1907.12085 is a cosmology paper),yes (4-page arXiv PDF; accessed 2026-10-14; not committed),Average-basis taxation with US 15% and 25% rates in a reinforcement-learning trading problem; no capacity text
+MKBA2021,metadata verified,"Crossref and arXiv 2008.04985 (v3, 2021-02-21)",yes (23-page BlackRock-posted author version dated 2021-02-23; arXiv copy; accessed 2026-10-14; not committed),S&P 500 universe 2002-2019; tax rates 0.238 and 0.408; 10 bps spread; wash sales avoided by monthly trading; no price-impact or capacity term; the 2025 correction notice was not examined
+DLLY2026,metadata verified,Crossref,no,NUS RMI working-paper PDF (an earlier draft with a different title) sat behind bot protection on 2026-10-14 (not bypassed); Management Science version not accessed; Crossref lists Management Science 72(10) Oct 2026
+CHOI2023,metadata verified,"Crossref (SSRN 10.2139/ssrn.3489679; published record 10.1093/rapstu/raaf005, RAPS 15(3-4) 288-331, 2025-06-24) and the PDF title page","yes (March 2023 working paper, 56 pp., ABFER-hosted; accessed 2026-10-14; not committed; published article not read)",Search for Germany in the text found no hit; the text states results do not account for transaction costs; no capacity or tax discussion
