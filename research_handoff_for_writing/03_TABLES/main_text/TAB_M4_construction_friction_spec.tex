@@ -1,0 +1,27 @@
+\begin{table}[t]
+\centering
+\small
+\caption{Table 4. Portfolio construction and friction specification as committed}
+\label{tab:spec}
+\begin{tabular}{lrr}
+\toprule
+Parameter & Value & Key in the committed configuration \\
+\midrule
+Gross exposure limit & 2.0 & configs/base.yaml portfolio.gross\_max \\
+Per-name weight cap & 0.01 & portfolio.weight\_abs\_max \\
+ADV participation limit & 0.05 & portfolio.adv\_participation\_max \\
+Target volatility (annual) & 0.1 & portfolio.target\_vol\_annual \\
+Dollar neutral & True & portfolio.dollar\_neutral \\
+Beta limit (absolute) & 0.05 & portfolio.beta\_abs\_max \\
+Industry limit (absolute) & 0.02 & portfolio.industry\_abs\_max \\
+Commission (basis points) & 1.0 & costs.commission\_bps \\
+Impact coefficient k & 1.0 & costs.impact\_k \\
+Impact exponent & 1.5 & costs.impact\_power \\
+Flat borrow rate (annual) & 0.01 & costs.borrow\_fee\_model.annual\_rate \\
+Risk aversion gamma & 25.0 & configs/portfolio.yaml risk\_aversion\_gamma \\
+Objective & mean\_variance\_minus\_tc & configs/portfolio.yaml objective \\
+\bottomrule
+\end{tabular}
+\par\vspace{2pt}
+\parbox{\textwidth}{\footnotesize Read from the committed configuration files; the manuscript states the same gross, cap, volatility, commission, impact and borrow values (Section 4.1). Run-time hashes of the configuration used on 2026-10-09 were not recorded, so this is the configuration as committed, not a certified record of the runs. Amendment 001A records the contract parameters as frozen by the project team, an attestation that has not been countersigned. Impact is k x sigma x sqrt(AUM/ADV) |dw|\textasciicircum{}1.5 as stated in the manuscript.}
+\end{table}

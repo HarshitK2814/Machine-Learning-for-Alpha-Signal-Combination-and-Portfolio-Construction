@@ -11,6 +11,58 @@ The design, hypotheses and experiment register live in the research package
 `Team_Coding_Work_Distribution.docx`: three equal workstreams (Absar = data/costs/backtest,
 Harshit = models/portfolio/risk/interpretation, Maham = baselines/statistics/reporting).
 
+## At a glance (2026-10-14)
+
+**What this repository is.** Research code, committed result snapshots, a narrowed manuscript candidate and a library of publication figures and tables for a study of how much of a machine-learning equity signal survives three frictions (AUM-indexed trading costs, an ADV participation constraint, statutory capital-gains tax) in **Germany, India and Japan, 2009-2019**.
+
+**What the evidence supports (and no more).** A modest, **as-run, non-US measurement with a methods caution**; no new method, no new mechanism. The gross decile composites look strong before costs; the executable participation-capped decile book is net-negative at a $1bn mandate in all three markets; the optimised book's net Sharpe is not distinguishable from zero where it is traceable; the capacity measure B(A) is an accounting difference against an infeasible comparator (not an investable gain); the statute decides whether a holding-period tax channel exists; no design axis is detectable at the available power. Every number is under the `as_run` exit treatment, and the sensitivity to the later exit ruling is **unknown**.
+
+**What is blocked or withdrawn.** Phase C (the revised analysis) is blocked and **not run**; all 560 required series are not estimable under current rules; Germany's optimised-book after-tax inference statistic is excluded (no artifact); Japan is **not** a confirmation of amendment 001C (P2 not met, P1/P3/P4/P5 not scoreable); several earlier headline claims were withdrawn (`docs/FINALIZATION_AUDIT_2026-10-09.md` section 1.2). The project's amendments are repository commits by the team, not countersigned, in no external registry: nothing here is "pre-registered" or "confirmatory", and no co-author or reviewer approval is claimed.
+
+### Repository map
+
+| Path | Contents |
+|---|---|
+| `src/alphacomb/` | The package: contracts, models, portfolio construction, risk, tax engine, validation, theory |
+| `pipelines/` | Stage scripts (train, construct portfolios, after-tax evaluation) |
+| `tools/` | Experiment and audit scripts, the candidate checker, the withdrawn-claims screen, the asset generators |
+| `tests/` | Unit and integration tests (`tests/tools`, `tests/validation`, `tests/tax`, ...) |
+| `configs/` | Base, portfolio, model and risk configuration |
+| `docs/` | Specifications, audits, results write-ups, amendments, the claim-evidence matrix and the completion report |
+| `docs/attachments/`, `results/` | Committed result snapshots with hashes recorded in `submission_candidate_as_run_only/TRACEABILITY.csv` |
+| `submission_candidate_as_run_only/` | The narrowed manuscript candidate (Markdown), bibliography with provenance, traceability table, submission notes |
+| `paper_assets_as_run_only/` | **26 figures and 25 tables** (PDF/SVG/PNG and CSV/LaTeX/Markdown), catalog and manifest |
+| `research_handoff_for_writing/` | Writer-friendly copy of the approved material, indexes, collaborator guide and a manifest |
+
+### Quick start
+
+```
+python -m pip install -e .                       # Python 3.12
+python tools/check_submission_candidate.py       # citations, hashes, every manuscript number re-derived
+python tools/check_withdrawn_claims.py           # screen for withdrawn wording
+python tools/make_paper_assets.py                # rebuild paper_assets_as_run_only/ from tracked artifacts
+python tools/make_paper_assets.py --verify       # verify the folder against its manifest (line-ending tolerant)
+python -m pytest tests/tools -o addopts= -p no:cacheprovider -q   # run test directories one at a time
+```
+
+The heavy stages that produced the committed snapshots need licensed vendor-derived panels that are **not** in this repository; they are not rerun by the commands above.
+
+### Where to read next
+
+* `docs/PROJECT_COMPLETION_REPORT.md`: what is done, what blocks submission, validation record, decision register.
+* `submission_candidate_as_run_only/manuscript.md`: the manuscript candidate (not submission-ready).
+* `paper_assets_as_run_only/ASSET_CATALOG.md`: every figure and table with sources, hashes, captions, limits and the placement map.
+* `research_handoff_for_writing/00_START_HERE/README_FOR_COLLABORATOR.md`: the guide for the person writing the paper.
+* `docs/FINAL_CLAIM_EVIDENCE_MATRIX.md`, `docs/FINAL_NUMERICAL_TRACEABILITY_GAPS.md`, `docs/FINAL_PRIOR_ART_REVIEW.md`: claim status, traceability gaps, literature status.
+
+### Data, licensing and sharing
+
+This repository is **public**. It contains derived result tables, monthly portfolio-level series and some security-level reference files produced from licensed vendor data (WRDS/Compustat Global lineage); raw vendor extracts are not included. Whether each derived artifact may be redistributed has **not** been verified against the vendor's terms; anyone reusing the data should check. No journal papers are committed. The manuscript candidate is a draft with author fields unfilled.
+
+### Validation record
+
+Candidate checker and withdrawn-claims screen pass. Tests were last run in 13 sequential per-directory batches (715 passed, 0 failed); this is not a single full-suite invocation. Details: `docs/PROJECT_COMPLETION_REPORT.md` sections 7, 8a and 8b.
+
 ## Status
 
 | Workstream | Owner | State |

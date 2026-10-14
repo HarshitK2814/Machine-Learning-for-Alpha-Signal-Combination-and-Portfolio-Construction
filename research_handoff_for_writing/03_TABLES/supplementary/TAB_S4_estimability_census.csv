@@ -1,0 +1,10 @@
+country,metric,series,0%,<=5%,<=25%,>25%
+Germany,gross (valuation),176,0,0,0,176
+Germany,net (valuation or cost),176,0,0,0,176
+Germany,"after-tax (valuation, cost or tax)",176,0,0,0,176
+India,gross (valuation),160,0,0,0,160
+India,net (valuation or cost),160,0,0,0,160
+India,"after-tax (valuation, cost or tax)",160,0,0,0,160
+Japan,gross (valuation),224,0,0,0,224
+Japan,net (valuation or cost),224,0,0,0,224
+Japan,"after-tax (valuation, cost or tax)",224,0,0,0,224

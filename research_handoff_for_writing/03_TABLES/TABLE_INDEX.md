@@ -1,0 +1,183 @@
+# Table index
+
+Refer to an asset by its ID. Each asset exists in the formats listed; the formats are one asset. Statuses: `MAIN_TEXT_ELIGIBLE`, `SUPPLEMENTARY_ELIGIBLE`, `DIAGNOSTIC_ONLY` (never the main text). Captions are as written in the asset catalog; do not strengthen them. Full source hashes and review notes: `05_RESULTS_AND_PROVENANCE/ASSET_CATALOG.md`.
+
+| ID | Status | Intended location | Formats | Sources (paths) |
+|---|---|---|---|---|
+| `TAB_M1_markets_coverage` | `MAIN_TEXT_ELIGIBLE` | Section 3 (data) | csv tex md | results/phase_c_census_v3_2026-10-14/input_coverage_by_country_month.csv |
+| `TAB_M2_matched_book_outcomes` | `MAIN_TEXT_ELIGIBLE` | Section 5.1 (candidate Table 1) | csv tex md | docs/attachments/MATCHED_BOOK_1E+09_2026-10-09.csv |
+| `TAB_M3_tax_regimes` | `MAIN_TEXT_ELIGIBLE` | Section 5.3 (or Section 3) | csv tex md | docs/attachments/SUMMARY_AFTER_TAX_DEU_1E9_2026-10-09.csv; docs/attachments/SUMMARY_AFTER_TAX_IND_1E9_2026-10-09.csv; docs/attachments/SUMMARY_AFTER_TAX_JPN_1E9_2026-10-09.csv; src/alphacomb/tax/jurisdictions.py |
+| `TAB_S1_cost_tax_turnover` | `SUPPLEMENTARY_ELIGIBLE` | Supplement D | csv tex md | docs/attachments/SUMMARY_AFTER_TAX_DEU_1E9_2026-10-09.csv; docs/attachments/SUMMARY_AFTER_TAX_IND_1E9_2026-10-09.csv; docs/attachments/SUMMARY_AFTER_TAX_JPN_1E9_2026-10-09.csv |
+| `TAB_S2_capacity_all_rungs` | `SUPPLEMENTARY_ELIGIBLE` | Supplement; selected rungs are candidate Table 2 | csv tex md | results/capacity_return_difference/tierB_DEU.csv; results/capacity_return_difference/tierB_IND.csv; results/capacity_return_difference/tierB_JPN.csv; results/capacity_return_difference/tierA_DEU.csv; results/capacity_return_difference/tierA_IND.csv; results/capacity_return_difference/tierA_JPN.csv |
+| `TAB_S3_design_axes_mde` | `SUPPLEMENTARY_ELIGIBLE` | Supplement E | csv tex md | docs/attachments/GATE2_POWER_1E9_2026-10-09.csv |
+| `TAB_S4_estimability_census` | `SUPPLEMENTARY_ELIGIBLE` | Supplement G: traceability and exclusions | csv tex md | results/phase_c_census_v3_2026-10-14/tier_counts_by_metric.csv |
+| `TAB_S5_not_reported_register` | `SUPPLEMENTARY_ELIGIBLE` | Supplement G | csv tex md | none (schematic or register) |
+| `TAB_M4_construction_friction_spec` | `MAIN_TEXT_ELIGIBLE` | Section 4.1 | csv tex md | configs/base.yaml; configs/portfolio.yaml |
+| `TAB_S6_terms_and_conventions` | `SUPPLEMENTARY_ELIGIBLE` | Supplement G | csv tex md | none (schematic or register) |
+| `TAB_S7_source_provenance_registry` | `SUPPLEMENTARY_ELIGIBLE` | Supplement G | csv tex md | none (schematic or register) |
+| `TAB_S8_stage06_weight_provenance` | `SUPPLEMENTARY_ELIGIBLE` | Supplement G | csv tex md | results/phase_c_after_tax_config_recovery_2026-10-14/after_tax_arms.csv; results/phase_c_after_tax_config_recovery_2026-10-14/after_tax_weight_identity.csv |
+| `TAB_S9_c4_row_composition` | `SUPPLEMENTARY_ELIGIBLE` | Supplement A: data and coverage | csv tex md | results/phase_c_census_v3_2026-10-14/c4_support_flag_crosstab.csv |
+| `TAB_S10_coverage_by_year` | `SUPPLEMENTARY_ELIGIBLE` | Supplement A: data and coverage | csv tex md | results/phase_c_census_v3_2026-10-14/input_coverage_by_country_month.csv |
+| `TAB_S11_coverage_aggregation_audit` | `SUPPLEMENTARY_ELIGIBLE` | Supplement A: data and coverage (supports the Section 3 India disclosure) | csv tex md | results/phase_c_census_v3_2026-10-14/input_coverage_by_country_month.csv |
+| `TAB_S12_matched_book_all_rungs` | `SUPPLEMENTARY_ELIGIBLE` | Supplement D | csv tex md | docs/attachments/MATCHED_BOOK_3E+07_2026-10-09.csv; docs/attachments/MATCHED_BOOK_1E+08_2026-10-09.csv; docs/attachments/MATCHED_BOOK_1E+09_2026-10-09.csv |
+| `TAB_S13_cell_level_results_1bn` | `SUPPLEMENTARY_ELIGIBLE` | Supplement D | csv tex md | docs/attachments/SUMMARY_AFTER_TAX_DEU_1E9_2026-10-09.csv; docs/attachments/SUMMARY_AFTER_TAX_IND_1E9_2026-10-09.csv; docs/attachments/SUMMARY_AFTER_TAX_JPN_1E9_2026-10-09.csv |
+| `TAB_S14_optimised_book_all_rungs` | `SUPPLEMENTARY_ELIGIBLE` | Supplement D | csv tex md | docs/attachments/SUMMARY_AFTER_TAX_DEU_1E8_2026-10-09.csv; docs/attachments/SUMMARY_AFTER_TAX_DEU_1E9_2026-10-09.csv; docs/attachments/SUMMARY_AFTER_TAX_DEU_1E10_2026-10-09.csv; docs/attachments/SUMMARY_AFTER_TAX_IND_1E9_2026-10-09.csv; docs/attachments/SUMMARY_AFTER_TAX_JPN_1E8_2026-10-09.csv; docs/attachments/SUMMARY_AFTER_TAX_JPN_1E9_2026-10-09.csv; docs/attachments/SUMMARY_AFTER_TAX_JPN_1E10_2026-10-09.csv |
+| `TAB_S15_prediction_vs_economic_arm` | `DIAGNOSTIC_ONLY` | Supplement F | csv tex md | docs/attachments/SUMMARY_AFTER_TAX_DEU_1E9_2026-10-09.csv; docs/attachments/SUMMARY_AFTER_TAX_IND_1E9_2026-10-09.csv; docs/attachments/SUMMARY_AFTER_TAX_JPN_1E9_2026-10-09.csv |
+| `TAB_S16_tierA_tierB_reconciliation` | `DIAGNOSTIC_ONLY` | Supplement F | csv tex md | results/capacity_return_difference/reconciliation_DEU.csv; results/capacity_return_difference/reconciliation_IND.csv; results/capacity_return_difference/reconciliation_JPN.csv |
+| `TAB_S17_solvency_ledger` | `SUPPLEMENTARY_ELIGIBLE` | Supplement C | csv tex md | results/capacity_return_difference/tierA_DEU.csv; results/capacity_return_difference/tierA_IND.csv; results/capacity_return_difference/tierA_JPN.csv |
+| `TAB_S18_trade_size_vs_adv` | `SUPPLEMENTARY_ELIGIBLE` | Supplement C | csv tex md | results/cost_parity_diagnostic/dtv_support.csv |
+| `TAB_S19_cost_parity_reconciliation` | `DIAGNOSTIC_ONLY` | Supplement F | csv tex md | results/cost_parity_diagnostic/parity_summary.csv |
+| `TAB_S20_design_axis_significance_counts` | `SUPPLEMENTARY_ELIGIBLE` | Supplement E | csv tex md | docs/attachments/DESIGN_IDENTIFIABILITY_DEU_2026-10-09.csv; docs/attachments/DESIGN_IDENTIFIABILITY_IND_2026-10-09.csv |
+| `TAB_S21_blocked_and_excluded_inventory` | `SUPPLEMENTARY_ELIGIBLE` | Supplement G | csv tex md | none (schematic or register) |
+
+## Captions and limitations
+
+### TAB_M1_markets_coverage
+
+* Status: `MAIN_TEXT_ELIGIBLE`; intended location: Section 3 (data).
+* Caption: Table 1. Markets, evaluation window and cost-input coverage. Coverage = security-months with a certified spread, daily volatility and USD ADV divided by in-universe security-months, per month. Counts are means over months. An uncertified security-month is non-tradeable and is not imputed. Lowest month by market (certified of in-universe): Germany 2009-01: 183 of 354; India 2009-10: 1 of 274; Japan 2009-01: 1491 of 1585. India's tax panel has 131 months in the stage-06 summaries. Source: outcome-free support census; it is a description of inputs, not a result.
+* What it does and does not establish: Same definitions in all markets; counts and ratios only. Placement: main text.
+
+### TAB_M2_matched_book_outcomes
+
+* Status: `MAIN_TEXT_ELIGIBLE`; intended location: Section 5.1 (candidate Table 1).
+* Caption: Table 2. Matched-book outcomes at $1bn by market. Decile composites at $1bn, matched-book accounting (same weights, zero-tax control and statutory regime). Channels are differences in Sharpe points (cost: net minus gross; tax: after-tax minus net). The uncapped book is not executable and is shown only as the comparator; its Japanese net Sharpe reflects near-ruin. No net Sharpe is significantly positive. Tax t and p are the source's paired block-bootstrap values for the after-tax minus net Sharpe difference (block 6), unadjusted for multiplicity; net t is a Newey-West t-statistic against zero. Germany's optimised-book inference statistic is not reported: no committed artifact holds it.
+* What it does and does not establish: Same books, AUM and accounting in all markets; the uncapped comparator is labelled. Inference columns come from the source and are unadjusted. Germany's optimised-book inference is absent by design. Placement: main text.
+
+### TAB_M3_tax_regimes
+
+* Status: `MAIN_TEXT_ELIGIBLE`; intended location: Section 5.3 (or Section 3).
+* Caption: Table 3. Tax regimes as run. Rates for Germany and Japan are the configured values in src/alphacomb/tax/jurisdictions.py (flat; every numeric rate in that file is marked as unverified by the project and this is not a legal review). India's rates are not restated here: the regime label as run in stage 06 is shown verbatim. The long-term share is exactly zero under flat statutes by construction, a mechanical consequence and not an estimate. Means over the 8 prediction cells at $1bn, statutory regime rows.
+* What it does and does not establish: States the statute inputs as configured and as run, with no legal claim. Placement: main text.
+
+### TAB_S1_cost_tax_turnover
+
+* Status: `SUPPLEMENTARY_ELIGIBLE`; intended location: Supplement D.
+* Caption: Table S1. Cost, tax and turnover accounting on the optimised book at $1bn. Optimised book at $1bn, stage-06 summaries, means over the 8 prediction cells. Net Sharpe and cost drag are from the zero-tax regime rows; after-tax Sharpe and tax drag from the statutory-regime rows. Germany's and India's summaries are verbatim snapshots of earlier untracked outputs (the German one from an older script version with 24 columns); the weight identity was recovered from the weights index. Turnover is endogenous, so the ordering of tax drag by turnover is descriptive and does not separate rate from wedge. No inference is attached.
+* What it does and does not establish: Optimised-book cost, tax and turnover means; provenance caveats for the German and Indian snapshots are in the notes. Placement: supplement.
+
+### TAB_S2_capacity_all_rungs
+
+* Status: `SUPPLEMENTARY_ELIGIBLE`; intended location: Supplement; selected rungs are candidate Table 2.
+* Caption: Table S2. Capacity accounting B(A) at every rung, with insolvent rungs shown. B(A) is the annualised mean net-return difference between the capped and uncapped decile composites (equal-weighted over 8 independently simulated full-AUM variants), in points of NAV per year, Tier B pipeline accounting. It is an accounting difference against an infeasible comparator and is not an investable performance gain; it is not convertible to Sharpe points. A rung is solvent only if no cell-month of either book is at or below -100% net return; insolvent rungs have no B(A) and are listed, not dropped. Intervals are unadjusted studentised stationary-bootstrap intervals; Holm p is adjusted within country across valid rungs. Near-ruined: uncapped terminal wealth below the display flag, not an exclusion rule.
+* What it does and does not establish: Every rung is listed, including insolvent ones, so exclusions are visible. Placement: supplement.
+
+### TAB_S3_design_axes_mde
+
+* Status: `SUPPLEMENTARY_ELIGIBLE`; intended location: Supplement E.
+* Caption: Table S3. Design-axis contrasts at $1bn and their minimum detectable effects. Optimised book at $1bn: paired effect of each design axis with its standard error from the source. MDE = 2.8016 x SE (5% two-sided, 80% power, the multiplier used in tools/gate2_power.py). The t-statistics are unadjusted. 1 of 9 contrasts have |t| above 1.96 (Japan conditioning); it was not specified in advance and is disclosed but not claimed (Japan's conditioning contrast is exploratory). A null here excludes only effects of roughly the MDE or larger.
+* What it does and does not establish: Observed contrasts and detectability; unadjusted. Placement: supplement.
+
+### TAB_S4_estimability_census
+
+* Status: `SUPPLEMENTARY_ELIGIBLE`; intended location: Supplement G: traceability and exclusions.
+* Caption: Table S4. Input-support (estimability) census of the series required by the revised analysis. Outcome-free support census (version 3). A series is one saved weight series (mandate rung x book x factorial cell), 560 in all across the three markets. Each is assigned to an estimability tier by the share of months lacking a usable input; the thresholds are 0% / at most 5% / at most 25% / above 25%. Every series under every metric sits in the highest tier, so none is estimable under the census rule. This table describes input support only: it is not a result and it does not show that the revised (carry-forward) analysis, Phase C, was run. That analysis is blocked.
+* What it does and does not establish: Input-support counts only; no outcome is shown and Phase C is not implied to have run. Placement: supplement.
+
+### TAB_S5_not_reported_register
+
+* Status: `SUPPLEMENTARY_ELIGIBLE`; intended location: Supplement G.
+* Caption: Table S5. What is not reported, and why. Register of results that are withheld, withdrawn, excluded or unresolved, so that their absence from the figures and tables is visible. Statuses restate the project's documents; no value is computed here.
+* What it does and does not establish: Makes withheld, withdrawn and unresolved items visible. Statuses restate project documents; no value is computed except the two Holm counts. Placement: supplement.
+
+### TAB_M4_construction_friction_spec
+
+* Status: `MAIN_TEXT_ELIGIBLE`; intended location: Section 4.1.
+* Caption: Table 4. Portfolio construction and friction specification as committed. Read from the committed configuration files; the manuscript states the same gross, cap, volatility, commission, impact and borrow values (Section 4.1). Run-time hashes of the configuration used on 2026-10-09 were not recorded, so this is the configuration as committed, not a certified record of the runs. Amendment 001A records the contract parameters as frozen by the project team, an attestation that has not been countersigned. Impact is k x sigma x sqrt(AUM/ADV) |dw|^1.5 as stated in the manuscript.
+* What it does and does not establish: Answers: what the portfolios and frictions were. Read from the committed configuration and checked against the manuscript; the provenance caveat is in the notes. Placement: main text (the paper has no parameter table).
+
+### TAB_S6_terms_and_conventions
+
+* Status: `SUPPLEMENTARY_ELIGIBLE`; intended location: Supplement G.
+* Caption: Table S6. Terms and accounting conventions. Definitions restate the manuscript and the named tool documentation; the multiplier 2.8016 equals 1.96 + 0.8416 as in the tool. No value is computed.
+* What it does and does not establish: Answers: what each term means. No numbers computed. Placement: supplement.
+
+### TAB_S7_source_provenance_registry
+
+* Status: `SUPPLEMENTARY_ELIGIBLE`; intended location: Supplement G.
+* Caption: Table S7. Source artifact and provenance registry for the publication assets. Every source the publication assets read, with its hash (full hash in the CSV) and the tracked code that produced it. Hashes of files listed in TRACEABILITY.csv are verified against it before any asset is built; the others are recorded here at build time. The heavy producing stages need untracked licensed data and are not rerun by the asset pipeline.
+* What it does and does not establish: Answers: where every number came from and whether its hash is verified. Placement: supplement (reproducibility record).
+
+### TAB_S8_stage06_weight_provenance
+
+* Status: `SUPPLEMENTARY_ELIGIBLE`; intended location: Supplement G.
+* Caption: Table S8. Provenance of the stage-06 summaries and the weights they used. Recovery record for the seven stage-06 summaries (2026-10-14): which weights each summary most plausibly used. 'Index = latest run' counts strategies whose indexed run is also the newest by modification time today; zero means later runs exist, so the weight identity rests on the weights index and on modification-time ordering, not on a run-time hash. Run-time hashes of code and weights were not recorded.
+* What it does and does not establish: Answers: how firmly each stage-06 summary is tied to its weights. States the limits of modification-time identity. Placement: supplement.
+
+### TAB_S9_c4_row_composition
+
+* Status: `SUPPLEMENTARY_ELIGIBLE`; intended location: Supplement A: data and coverage.
+* Caption: Table S9. Composition of the C4 target rows by certification and usability. All C4 target rows, 2009-01 to 2019-12, by presence flags from the support census (values were reduced to flags at load time). Certified means the cost-input predicate of the engine: spread and volatility present and non-negative, ADV positive. The census does not retain which component fails.
+* What it does and does not establish: Answers: what the coverage denominator is made of. Row counts from flags. Placement: supplement.
+
+### TAB_S10_coverage_by_year
+
+* Status: `SUPPLEMENTARY_ELIGIBLE`; intended location: Supplement A: data and coverage.
+* Caption: Table S10. Cost-input coverage by calendar year. Mean and lowest monthly share of in-universe securities with certified cost inputs, by calendar year. Same definition as the coverage table; no month is omitted.
+* What it does and does not establish: Answers: how coverage varies by year. Placement: supplement.
+
+### TAB_S11_coverage_aggregation_audit
+
+* Status: `SUPPLEMENTARY_ELIGIBLE`; intended location: Supplement A: data and coverage (supports the Section 3 India disclosure).
+* Caption: Table S11. Aggregation audit of the cost-input coverage statistic. The manuscript's coverage statistic (Section 3) is the mean over months of certified over in-universe securities, applied identically to all three markets; this table recomputes it and three alternatives from the same counts. India's lowest month is included in its 0.989. The census retains presence flags only, so it cannot show which certification component failed in that month, nor whether the as-run engine's treatment of uncertified security-months interacts with it; answering that needs the monthly cost series and is outside this audit. India's committed Tier B monthly series has no return for 2009-10; this is the lowest-coverage month. Project documents of 2026-10-09 (the full account and the capacity-channel results) say India's 0.004 minimum is a single month, January 2009, and the reason for its 131 months; the committed census and series show 2009-10 instead.
+* What it does and does not establish: Answers: how the 0.989 statistic is computed and how sensitive it is. Source counts only; says what cannot be established. Placement: supplement.
+
+### TAB_S12_matched_book_all_rungs
+
+* Status: `SUPPLEMENTARY_ELIGIBLE`; intended location: Supplement D.
+* Caption: Table S12. Matched-book outcomes at every committed mandate size. Every matched-book snapshot that exists (3e7 for India, 1e8 for Germany, 1e9 for all). Matched-book outputs were produced only for these market-by-rung pairs; the others are not available and are not interpolated. The uncapped book is the non-executable comparator.
+* What it does and does not establish: Answers: what matched-book results exist beyond $1bn. Absent rungs are not filled. Placement: supplement.
+
+### TAB_S13_cell_level_results_1bn
+
+* Status: `SUPPLEMENTARY_ELIGIBLE`; intended location: Supplement D.
+* Caption: Table S13. Optimised-book results by prediction cell at $1bn. Optimised book at $1bn, one row per prediction-loss cell. Cell codes are representation (L or N), conditioning (S or C), loss (P) and uncertainty (0 or U) as named in the stage-06 summaries. Net, cost drag and turnover from the zero-tax regime rows; after-tax and tax drag from the statutory-regime rows. No inference is attached; Germany's and India's snapshots are verbatim copies of earlier outputs.
+* What it does and does not establish: Answers: how results differ across the 8 cells. Placement: supplement.
+
+### TAB_S14_optimised_book_all_rungs
+
+* Status: `SUPPLEMENTARY_ELIGIBLE`; intended location: Supplement D.
+* Caption: Table S14. Optimised-book summary at every committed mandate size. Means over the 8 prediction cells for every stage-06 summary that exists: Germany and Japan at 1e8, 1e9, 1e10, India at 1e9 only. Absent rungs are not shown or interpolated. Descriptive; no inference; Germany's $1bn snapshot is from an older script version (24 columns).
+* What it does and does not establish: Answers: optimised-book summary at every committed rung. Placement: supplement.
+
+### TAB_S15_prediction_vs_economic_arm
+
+* Status: `DIAGNOSTIC_ONLY`; intended location: Supplement F.
+* Caption: Table S15. Prediction-loss and economic-loss arms at $1bn (diagnostic). Zero-tax regime, optimised book at $1bn, means over each arm's 8 cells. The restriction of headline results to the prediction-loss arm was made after the economic arm's behaviour was observed (a post hoc deviation); this table documents the contrast and is not evidence for any claim. Diagnostic only.
+* What it does and does not establish: Answers: why the economic arm is outside the headline. Diagnostic only.
+
+### TAB_S16_tierA_tierB_reconciliation
+
+* Status: `DIAGNOSTIC_ONLY`; intended location: Supplement F.
+* Caption: Table S16. Reconciliation of the two accountings of B(A), by rung. Points of NAV per year. The reconciliation files hold only the rungs where Tier B was run (solvent comparator); insolvent rungs are not listed here and appear in the solvency ledger. The two accountings are not equal; the largest absolute gaps are Germany up to 44.3 points at $100mn; India up to 7.0 points at $30mn; Japan up to 37.8 points at $10bn. Tier B is primary. Closeness at large B(A) would not be independent confirmation of the capacity effect, and B(A) remains an accounting difference against an infeasible comparator.
+* What it does and does not establish: Answers: how the two B(A) accountings differ rung by rung. Diagnostic only.
+
+### TAB_S17_solvency_ledger
+
+* Status: `SUPPLEMENTARY_ELIGIBLE`; intended location: Supplement C.
+* Caption: Table S17. Solvency ledger of the uncapped comparator and the capped book. Tier A solvency ledger for every rung. A rung is solvent only if no cell-month of either book is at or below -100%. A worst month below -100% means the comparator's account would be negative; such rungs get no B(A). Worst months are single-month net returns of the worst cell, not averages.
+* What it does and does not establish: Answers: where and when the uncapped comparator fails. Placement: supplement.
+
+### TAB_S18_trade_size_vs_adv
+
+* Status: `SUPPLEMENTARY_ELIGIBLE`; intended location: Supplement C.
+* Caption: Table S18. Trade size relative to ADV by book and mandate size. From the cost-parity diagnostic: the share of traded notional in trades larger than 12% (respectively 100%) of the name's ADV, and the notional-weighted median trade as a percentage of ADV, for the rungs the diagnostic covers.
+* What it does and does not establish: Answers: trade size against liquidity by book. Placement: supplement.
+
+### TAB_S19_cost_parity_reconciliation
+
+* Status: `DIAGNOSTIC_ONLY`; intended location: Supplement F.
+* Caption: Table S19. Cost-parity reconciliation between the two accountings. Points of NAV per year. Each effect is the change in cost from switching one accounting convention from Tier B to Tier A (trade-size basis, exit treatment, borrow); effects plus interaction sum to the replicated difference; the residual is the recorded difference minus the replicated one. Material: the discrepancy exceeds 0.05 points; reconciled: the replication residual is within tolerance. This is accounting reconciliation of the cost function on existing weights, not the sensitivity of results to the exit treatment.
+* What it does and does not establish: Answers: why two cost accountings differ. Explicitly not the exit-treatment sensitivity. Diagnostic only.
+
+### TAB_S20_design_axis_significance_counts
+
+* Status: `SUPPLEMENTARY_ELIGIBLE`; intended location: Supplement E.
+* Caption: Table S20. Design-axis significance counts by market, book and axis. Counts over the mandate sizes of the design-identifiability tables. Holm adjustment is across the three axes within a rung; rungs without an adjusted value in the source are counted as unavailable, not as non-significant. Unadjusted counts are shown for transparency and carry no multiplicity control. Compare with the manuscript's 0 of 42 capped-book axis-rungs in each of Germany and India.
+* What it does and does not establish: Answers: how many axis contrasts are significant. Unavailable adjusted values counted separately. Placement: supplement.
+
+### TAB_S21_blocked_and_excluded_inventory
+
+* Status: `SUPPLEMENTARY_ELIGIBLE`; intended location: Supplement G.
+* Caption: Table S21. Inventory of blocked, unsupported and excluded assets. Assets and comparisons considered and not generated, with the reason; what would be needed (data or a separately authorised analysis) is stated where applicable. Nothing in this table was computed.
+* What it does and does not establish: Answers: what is not available and why. Placement: supplement.

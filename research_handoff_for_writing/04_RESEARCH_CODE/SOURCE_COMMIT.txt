@@ -1,0 +1,4 @@
+repository: https://github.com/HarshitK2814/Machine-Learning-for-Alpha-Signal-Combination-and-Portfolio-Construction.git
+branch: feat/completion-sprint-2026-10-14
+commit: dfabaacc9107074ff0e34875f9d3ceeb956dfcae
+note: copy of code for reading; the Git repository is canonical

@@ -13,3 +13,7 @@ build/
 dist/
 .env
 .ipynb_checkpoints/
+
+# generated copies for the writing handoff (rebuild with tools/build_writer_handoff.py)
+research_handoff_for_writing_*.zip
+research_handoff_for_writing_*.zip.sha256

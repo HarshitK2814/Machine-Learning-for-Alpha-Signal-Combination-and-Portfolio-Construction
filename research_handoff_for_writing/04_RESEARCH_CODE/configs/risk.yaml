@@ -1,0 +1,15 @@
+# Workstream B (Harshit): structural factor risk model (contract C7).
+model: structural
+factors:
+  market_beta: true
+  themes: true                 # 13 JKP-style theme composites
+  industries: true             # FF49 (synthetic data uses 12 industry codes)
+estimation:
+  beta_window_months: 36
+  factor_cov_halflife_months: 24
+  specific_halflife_months: 24
+  specific_shrink_to_size_decile: 0.3
+  min_obs: 24
+  ridge_on_factor_cov: 0.0001
+alternatives:
+  pca_factors: 20              # robustness model
