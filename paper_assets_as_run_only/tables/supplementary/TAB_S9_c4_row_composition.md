@@ -1,0 +1,9 @@
+**Table S9. Composition of the C4 target rows by certification and usability**
+
+| Market | C4 rows | not in the C1 universe | in universe, no certified cost inputs | in universe, certified, return or dividend unusable | in universe, certified, return and dividend usable |
+|---|---|---|---|---|---|
+| Germany | 125,803 | 75,799 (60.3%) | 17,458 (13.9%) | 5 (0.0%) | 32,541 (25.9%) |
+| India | 515,401 | 471,168 (91.4%) | 385 (0.1%) | 10 (0.0%) | 43,838 (8.5%) |
+| Japan | 510,598 | 263,186 (51.5%) | 520 (0.1%) | 31 (0.0%) | 246,861 (48.3%) |
+
+*Notes.* All C4 target rows, 2009-01 to 2019-12, by presence flags from the support census (values were reduced to flags at load time). Certified means the cost-input predicate of the engine: spread and volatility present and non-negative, ADV positive. The census does not retain which component fails.

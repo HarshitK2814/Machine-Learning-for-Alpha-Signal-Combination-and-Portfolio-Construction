@@ -93,3 +93,25 @@ def test_japan_net_sharpe_statement_must_match_artifacts(cand):
 def test_japan_rung_values_must_match_artifacts(cand):
     _edit(cand, "(-0.088, +0.057, -0.100)", "(-0.088, +0.157, -0.100)")
     assert any("jpn_rungs" in e for e in mod.check())
+
+
+def test_hash_check_accepts_crlf_or_lf_text_but_not_other_changes(tmp_path):
+    p = tmp_path / "t.csv"
+    lf = b"a,b\n1,2\n"
+    p.write_bytes(lf)
+    h_lf = mod.sha(p)
+    p.write_bytes(lf.replace(b"\n", b"\r\n"))
+    assert mod.hash_matches(p, h_lf)          # same content, Windows line endings
+    assert mod.hash_matches(p, mod.sha(p))    # the raw hash also matches
+    p.write_bytes(b"a,b\n1,3\r\n")
+    assert not mod.hash_matches(p, h_lf)
+
+
+def test_india_coverage_month_statement_must_match_the_census(cand):
+    _edit(cand, "1 of 274 in-universe", "2 of 274 in-universe")
+    assert any("india_low_month" in e for e in mod.check())
+
+
+def test_india_tierb_gap_statement_must_match_the_series(cand):
+    _edit(cand, "lacks 2009-10 (131 months)", "lacks 2009-01 (131 months)")
+    assert any("india_tierB_gap" in e for e in mod.check())

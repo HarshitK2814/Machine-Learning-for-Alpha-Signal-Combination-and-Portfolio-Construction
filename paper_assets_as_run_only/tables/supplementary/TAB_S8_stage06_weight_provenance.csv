@@ -1,0 +1,8 @@
+country,aum_label,months,dated_column,tracked_snapshot,snapshot_sha256_equals_live_file,index_written_before_summary,strategies,indexed_run_exists,index_equals_latest,predates_summary,summary_sha256
+DEU,100000000.0,132,False,docs\attachments\SUMMARY_AFTER_TAX_DEU_1E8_2026-10-09.csv,True,True,16,16,0,16,12d9553d0e1657c382a7a603f6407ec6fdcb026b4022f62e31e0c2967bea3bcd
+DEU,1000000000.0,132,absent (older code),none,,False,16,16,0,16,84a8d5ff172cf1f67b8ffc4be72359908cb03cccffb8ccea27216957e97f86ca
+DEU,10000000000.0,132,False,docs\attachments\SUMMARY_AFTER_TAX_DEU_1E10_2026-10-09.csv,True,True,16,16,0,16,9f29ea994dc34739c49183c21c90d45e347c8abd16baaebb2a0ca8be4d706cc0
+IND,1000000000.0,131,False,none,,False,16,16,0,16,e2fd34229e1e8b38f9977a0ff94ffb0d3d6d178288080b4365dfa20eeca623d6
+JPN,100000000.0,132,False,docs\attachments\SUMMARY_AFTER_TAX_JPN_1E8_2026-10-09.csv,True,True,16,16,0,16,b37f0da8081e62ab9efc5ed1c0838723b004bdebaae76feb38f411f86b11ec15
+JPN,1000000000.0,132,False,docs\attachments\SUMMARY_AFTER_TAX_JPN_1E9_2026-10-09.csv,True,True,16,16,0,16,cec2ef836ce0ea0dd28d56d48e6d3d5b017a1df62ae8dd665b6ba3d02666aa3c
+JPN,10000000000.0,132,False,docs\attachments\SUMMARY_AFTER_TAX_JPN_1E10_2026-10-09.csv,True,True,16,16,16,16,9b75bdb5d8ce5be3e57b4342ced870f6f0d5de1e75d3f0924c277a0bc23a06cb

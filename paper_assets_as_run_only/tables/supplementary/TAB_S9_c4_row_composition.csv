@@ -1,0 +1,4 @@
+country,total_c4_rows,not in the C1 universe (rows),"in universe, no certified cost inputs (rows)","in universe, certified, return or dividend unusable (rows)","in universe, certified, return and dividend usable (rows)",not in the C1 universe (share),"in universe, no certified cost inputs (share)","in universe, certified, return or dividend unusable (share)","in universe, certified, return and dividend usable (share)"
+DEU,125803,75799,17458,5,32541,0.602521402510274,0.13877252529748893,3.9744680174558635e-05,0.25866632751206253
+IND,515401,471168,385,10,43838,0.9141775045062001,0.0007469911777431553,1.940236825306897e-05,0.08505610194780375
+JPN,510598,263186,520,31,246861,0.5154465939937093,0.0010184137031480735,6.071312461075053e-05,0.48347427917853186

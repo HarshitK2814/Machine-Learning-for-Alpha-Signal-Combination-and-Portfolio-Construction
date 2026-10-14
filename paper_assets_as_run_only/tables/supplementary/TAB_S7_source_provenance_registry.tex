@@ -1,0 +1,49 @@
+\begin{table}[t]
+\centering
+\small
+\caption{Table S7. Source artifact and provenance registry for the publication assets}
+\label{tab:s7}
+\begin{tabular}{lrrrr}
+\toprule
+Key & Path & SHA-256 (first 16) & In TRACEABILITY.csv & Producing code \\
+\midrule
+coverage & results/phase\_c\_census\_v3\_2026-10-14/input\_coverage\_by\_country\_month.csv & 0dcec943895f93d5 & yes & tools/phase\_c\_input\_census\_v3.py \\
+matched\_1e9 & docs/attachments/MATCHED\_BOOK\_1E+09\_2026-10-09.csv & 0b0bad711ee1a8d0 & yes & tools/exp\_matched\_book\_accounting.py \\
+gate2 & docs/attachments/GATE2\_POWER\_1E9\_2026-10-09.csv & ac8706d36d43dcb7 & yes & tools/gate2\_power.py \\
+design\_deu & docs/attachments/DESIGN\_IDENTIFIABILITY\_DEU\_2026-10-09.csv & 1e5ceae05eadc455 & yes & tools/exp\_design\_identifiability.py \\
+design\_ind & docs/attachments/DESIGN\_IDENTIFIABILITY\_IND\_2026-10-09.csv & eb96135a139e93a6 & yes & tools/exp\_design\_identifiability.py \\
+tier\_counts & results/phase\_c\_census\_v3\_2026-10-14/tier\_counts\_by\_metric.csv & 84d0cb8fb142ad44 & no & tools/phase\_c\_input\_census\_v3.py \\
+flag\_crosstab & results/phase\_c\_census\_v3\_2026-10-14/c4\_support\_flag\_crosstab.csv & 90ebd092487d5611 & no & tools/phase\_c\_input\_census\_v3.py \\
+parity\_summary & results/cost\_parity\_diagnostic/parity\_summary.csv & 3546a0d4d030cde2 & no & tools/diag\_cost\_parity.py \\
+dtv\_support & results/cost\_parity\_diagnostic/dtv\_support.csv & 104d61ab97ff25c0 & no & tools/diag\_cost\_parity.py \\
+after\_tax\_arms & results/phase\_c\_after\_tax\_config\_recovery\_2026-10-14/after\_tax\_arms.csv & 3afdac8f8904c413 & no & tools/phase\_c\_recover\_after\_tax\_config.py \\
+after\_tax\_weight\_identity & results/phase\_c\_after\_tax\_config\_recovery\_2026-10-14/after\_tax\_weight\_identity.csv & 12561fe28bb564ea & no & tools/phase\_c\_recover\_after\_tax\_config.py \\
+config\_base & configs/base.yaml & 1baa9cd09d76edf1 & no & (configuration) \\
+config\_portfolio & configs/portfolio.yaml & 87a837c0ed26f0d1 & no & (configuration) \\
+jurisdictions & src/alphacomb/tax/jurisdictions.py & a5d9033fcf6a60ce & no & (configuration) \\
+tierB\_DEU & results/capacity\_return\_difference/tierB\_DEU.csv & 3f428d19f98317bc & yes & tools/exp\_capacity\_return\_difference.py \\
+tierB\_IND & results/capacity\_return\_difference/tierB\_IND.csv & c39681e974cbe8ac & yes & tools/exp\_capacity\_return\_difference.py \\
+tierB\_JPN & results/capacity\_return\_difference/tierB\_JPN.csv & 2fe6a462a5e0d789 & yes & tools/exp\_capacity\_return\_difference.py \\
+tierA\_DEU & results/capacity\_return\_difference/tierA\_DEU.csv & 8fe267e281ddb1b4 & no & tools/exp\_capacity\_return\_difference.py \\
+tierA\_IND & results/capacity\_return\_difference/tierA\_IND.csv & a74472dd34103024 & no & tools/exp\_capacity\_return\_difference.py \\
+tierA\_JPN & results/capacity\_return\_difference/tierA\_JPN.csv & 603c2836cfc971d6 & no & tools/exp\_capacity\_return\_difference.py \\
+tierB\_monthly\_DEU & results/capacity\_return\_difference/tierB\_monthly\_DEU.csv.gz & e62f70bc5fc1575e & no & tools/exp\_capacity\_return\_difference.py \\
+tierB\_monthly\_IND & results/capacity\_return\_difference/tierB\_monthly\_IND.csv.gz & 15b8f1e4ad03dd06 & yes & tools/exp\_capacity\_return\_difference.py \\
+tierB\_monthly\_JPN & results/capacity\_return\_difference/tierB\_monthly\_JPN.csv.gz & 1a2ed01f39b2a76b & no & tools/exp\_capacity\_return\_difference.py \\
+reconciliation\_DEU & results/capacity\_return\_difference/reconciliation\_DEU.csv & ca06f574d513b42f & no & tools/exp\_capacity\_return\_difference.py \\
+reconciliation\_IND & results/capacity\_return\_difference/reconciliation\_IND.csv & b9dc5f75171234dd & no & tools/exp\_capacity\_return\_difference.py \\
+reconciliation\_JPN & results/capacity\_return\_difference/reconciliation\_JPN.csv & b3befed42657fd7b & no & tools/exp\_capacity\_return\_difference.py \\
+sum\_deu\_1e8 & docs/attachments/SUMMARY\_AFTER\_TAX\_DEU\_1E8\_2026-10-09.csv & cf119082a555ac1c & yes & pipelines/06\_after\_tax\_eval.py (verbatim snapshot) \\
+sum\_deu\_1e9 & docs/attachments/SUMMARY\_AFTER\_TAX\_DEU\_1E9\_2026-10-09.csv & c14d2710501169df & yes & pipelines/06\_after\_tax\_eval.py (verbatim snapshot) \\
+sum\_deu\_1e10 & docs/attachments/SUMMARY\_AFTER\_TAX\_DEU\_1E10\_2026-10-09.csv & 90f37f2aeb655440 & yes & pipelines/06\_after\_tax\_eval.py (verbatim snapshot) \\
+sum\_ind\_1e9 & docs/attachments/SUMMARY\_AFTER\_TAX\_IND\_1E9\_2026-10-09.csv & c5c86bb1ead049dd & yes & pipelines/06\_after\_tax\_eval.py (verbatim snapshot) \\
+sum\_jpn\_1e8 & docs/attachments/SUMMARY\_AFTER\_TAX\_JPN\_1E8\_2026-10-09.csv & 8ac3874427bde25f & yes & pipelines/06\_after\_tax\_eval.py (verbatim snapshot) \\
+sum\_jpn\_1e9 & docs/attachments/SUMMARY\_AFTER\_TAX\_JPN\_1E9\_2026-10-09.csv & 54935464c6a0fef5 & yes & pipelines/06\_after\_tax\_eval.py (verbatim snapshot) \\
+sum\_jpn\_1e10 & docs/attachments/SUMMARY\_AFTER\_TAX\_JPN\_1E10\_2026-10-09.csv & 9b18236d42f20080 & yes & pipelines/06\_after\_tax\_eval.py (verbatim snapshot) \\
+matched\_1e8 & docs/attachments/MATCHED\_BOOK\_1E+08\_2026-10-09.csv & 11da9e256c85cbe1 & yes & tools/exp\_matched\_book\_accounting.py \\
+matched\_3e7 & docs/attachments/MATCHED\_BOOK\_3E+07\_2026-10-09.csv & 7410bdb33980f082 & yes & tools/exp\_matched\_book\_accounting.py \\
+\bottomrule
+\end{tabular}
+\par\vspace{2pt}
+\parbox{\textwidth}{\footnotesize Every source the publication assets read, with its hash (full hash in the CSV) and the tracked code that produced it. Hashes of files listed in TRACEABILITY.csv are verified against it before any asset is built; the others are recorded here at build time. The heavy producing stages need untracked licensed data and are not rerun by the asset pipeline.}
+\end{table}

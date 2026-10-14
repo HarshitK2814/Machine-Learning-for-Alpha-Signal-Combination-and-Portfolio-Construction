@@ -32,3 +32,5 @@ It verifies that every citation resolves to a bibliography entry that is identic
 ## Publication assets
 
 `paper_assets_as_run_only/` (at the repository root) holds generated figures and tables with a catalog (`ASSET_CATALOG.md`); regenerate with `python tools/make_paper_assets.py`. They are presentation of the committed artifacts listed in `TRACEABILITY.csv` and are not part of the checked manuscript text.
+
+Mapping of the manuscript's exhibits to the asset library (full placement map in `paper_assets_as_run_only/ASSET_CATALOG.md`): Table 1 = `TAB_M2_matched_book_outcomes`; Table 2 = `TAB_S2_capacity_all_rungs` (all rungs); Figure 1 = `FIG_M4_capacity_B_tierB`; Figure 2 = `FIG_S1_uncapped_terminal_wealth`. The manuscript text was not changed to cite the other assets; Section 3 gained one disclosure (India's 2009-10 month) that `FIG_S7_india_coverage_audit` and `TAB_S11_coverage_aggregation_audit` document.

@@ -41,6 +41,7 @@ ARTIFACTS = {
     "tierB_IND": "results/capacity_return_difference/tierB_IND.csv",
     "tierB_JPN": "results/capacity_return_difference/tierB_JPN.csv",
     "coverage": "results/phase_c_census_v3_2026-10-14/input_coverage_by_country_month.csv",
+    "tierB_monthly_IND": "results/capacity_return_difference/tierB_monthly_IND.csv.gz",
     "fig1": "results/figures/fig1_capacity_return_difference_B.png",
     "fig2": "results/figures/fig2_uncapped_terminal_wealth.png",
     "sum_deu_1e9": ATT + "SUMMARY_AFTER_TAX_DEU_1E9_2026-10-09.csv",
@@ -67,6 +68,20 @@ def sha(p: Path) -> str:
         for b in iter(lambda: f.read(1 << 20), b""):
             h.update(b)
     return h.hexdigest()
+
+
+TEXT_SUFFIXES = {".csv", ".md", ".py", ".yaml", ".yml", ".json", ".txt", ".tex"}
+
+
+def sha_lf(p: Path) -> str:
+    """SHA-256 of a text file with CRLF read as LF (the form stored in git); binary files hash as they are."""
+    if p.suffix.lower() not in TEXT_SUFFIXES:
+        return sha(p)
+    return hashlib.sha256(p.read_bytes().replace(b"\r\n", b"\n")).hexdigest()
+
+
+def hash_matches(p: Path, recorded: str) -> bool:
+    return recorded in (sha(p), sha_lf(p))
 
 
 def art(key: str) -> Path:
@@ -96,6 +111,13 @@ def derived_strings() -> dict[str, str]:
     cov["c"] = cov.c4_with_certified_c6 / cov.c4_in_c1_universe
     m = cov.groupby("country")["c"].mean()
     out["coverage"] = f"{m['DEU']:.3f} in Germany, {m['IND']:.3f} in India and {m['JPN']:.3f} in Japan"
+    ind = cov[cov.country == "IND"].reset_index(drop=True)
+    low = ind.loc[ind["c"].idxmin()]
+    out["india_low_month"] = f"{low['month']} ({int(low['c4_with_certified_c6'])} of {int(low['c4_in_c1_universe'])} in-universe securities certified)"
+    tb = pd.read_csv(art("tierB_monthly_IND"), parse_dates=["date"])
+    have = {d.strftime("%Y-%m") for d in tb["date"].unique()}
+    miss = [m_ for m_ in sorted(set(cov.month)) if m_ not in have]
+    out["india_tierB_gap"] = "lacks " + ", ".join(miss)
     # B(A) rungs
     n_solv, n_sig, n_nr, n_mono = {}, {}, {}, {}
     for c in ("DEU", "IND", "JPN"):
@@ -204,7 +226,7 @@ def check() -> list[str]:
         p = ROOT / r["path"]
         if not p.exists():
             errs.append(f"missing artifact {r['path']}")
-        elif sha(p) != r["sha256"]:
+        elif not hash_matches(p, r["sha256"]):
             errs.append(f"hash mismatch {r['path']}")
     # 3 derived numbers
     d = derived_strings()

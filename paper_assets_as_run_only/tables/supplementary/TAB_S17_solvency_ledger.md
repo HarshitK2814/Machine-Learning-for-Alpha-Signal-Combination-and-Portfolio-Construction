@@ -1,0 +1,48 @@
+**Table S17. Solvency ledger of the uncapped comparator and the capped book**
+
+| Market | AUM | Solvent | Cells wiped (of 8) | Worst month, uncapped | Worst month, capped | First uncapped wipe-out |
+|---|---|---|---|---|---|---|
+| Germany | $100k | yes | 0 | -18.2% | -19.2% | none |
+| Germany | $300k | yes | 0 | -19.0% | -20.3% | none |
+| Germany | $1mn | yes | 0 | -21.2% | -20.8% | none |
+| Germany | $2mn | yes | 0 | -23.2% | -18.5% | none |
+| Germany | $3mn | yes | 0 | -24.7% | -15.4% | none |
+| Germany | $4mn | yes | 0 | -26.0% | -13.7% | none |
+| Germany | $6mn | yes | 0 | -28.2% | -12.0% | none |
+| Germany | $8mn | yes | 0 | -30.0% | -10.9% | none |
+| Germany | $10mn | yes | 0 | -31.7% | -9.9% | none |
+| Germany | $30mn | yes | 0 | -42.9% | -5.9% | none |
+| Germany | $100mn | yes | 0 | -64.8% | -3.6% | none |
+| Germany | $300mn | no | 1 | -100.2% | -2.4% | 2009-03-31 |
+| Germany | $1bn | no | 8 | -169.4% | -1.0% | 2009-01-31 |
+| Germany | $10bn | no | 8 | -500.4% | -0.1% | 2009-01-31 |
+| India | $100k | yes | 0 | -51.6% | -48.7% | none |
+| India | $300k | yes | 0 | -52.3% | -44.7% | none |
+| India | $1mn | yes | 0 | -53.6% | -36.8% | none |
+| India | $2mn | yes | 0 | -54.8% | -32.9% | none |
+| India | $3mn | yes | 0 | -55.8% | -30.0% | none |
+| India | $4mn | yes | 0 | -56.6% | -28.0% | none |
+| India | $6mn | yes | 0 | -57.9% | -25.8% | none |
+| India | $8mn | yes | 0 | -59.0% | -24.7% | none |
+| India | $10mn | yes | 0 | -60.0% | -23.5% | none |
+| India | $30mn | yes | 0 | -66.7% | -19.4% | none |
+| India | $100mn | no | 1 | -100.1% | -10.0% | 2011-12-31 |
+| India | $300mn | no | 8 | -157.7% | -3.5% | 2009-01-31 |
+| India | $1bn | no | 8 | -274.8% | -1.0% | 2009-01-31 |
+| India | $10bn | no | 8 | -847.6% | -0.1% | 2009-01-31 |
+| Japan | $100k | yes | 0 | -12.6% | -12.6% | none |
+| Japan | $300k | yes | 0 | -12.6% | -12.6% | none |
+| Japan | $1mn | yes | 0 | -12.7% | -12.7% | none |
+| Japan | $2mn | yes | 0 | -12.8% | -12.8% | none |
+| Japan | $3mn | yes | 0 | -12.9% | -12.9% | none |
+| Japan | $4mn | yes | 0 | -12.9% | -13.0% | none |
+| Japan | $6mn | yes | 0 | -13.0% | -13.0% | none |
+| Japan | $8mn | yes | 0 | -13.1% | -13.0% | none |
+| Japan | $10mn | yes | 0 | -13.2% | -13.1% | none |
+| Japan | $30mn | yes | 0 | -13.7% | -12.2% | none |
+| Japan | $100mn | yes | 0 | -14.7% | -8.0% | none |
+| Japan | $300mn | yes | 0 | -16.9% | -3.7% | none |
+| Japan | $1bn | yes | 0 | -28.7% | -1.7% | none |
+| Japan | $10bn | yes | 0 | -89.4% | -0.2% | none |
+
+*Notes.* Tier A solvency ledger for every rung. A rung is solvent only if no cell-month of either book is at or below -100%. A worst month below -100% means the comparator's account would be negative; such rungs get no B(A). Worst months are single-month net returns of the worst cell, not averages.

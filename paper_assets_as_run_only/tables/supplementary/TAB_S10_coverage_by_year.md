@@ -1,0 +1,17 @@
+**Table S10. Cost-input coverage by calendar year**
+
+| Year | Germany mean | Germany lowest month | India mean | India lowest month | Japan mean | Japan lowest month |
+|---|---|---|---|---|---|---|
+| 2009 | 0.574 | 0.517 | 0.904 | 0.004 | 0.990 | 0.941 |
+| 2010 | 0.631 | 0.599 | 0.998 | 0.991 | 0.997 | 0.979 |
+| 2011 | 0.619 | 0.561 | 0.999 | 0.997 | 0.998 | 0.991 |
+| 2012 | 0.582 | 0.550 | 0.999 | 0.996 | 0.998 | 0.983 |
+| 2013 | 0.628 | 0.594 | 0.995 | 0.987 | 0.999 | 0.991 |
+| 2014 | 0.645 | 0.598 | 0.997 | 0.991 | 1.000 | 0.999 |
+| 2015 | 0.671 | 0.646 | 0.998 | 0.995 | 1.000 | 0.998 |
+| 2016 | 0.677 | 0.653 | 0.995 | 0.990 | 0.999 | 0.992 |
+| 2017 | 0.724 | 0.697 | 0.996 | 0.990 | 1.000 | 0.999 |
+| 2018 | 0.719 | 0.689 | 1.000 | 1.000 | 0.999 | 0.998 |
+| 2019 | 0.701 | 0.678 | 1.000 | 1.000 | 0.996 | 0.993 |
+
+*Notes.* Mean and lowest monthly share of in-universe securities with certified cost inputs, by calendar year. Same definition as the coverage table; no month is omitted.

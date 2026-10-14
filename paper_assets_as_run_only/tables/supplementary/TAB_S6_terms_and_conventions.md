@@ -1,0 +1,22 @@
+**Table S6. Terms and accounting conventions**
+
+| Term | Definition as used here | Where defined |
+|---|---|---|
+| Capped decile spread | Long the top decile and short the bottom decile by signal, gross exposure 2.0, with weights clipped to the participation limit |w| <= 5% of ADV / AUM; the first executable object. | manuscript Section 4.1 |
+| Uncapped decile spread | The same spread without the participation clip. Not executable; used only as the comparator in B(A). | manuscript Section 4.1 |
+| Optimised book | The full-constraint optimised portfolio; breadth capped at 600 names. | manuscript Section 4.1, amendment 001B |
+| Prediction cells | The 8 prediction-loss cells of the 2x2x2x2 factorial (representation, conditioning, loss, uncertainty) used for headline results. | manuscript Section 4.1 |
+| Composite | Equal-weighted mean over the 8 cells of a monthly series. | tools/exp_capacity_return_difference.py |
+| Gross, net, after-tax Sharpe | Annualised Sharpe ratios of the monthly return before costs, after costs, and after costs and tax. | stage-06 summaries |
+| Cost channel | Net minus gross Sharpe, in Sharpe points. | tools/exp_matched_book_accounting.py |
+| Tax channel | After-tax minus net Sharpe, in Sharpe points; the paired block-bootstrap statistic of the matched-book tool. | tools/exp_matched_book_accounting.py |
+| Cost drag, tax drag | Annualised mean return lost to costs, respectively to tax, in basis points per year. | stage-06 summaries |
+| Long-term share of gains | Share of realised gains in the long-term category; exactly zero under a flat statute. | stage-06 summaries |
+| B(A) | Annualised mean net-return difference between the capped and uncapped decile composites at mandate size A, in points of NAV per year. An accounting difference against an infeasible comparator, not an investable gain. | manuscript Section 4.2 |
+| Solvent rung | No cell-month of either book has a net return at or below -100% over the horizon. Insolvent rungs receive no B(A). | manuscript Section 4.2 |
+| Near-ruined | Display flag for a solvent rung whose uncapped terminal wealth is below the flag threshold. Not an exclusion rule. | tools/make_figures.py |
+| Cost-input coverage | In a month, securities with a certified spread, daily volatility and USD ADV divided by in-universe securities. | coverage census |
+| Minimum detectable effect | 2.8016 x the paired standard error (5% two-sided, 80% power). | tools/gate2_power.py |
+| Tier A, Tier B | Tier A: wedge-tool monthly series; Tier B: pipeline accounting. Tier B is primary. | tools/exp_capacity_return_difference.py |
+
+*Notes.* Definitions restate the manuscript and the named tool documentation; the multiplier 2.8016 equals 1.96 + 0.8416 as in the tool. No value is computed.

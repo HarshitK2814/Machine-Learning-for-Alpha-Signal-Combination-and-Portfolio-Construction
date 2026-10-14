@@ -1,0 +1,18 @@
+**Table S18. Trade size relative to ADV by book and mandate size**
+
+| Market | AUM | Book | Notional in trades > 12% ADV | Notional in trades > 100% ADV | Median trade (% ADV) |
+|---|---|---|---|---|---|
+| Germany | $100k | capped | 0.30% | 0.000% | 0.50 |
+| Germany | $100k | uncapped | 4.29% | 0.076% | 0.60 |
+| Germany | $300k | capped | 0.84% | 0.000% | 0.94 |
+| Germany | $300k | uncapped | 18.46% | 0.630% | 1.79 |
+| Germany | $100mn | capped | 0.58% | 0.000% | 4.61 |
+| Germany | $100mn | uncapped | 90.67% | 70.678% | 595.95 |
+| India | $30mn | capped | 3.28% | 0.066% | 4.41 |
+| India | $30mn | uncapped | 81.57% | 54.101% | 127.91 |
+| Japan | $1bn | capped | 0.89% | 0.001% | 5.00 |
+| Japan | $1bn | uncapped | 96.89% | 64.960% | 171.93 |
+| Japan | $10bn | capped | 1.48% | 0.001% | 5.00 |
+| Japan | $10bn | uncapped | 99.98% | 97.688% | 1719.35 |
+
+*Notes.* From the cost-parity diagnostic: the share of traded notional in trades larger than 12% (respectively 100%) of the name's ADV, and the notional-weighted median trade as a percentage of ADV, for the rungs the diagnostic covers.
