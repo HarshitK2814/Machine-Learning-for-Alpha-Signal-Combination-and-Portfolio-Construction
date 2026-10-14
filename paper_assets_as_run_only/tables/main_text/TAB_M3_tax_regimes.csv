@@ -1,0 +1,4 @@
+country,as_run_regime_label,lt_share_of_gains_mean,wash_disallowed_bps_mean,short_term_rate,long_term_rate
+Germany,DEU_ABGELTUNGSTEUER,0.0,0.0,0.26375,0.26375
+India,IND_STT100_LTCG_EXEMPT_STCG15,0.5927775841137564,0.0,,
+Japan,JPN_NORMAL_LISTED_SHARE_RATE_PLUS_RECONSTRUCTION,0.0,0.0,0.20315,0.20315

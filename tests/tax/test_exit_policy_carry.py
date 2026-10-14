@@ -10,7 +10,7 @@ import pytest
 
 from alphacomb.tax import TaxConfig, get_regime, summarise_after_tax
 from alphacomb.tax.backtest import after_tax_backtest
-from exit_fixtures import DATES, build_bundle, build_weights, evidence, run, test_cfg
+from exit_fixtures import DATES, build_bundle, build_weights, evidence, run, build_cfg
 
 CARRY = dict(exit_policy="carry_v1")
 
@@ -200,7 +200,7 @@ def test_carry_v1_refuses_a_synthetic_bundle_and_unknown_policies():
     b = build_bundle()
     b.source = "synthetic_seed_1"
     with pytest.raises(ValueError, match="real-panel"):
-        after_tax_backtest(build_weights(), b, test_cfg(), TaxConfig(regime=get_regime("taxable"), **CARRY))
+        after_tax_backtest(build_weights(), b, build_cfg(), TaxConfig(regime=get_regime("taxable"), **CARRY))
     with pytest.raises(ValueError, match="exit_policy"):
         TaxConfig(regime=get_regime("taxable"), exit_policy="carry_v2")
 

@@ -21,7 +21,7 @@ LIMITS (do not describe a PASS as sufficient verification)
     refers to the figure rather than to something else on that line.
   * It only knows the figures and phrases in PATTERNS. A stale claim stated in new words or with
     new numbers is invisible to it (STATUS.md's stale table passed an earlier version).
-  * It scans markdown under docs/, research/, prereg/ and submission_candidate_as_run_only/ plus the root README.
+  * It scans markdown under docs/, research/, prereg/ and submission_candidate_as_run_only/ and paper_assets_as_run_only/ plus the root README.
 
 Usage:  python tools/check_withdrawn_claims.py
 """
@@ -113,7 +113,7 @@ def _heading_labels(lines: list[str], i: int) -> bool:
 
 def files() -> list[Path]:
     out: list[Path] = []
-    for sub in ("docs", "research", "prereg", "submission_candidate_as_run_only"):
+    for sub in ("docs", "research", "prereg", "submission_candidate_as_run_only", "paper_assets_as_run_only"):
         out += sorted((ROOT / sub).rglob("*.md"))
     readme = ROOT / "README.md"
     if readme.exists():

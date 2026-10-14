@@ -61,7 +61,7 @@ def build_weights(drop_from=None):
     return out
 
 
-def test_cfg():
+def build_cfg():
     cfg = load_config("base")
     return {**cfg, "costs": {**cfg["costs"], "aum_usd_2020": 1e7}}
 
@@ -79,7 +79,7 @@ def run(bundle, weights, regime="taxable", **tax_kwargs):
     bt.TaxLotLedger = _Capture
     try:
         tc = TaxConfig(regime=get_regime(regime), initial_nav=1e7, liquidate_at_end=False, **tax_kwargs)
-        frame = bt.after_tax_backtest(weights, bundle, test_cfg(), tc)
+        frame = bt.after_tax_backtest(weights, bundle, build_cfg(), tc)
     finally:
         bt.TaxLotLedger = orig
     return frame, captured["ledger"]
