@@ -1,6 +1,6 @@
 # Project completion report (updated 2026-10-14, after the manuscript-lockdown sprint)
 
-Internal researcher-led report; not an external review. No approval by Maham or Absar beyond their documented responses is claimed; Maham's acknowledgement of the exit ruling is outstanding and 001A-001E are not countersigned. Sprint history on `feat/completion-sprint-2026-10-14`: `24e9a4c` (start) -> `f295d3d` (sprint 1) -> `5f206fd` (sprint 2) -> lockdown sprint (this update).
+Internal researcher-led report; not an external review. No approval by Maham or Absar beyond their documented responses is claimed; Maham's acknowledgement of the exit ruling is outstanding and 001A-001E are not countersigned. Sprint history on `feat/completion-sprint-2026-10-14`: `24e9a4c` (start) -> `f295d3d` (sprint 1) -> `5f206fd` (sprint 2) -> `8ad2f3c` (lockdown) -> novelty-gate and 001C-scorecard sprint (this update).
 
 **Overall state: not submission-ready.** A narrowed, internally consistent, traceable as-run candidate exists. It is blocked from submission by prerequisites that need external access or author decisions (below); passing the available checks does not change that.
 
@@ -21,11 +21,11 @@ Internal researcher-led report; not an external review. No approval by Maham or 
 
 Further manuscript consistency fixes: removed "real" for the gross signal (the gross t-statistics are untraceable); removed an unsupported attribution of the cost-model choice to the capacity literature; stated that the capped-slack remark rests only on a Sharpe-unit ladder not reported; qualified the retraction narrative as recorded in the project note; sourced the statutory rates (`src/alphacomb/tax/jurisdictions.py`) and the breadth cap (amendment 001B) and said neither was independently re-verified; added the provenance and the sensitivity caveats for the Germany and India summaries.
 
-**Finding the authors must see:** amendment 001C required that its five Japan predictions be scored and failures reported prominently. No scoring record exists in the repository. On the committed summaries the second prediction (Japan's net Sharpe at $1bn above Germany's +0.128) does not appear to hold (Japan +0.057). The candidate says so and does not call Japan a confirmation. The earlier sprint's claim that Japan was "a pre-registered out-of-sample confirmation" (and the evidence-map wording behind it) is superseded.
+**Update (novelty-gate sprint): amendment 001C scorecard** (`docs/AMENDMENT_001C_JAPAN_PREDICTION_SCORECARD.md`). Of the five Japan predictions, **P2 is `NOT_MET`** (Japan's net Sharpe at $1bn, cell mean 0.0568 and composite 0.0550, against the amendment's fixed threshold of +0.128; descriptive, no test); **P1, P3, P4 and P5 are `NOT_SCOREABLE`** from committed artifacts (incomplete definitions and diagnostics that were never committed; no substitution was made). Of the amendment's own whole-hypothesis falsification conditions, a non-monotone Japanese net Sharpe across $100mn, $1bn and $10bn is met, rising cost drag is not met, and the joint P2-and-P4 condition is indeterminate. The candidate reports this and does not call Japan a confirmation. The earlier claim that Japan was "a pre-registered out-of-sample confirmation" remains superseded.
 
 ## 3. Prior-art status (`docs/FINAL_PRIOR_ART_REVIEW.md`)
 
-Full texts (some version) read for Azevedo et al., Novy-Marx and Velikov, Korajczyk and Sadka, Jensen et al., Gârleanu and Pedersen, Gu et al., Chen and Velikov (working paper) and Liao et al. **Avramov-Cheng-Metzker's full text was not accessible and was not reviewed**; every statement about it is abstract-level and the candidate says so. Section 7 of the review lists which novelty statements remain **provisional** (those that depend on that comparison and on the abstract-level tax and international sources). No further novelty claim was drafted to work around inaccessible texts. Bibliographic metadata for all 21 candidate entries were verified against Crossref or arXiv where reachable (`BIB_PROVENANCE.csv`); two project-record errors (BY2003 DOI, HUANG2019 arXiv id) were not propagated.
+Full texts (some version) read for Azevedo et al., Novy-Marx and Velikov, Korajczyk and Sadka, Jensen et al., Gârleanu and Pedersen, Gu et al., Chen and Velikov (working paper), Liao et al., and, since the novelty-gate sprint, **Avramov-Cheng-Metzker (the published article from the author-hosted PDF, accessed 2026-10-14; the PDF is not committed and the online appendix was not accessed)**. The detailed comparison and per-statement statuses (`SUPPORTED_BY_COMPARISON`, `NARROW_REQUIRED`, `UNRESOLVED_PRIOR_ART`, `REMOVE`) are in `docs/FINAL_PRIOR_ART_REVIEW.md` section 1: that paper has no AUM-indexed cost, capacity, participation constraint, tax or non-US analysis, but a new geography is a difference in coverage, not a method, and the candidate's novelty wording was narrowed accordingly. Statements that depend on the unread tax and international papers remain `UNRESOLVED_PRIOR_ART`. Bibliographic metadata for all 21 candidate entries were verified against Crossref or arXiv where reachable (`BIB_PROVENANCE.csv`); two project-record errors (BY2003 DOI, HUANG2019 arXiv id) were not propagated.
 
 ## 4. Is the central contribution defensible?
 
@@ -41,9 +41,9 @@ As a narrow non-US as-run measurement with a methods caution: yes, on the eviden
 
 | # | Task | State |
 |---|---|---|
-| 1 | Obtain and read Avramov-Cheng-Metzker's full text; re-check every provisional novelty statement (review section 7) | blocked on access |
+| 1 | ~~Obtain and read Avramov-Cheng-Metzker's full text~~ **done 2026-10-14** (online appendix not accessed). Remaining: read the abstract-level works and tax papers (item 2) and re-check statements 3, 4, 9 and 11 of the review | partly done |
 | 2 | Read the abstract-level works and the tax papers in full; replace abstract-level wording | open (some need library access) |
-| 3 | Authors score amendment 001C's five Japan predictions formally and decide how the manuscript reports the outcome | open (finding in section 2) |
+| 3 | Authors decide the scoring of 001C's four unscored Japan predictions (P1, P3, P4, P5) and how the manuscript reports the outcome; P2 is scored `NOT_MET` | open (scorecard decisions below) |
 | 4 | Convert the Markdown to the chosen venue's template and compile; check cross-references in the converted file | blocked: no TeX/Pandoc, no template chosen |
 | 5 | Fill author, affiliation, contribution, acknowledgement, funding, conflict, data/code availability and any venue-required statements | author decisions |
 | 6 | Re-run the candidate check, screens and tests on the final text | done for the current text; repeat after any edit |
@@ -59,6 +59,7 @@ As a narrow non-US as-run measurement with a methods caution: yes, on the eviden
 | E | Whether to accept the "exit-treatment sensitivity unknown" disclosure permanently, or to rule on a different treatment (a different ruling needs its own addendum and is not implied here) |
 | F | Whether a future reproduction of Germany's historical statistic is ever wanted (conditions are recorded in the traceability document; currently declined) |
 | G | Whether the cost-calibration or finite-unit capacity runs should ever be added; they would be needed only for a stronger capacity claim than the candidate makes |
+| H | **001C scorecard.** (i) For P1, P3 and P4: approve or decline a descriptive aggregation of Japan's existing optimised-weights files (untracked, not committed snapshots) and, if approved, fix the exact definitions in writing **before** any number is read (which book, months and statistic; for P4 what "materially below" means). (ii) For P5: approve or decline deriving Japan's $100mn axis contrasts from stored cell series, and the multiplicity rule. (iii) How the manuscript reports the scorecard. (iv) Whether the reviewer named in the amendment will countersign or comment. Without these, the four predictions stay `NOT_SCOREABLE`. |
 
 ### EXTERNAL_DEPENDENCY
 
