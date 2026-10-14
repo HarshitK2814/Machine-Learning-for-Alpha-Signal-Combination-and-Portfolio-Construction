@@ -78,3 +78,13 @@ def test_bib_entry_without_provenance_fails(cand):
     lines = [l for l in p.read_text(encoding="utf-8").splitlines() if not l.startswith("SS2018,")]
     p.write_text(chr(10).join(lines) + chr(10), encoding="utf-8")
     assert any("SS2018" in e and "PROVENANCE" in e for e in mod.check())
+
+
+def test_preregistration_language_is_banned(cand):
+    _edit(cand, "## 8. Conclusion", "## 8. Conclusion" + chr(10) * 2 + "This pre-registered analysis shows the result.")
+    assert any("banned wording" in e for e in mod.check())
+
+
+def test_japan_net_sharpe_statement_must_match_artifacts(cand):
+    _edit(cand, "Japan's is +0.057 against Germany's +0.128", "Japan's is +0.157 against Germany's +0.128")
+    assert any("p2" in e for e in mod.check())

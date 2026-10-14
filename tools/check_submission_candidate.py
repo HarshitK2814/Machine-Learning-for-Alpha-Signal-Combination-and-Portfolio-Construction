@@ -57,7 +57,7 @@ TABLE2_RUNGS = {"DEU": [(1e5, "$100k", "Germany"), (1e6, "$1mn", "Germany"), (1e
 REQUIRED_PHRASES = ["Phase C", "has **not been run**", "as_run", "not countersigned", "Not submission-ready",
                     "abstract level only", "exploratory, not pre-specified"]
 # Wording that must never appear in the candidate (the withdrawn-claims screen covers the figures).
-BANNED = [r"\bH-FLIP CONFIRMED\b", r"established (economic )?gain", r"cap(?: never| does not) hurts?\b(?! at)",
+BANNED = [r"pre-?registered (result|analysis|confirm)", r"confirmatory (result|sample|analysis)(?! status)", r"pre-specified (result|analysis)", r"\bH-FLIP CONFIRMED\b", r"established (economic )?gain", r"cap(?: never| does not) hurts?\b(?! at)",
           r"Maham (approved|acknowledged)", r"approved by (Maham|Absar)", r"submission[- ]ready\b(?!\.)(?<!not submission-ready)"]
 
 
@@ -146,6 +146,14 @@ def derived_strings() -> dict[str, str]:
     out["turnover"] = (f"turnover {tv['DEU'][0]:.4f} / {tv['IND'][0]:.4f} / {tv['JPN'][0]:.4f} (Germany / India / Japan) "
                        f"and tax drag {tv['DEU'][1]:.2f} / {tv['IND'][1]:.2f} / {tv['JPN'][1]:.2f} basis points per year")
     out["lt_india"] = f"{tv['IND'][2]:.4f} in India"
+    nets = {}
+    for c, k in (("DEU", "sum_deu_1e9"), ("JPN", "sum_jpn_1e9")):
+        d = pd.read_csv(art(k))
+        nets[c] = d[(d.regime == "tax_exempt") & d.strategy.str.contains("-P-")].net_sharpe.mean()
+    dd = pd.read_csv(art("sum_deu_1e9"))
+    dd = dd[(dd.regime != "tax_exempt") & dd.strategy.str.contains("-P-")]
+    out["deu_summary"] = f"net Sharpe {nets['DEU']:+.3f} and after-tax Sharpe {dd.after_tax_sharpe.mean():+.3f}"
+    out["p2"] = f"Japan's is {nets['JPN']:+.3f} against Germany's {nets['DEU']:+.3f}"
     out["lt_zero"] = f"80 rows across five summaries" if (mx == 0.0 and n == 80) else f"MISMATCH max={mx} rows={n}"
     return out
 
