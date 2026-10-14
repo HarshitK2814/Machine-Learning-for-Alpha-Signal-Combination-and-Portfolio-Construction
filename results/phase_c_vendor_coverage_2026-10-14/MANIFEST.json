@@ -1,0 +1,30 @@
+{
+  "label": "OUTCOME-FREE AGGREGATE COVERAGE COUNTS - not a result",
+  "fields": {
+    "vendor_audit_csv": [
+      "country",
+      "daily_rows",
+      "actual_price_status_rows",
+      "carry_forward_status_rows",
+      "first_daily_date",
+      "last_daily_date",
+      "permno (join key, not written)"
+    ],
+    "C4": [
+      "date",
+      "permno",
+      "ret_next (isfinite flag only)"
+    ]
+  },
+  "window": [
+    "2009-01",
+    "2019-12"
+  ],
+  "input_sha256": {
+    "data\\intl_c6\\audit\\C1_WRDS_ALL_SECURITY_DAILY_COVERAGE.csv": "bfa4524a5086306cc6bd6c8e5c86f58c92ab49af2e17d3c2765424ebea98658a",
+    "data\\intl_c4\\production\\DEU\\targets.parquet": "ba903a1a75fc04cf8659a25e1e40ae818bd218b4fae3fa5feb244ebfd344a2d2",
+    "data\\intl_c4\\production\\IND\\targets.parquet": "835b955c3e33df162f839741300f9064a21f7adc2635a99bca1cbb351094fd1f",
+    "data\\intl_c4\\production\\JPN\\targets.parquet": "d7984e5e3b2a1ff74d026f74ed0a7a28dcb762fb721045c9117165af8b6df432"
+  },
+  "limit": "vendor counts are per security over the queried interval; no month-level status is available"
+}

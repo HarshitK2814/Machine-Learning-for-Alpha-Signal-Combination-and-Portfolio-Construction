@@ -1,0 +1,44 @@
+{
+  "DEU": {
+    "gap_runs": 1792,
+    "gap_months": 7875,
+    "gap_securities": 877,
+    "gap_securities_with_any_vendor_daily": 876,
+    "gap_securities_with_any_carry_forward_rows": 871,
+    "gap_runs_vendor_date_range_spans_run": 1691,
+    "gap_runs_not_in_vendor_file_or_no_daily": 1,
+    "vendor_rows_in_all_securities": 5465450,
+    "vendor_actual_status_rows_all_securities": 4566602,
+    "vendor_carry_forward_status_rows_all_securities": 898152,
+    "vendor_other_status_rows_all_securities": 696,
+    "month_level_status_for_gap_months": "unknown (security-level counts only; no month-level status on disk)"
+  },
+  "IND": {
+    "gap_runs": 7932,
+    "gap_months": 67213,
+    "gap_securities": 2724,
+    "gap_securities_with_any_vendor_daily": 2724,
+    "gap_securities_with_any_carry_forward_rows": 2713,
+    "gap_runs_vendor_date_range_spans_run": 7289,
+    "gap_runs_not_in_vendor_file_or_no_daily": 0,
+    "vendor_rows_in_all_securities": 13907182,
+    "vendor_actual_status_rows_all_securities": 10353861,
+    "vendor_carry_forward_status_rows_all_securities": 3552057,
+    "vendor_other_status_rows_all_securities": 1264,
+    "month_level_status_for_gap_months": "unknown (security-level counts only; no month-level status on disk)"
+  },
+  "JPN": {
+    "gap_runs": 1623,
+    "gap_months": 17279,
+    "gap_securities": 1524,
+    "gap_securities_with_any_vendor_daily": 1524,
+    "gap_securities_with_any_carry_forward_rows": 1481,
+    "gap_runs_vendor_date_range_spans_run": 952,
+    "gap_runs_not_in_vendor_file_or_no_daily": 0,
+    "vendor_rows_in_all_securities": 24447511,
+    "vendor_actual_status_rows_all_securities": 23181135,
+    "vendor_carry_forward_status_rows_all_securities": 1261090,
+    "vendor_other_status_rows_all_securities": 5286,
+    "month_level_status_for_gap_months": "unknown (security-level counts only; no month-level status on disk)"
+  }
+}
