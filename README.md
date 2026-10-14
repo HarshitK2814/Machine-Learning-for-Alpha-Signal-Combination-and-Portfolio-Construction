@@ -19,9 +19,9 @@ Harshit = models/portfolio/risk/interpretation, Maham = baselines/statistics/rep
 | B - models, portfolio, risk, interpretation | Harshit | **Code complete on synthetic data; real-data inputs handed off.** Next: validate the handoff, produce real C11 weights under the frozen experiment, and return those weights to Absar for final C12 accounting. |
 | C - baselines, statistics, reporting | Maham | Not started. Contracts, example outputs and a worked "how to plug a baseline in" snippet are ready: `docs/HARSHIT_PROVIDES.md`. |
 
-No real empirical result had been run or inspected at the Workstream-A handoff.
-The repository suite passes 290/290 tests; real-data model execution remains a
-separately gated Workstream-B step.
+That sentence block describes the state at the Workstream-A handoff (2026-10-07). It is superseded by
+the **current state** section below: real-data as-run experiments have since been run, several results were
+withdrawn, and the revised (Phase C) analysis is blocked.
 
 ### Frozen Workstream-A boundary
 
@@ -37,12 +37,37 @@ separately gated Workstream-B step.
 - Absar's remaining downstream responsibility is final C12 accounting after
   Harshit supplies real C11 weights.
 
+## Current state (2026-10-14)
+
+* Authoritative records: `docs/PROJECT_COMPLETION_REPORT.md` (what is done, what blocks submission),
+  `docs/FINAL_CLAIM_EVIDENCE_MATRIX.md` (status of every claim), `docs/FINAL_PUBLICATION_PATH.md`.
+* The as-run experiments (2009-2019, DEU/IND/JPN) exist; several headline results were **withdrawn** and are
+  listed in `docs/FINALIZATION_AUDIT_2026-10-09.md` section 1.2. `python tools/check_withdrawn_claims.py` screens
+  `docs/`, `research/`, `prereg/`, `submission_candidate_as_run_only/` and this README for them (a screen, not verification).
+* **Phase C (the revised analysis under the 2026-10-13 exit ruling) is blocked and has not been run**; see
+  `docs/PHASE_C_RUN_READINESS_V2_2026-10-14.md` section 8.
+* A narrower manuscript candidate is in `submission_candidate_as_run_only/` (Markdown; no TeX toolchain is
+  assumed). Consistency check: `python tools/check_submission_candidate.py`. It checks citations, hashes,
+  re-derived numbers and disclosures; it is not scientific validation and the candidate is not submission-ready.
+* Environment: Python 3.12 (`python -m pip install -e .`, then `pytest -q`). Commands elsewhere in this README that
+  reference `../ML_Alpha_Signal_Combination_Research/` assume a sibling research folder that is not part of this repository.
+
+### Data access and unavailable sources
+
+* `data/` holds the production C1/C4/C6/C14 tables and audits that were committed or copied locally. The raw
+  vendor extracts (the C4 source SAS file and every `data/intl_c6/staging/*` file named in the C6 audits) are **not
+  in this repository**, so those audits cannot be re-verified here; vendor (WRDS/Compustat Global) access and the
+  vendor's own item documentation are external prerequisites for any further data-recovery work.
+* `outputs/` is git-ignored: historical experiment outputs live there only on the original machine. Tracked,
+  verbatim snapshots are `docs/attachments/*.csv`; Germany's optimised-book after-tax inference row and the India and
+  Germany $1bn after-tax summaries have **no tracked snapshot** (see the claim-evidence matrix, section 1).
+
 ## Quick start
 
 ```bash
 python -m pip install -e .
 python pipelines/run_all.py --smoke               # generate data, 2 cells, 2 years, end to end
-pytest -q                                         # 290 tests
+pytest -q                                         # full suite (count changes; see docs/PROJECT_COMPLETION_REPORT.md)
 
 # or stage by stage
 python -m alphacomb.synthetic.generate --out data/synthetic          # C1-C6 fixtures + truth.json
