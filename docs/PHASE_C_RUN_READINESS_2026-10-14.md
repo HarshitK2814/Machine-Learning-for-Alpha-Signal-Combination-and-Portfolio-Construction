@@ -2,6 +2,8 @@
 
 **Verdict: NOT READY. Do not run the revised historical panel yet.** If it were run exactly as the committed specification prescribes, the census says every rung x book x cell would be **not estimable** (more than 25% of months unresolved), so the run would produce a data-adequacy statement and no performance result. The prerequisites that decide what the run should be are listed in section 7. Nothing here relaxes a threshold or changes a rule.
 
+> **Status note, 2026-10-14 (later):** section 2's explanation (C6 lapses as exits) is corrected by census v3; the verdict is unchanged but its cause is not. See `docs/PHASE_C_RUN_READINESS_V2_2026-10-14.md`. This version is kept as the record.
+
 Internal researcher-led preparation; not external statistical sign-off; no approval by Maham or Absar beyond their documented responses is claimed. No historical performance panel, cost sensitivity, re-optimisation, training or A2 evaluation was run; no return, price, dividend, cost, tax or NAV value was read.
 
 Inputs: specification `0a320cb` + addendum 1 `d0c1768`; configuration recovery (`docs/PHASE_C_CONFIGURATION_RECOVERY_2026-10-14.md`); census v2 (`results/phase_c_census_v2_2026-10-14`, commit `fd4c7b7`; code and 7 whitelist tests in the same commit). Census v1 (`076a6e9`) used the wrong weight set and is superseded.

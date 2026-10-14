@@ -15,3 +15,18 @@ Internal researcher-led work; not external sign-off. Start 2026-10-14 00:12 IST 
 | Part 8 final-tree full suite | (this log) | `python -m pytest tests -o addopts="" -p no:cacheprovider -q -rfE`: **652 passed, 0 failed, exit 0, 235.33 s**, run serially on HEAD `6c55ff8`, clean tree | log kept outside the repo |
 
 `git diff --check` was clean for every commit (only CRLF conversion warnings). No frozen path (`results/capacity_return_difference`, `cost_parity_diagnostic`, `figures`, `outputs`, `data`, `prereg`) was modified; new directories only: `results/phase_c_census_2026-10-14` (superseded) and `results/phase_c_census_v2_2026-10-14`.
+
+## Second section: Phase C recovery (2026-10-14, after the sprint)
+
+Task: correct the census classification, recover the after-tax configuration, addendum 2, targeted document corrections, readiness v2. Outcome-free preparation only; no historical panel, cost sensitivity, re-optimisation, training or A2 evaluation.
+
+| Item | Commit |
+|---|---|
+| Census v3 script and 15 tests | `e6e5d16` |
+| Census v3 outputs (new directory; v1 and v2 untouched) | `ae8b058` |
+| After-tax configuration recovery (tool, outputs, document) | `132396a` |
+| Specification addendum 2 | `14fd8ae` |
+| Targeted corrections (survival framing; near-ruined comparators), checker extension | `b7b26b8` |
+| Readiness v2 and this log entry | the commit that contains this text |
+
+Final-tree check: full suite run serially on clean HEAD `b7b26b8` (code and tests as final; later commits are documentation only): **667 passed, 0 failed, 337 warnings, 446.55 s** (652 before this step plus 15 census v3 tests). Log outside the repository: `C:\Temp\claudeull_suite_phaseC_recovery_2026-10-14.log`. Documentation hygiene 14 passed and withdrawn-claims screen PASS were re-run after the document edits.

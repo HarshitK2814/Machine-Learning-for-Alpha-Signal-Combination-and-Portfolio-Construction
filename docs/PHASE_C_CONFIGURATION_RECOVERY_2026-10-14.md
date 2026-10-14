@@ -2,6 +2,8 @@
 
 **Date:** 2026-10-14. Configuration and provenance fields only. No performance summary, return, price, dividend, cost value or tax outcome was read to produce this document. Internal researcher-led work; no external sign-off.
 
+> **Scope note, 2026-10-14 (later):** this document recovers the configuration of the zero-tax capacity comparison B(A) only. The multi-regime after-tax grid is recovered separately in `docs/PHASE_C_AFTER_TAX_CONFIGURATION_RECOVERY_2026-10-14.md`; this manifest is not a source for it.
+
 ## 1. What "Phase 2" is
 
 Phase 2 (commit `ac669f2`, 2026-10-10) is the **capacity return-difference accounting** `B(A) = 12 * (mean net return capped - mean net return uncapped)` of `docs/CAPACITY_RETURN_DIFFERENCE_SPEC_2026-10-10.md`, with **Tier B** (the pipeline's own `after_tax_backtest` at zero tax on re-dumped decile weights) as the primary tier. It is **not** the multi-regime after-tax grid of `pipelines/06_after_tax_eval.py`. The first census (`results/phase_c_census_2026-10-14`, commit 076a6e9) used the after-tax `weights_index` sets and is therefore the wrong object. It is superseded by `results/phase_c_census_v2_2026-10-14` (fd4c7b7); the older directory is left in place unchanged.
