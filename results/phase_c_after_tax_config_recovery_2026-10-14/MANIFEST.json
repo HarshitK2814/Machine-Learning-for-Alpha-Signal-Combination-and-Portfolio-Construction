@@ -1,0 +1,14 @@
+{
+  "label": "CONFIGURATION RECOVERY - no outcome value read; revised analysis, not confirmatory",
+  "columns_read_from_summaries": [
+    "strategy",
+    "country",
+    "regime",
+    "lot_method",
+    "months",
+    "dated",
+    "wedge"
+  ],
+  "weights": "hashed as bytes; contents not opened",
+  "note": "weight hashes describe the files as they are now, not necessarily as at run time"
+}
