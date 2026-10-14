@@ -24,6 +24,7 @@ It verifies that every citation resolves to a bibliography entry that is identic
 
 * Germany's optimised-book net-Sharpe and tax-channel inference figures exist in no artifact and are omitted (regeneration conditions are in `docs/FINAL_NUMERICAL_TRACEABILITY_GAPS.md`; not authorised, not run).
 * Germany and India $1bn after-tax summaries are verbatim snapshots of untracked historical outputs with partly inferred provenance (disclosed in manuscript Section 7).
-* `ACM2023` (the closest prior art) is abstract level only: its full text was not accessible. Several other cited works are abstract level (`BIB_PROVENANCE.csv`, `docs/FINAL_PRIOR_ART_REVIEW.md`).
+* `ACM2023` (the closest prior art) was read in full (published article; online appendix not accessed) and compared in `docs/FINAL_PRIOR_ART_REVIEW.md` section 1. Several other cited works are still abstract level or unread (`BIB_PROVENANCE.csv`), so novelty statements about the tax and international literatures stay provisional.
+* Amendment 001C's Japan predictions: P2 not met, four not scoreable from committed artifacts (`docs/AMENDMENT_001C_JAPAN_PREDICTION_SCORECARD.md`); the authors must decide whether to approve any further descriptive scoring.
 * Authors, affiliations, journal template, abstract length, data and code availability statement are not set (author decisions).
 * Exit-treatment sensitivity is unknown; the revised analysis is blocked (Section 7 of the manuscript).

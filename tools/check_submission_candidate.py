@@ -55,7 +55,7 @@ TABLE2_RUNGS = {"DEU": [(1e5, "$100k", "Germany"), (1e6, "$1mn", "Germany"), (1e
                 "IND": [(1e5, "$100k", "India"), (1e6, "$1mn", "India"), (3e7, "$30mn", "India")],
                 "JPN": [(1e5, "$100k", "Japan"), (1e9, "$1bn", "Japan"), (1e10, "$10bn", "Japan")]}
 REQUIRED_PHRASES = ["Phase C", "has **not been run**", "as_run", "not countersigned", "Not submission-ready",
-                    "abstract level only", "exploratory, not pre-specified"]
+                    "(abstract level", "exploratory, not pre-specified"]
 # Wording that must never appear in the candidate (the withdrawn-claims screen covers the figures).
 BANNED = [r"pre-?registered (result|analysis|confirm)", r"confirmatory (result|sample|analysis)(?! status)", r"pre-specified (result|analysis)", r"\bH-FLIP CONFIRMED\b", r"established (economic )?gain", r"cap(?: never| does not) hurts?\b(?! at)",
           r"Maham (approved|acknowledged)", r"approved by (Maham|Absar)", r"submission[- ]ready\b(?!\.)(?<!not submission-ready)"]
@@ -154,6 +154,18 @@ def derived_strings() -> dict[str, str]:
     dd = dd[(dd.regime != "tax_exempt") & dd.strategy.str.contains("-P-")]
     out["deu_summary"] = f"net Sharpe {nets['DEU']:+.3f} and after-tax Sharpe {dd.after_tax_sharpe.mean():+.3f}"
     out["p2"] = f"Japan's is {nets['JPN']:+.3f} against Germany's {nets['DEU']:+.3f}"
+    comp_j = at[at.scope == "composite"].set_index("country").loc["JPN"]
+    out["p2_composite"] = f"{comp_j.sharpe_net:+.3f} for the composite"
+    rungs = []
+    drags = []
+    for k in ("sum_jpn_1e8", "sum_jpn_1e9", "sum_jpn_1e10"):
+        dj = pd.read_csv(art(k))
+        dj = dj[(dj.regime == "tax_exempt") & dj.strategy.str.contains("-P-")]
+        rungs.append(dj.net_sharpe.mean())
+        drags.append(dj.cost_drag_ann_bps.mean())
+    out["jpn_rungs"] = f"({rungs[0]:+.3f}, {rungs[1]:+.3f}, {rungs[2]:+.3f})"
+    out["jpn_nonmonotone"] = "True" if not (rungs[0] < rungs[1] < rungs[2] or rungs[0] > rungs[1] > rungs[2]) else "False"
+    out["jpn_cost_falls"] = "True" if drags[0] > drags[1] > drags[2] else "False"
     out["lt_zero"] = f"80 rows across five summaries" if (mx == 0.0 and n == 80) else f"MISMATCH max={mx} rows={n}"
     return out
 
@@ -202,6 +214,14 @@ def check() -> list[str]:
         if k == "monotone":
             if v != "True":
                 errs.append("B(A) not monotone in AUM")
+            continue
+        if k == "jpn_nonmonotone":
+            if v != "True":
+                errs.append("Japan net Sharpe is monotone: manuscript statement is wrong")
+            continue
+        if k == "jpn_cost_falls":
+            if v != "True":
+                errs.append("Japan cost drag does not fall: manuscript statement is wrong")
             continue
         if isinstance(v, str) and (v not in ms):
             errs.append(f"derived string not in manuscript [{k}]: {v}")

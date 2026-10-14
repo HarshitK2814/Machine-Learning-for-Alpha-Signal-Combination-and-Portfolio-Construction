@@ -88,3 +88,8 @@ def test_preregistration_language_is_banned(cand):
 def test_japan_net_sharpe_statement_must_match_artifacts(cand):
     _edit(cand, "Japan's is +0.057 against Germany's +0.128", "Japan's is +0.157 against Germany's +0.128")
     assert any("p2" in e for e in mod.check())
+
+
+def test_japan_rung_values_must_match_artifacts(cand):
+    _edit(cand, "(-0.088, +0.057, -0.100)", "(-0.088, +0.157, -0.100)")
+    assert any("jpn_rungs" in e for e in mod.check())
