@@ -44,7 +44,7 @@ These items undermine or can change claims, so none is optional:
 
 1. **Germany's net-Sharpe and optimised-book tax numbers have no artifact.** A tracked, hashed snapshot would need a regeneration of historical statistics, which requires explicit authorisation. Until then the Germany headline cannot appear as a number.
 2. **Exit-treatment sensitivity is unknown and cannot currently be bounded.** A referee will ask what the as-run exit does to the numbers. The exit ruling is the owners'; the revised analysis is blocked by data (`unknown` vendor coverage). The candidate can only disclose.
-3. **Pre-registration is not countersigned** (001A-001D) and 001E is a draft. The candidate says so; any "pre-registered" wording is an author decision.
+3. **Pre-registration is not countersigned** (001A-001D) and 001E is a draft. Superseded by the 2026-10-14 terminology audit (`docs/FINAL_CLAIM_EVIDENCE_MATRIX.md` section 6): the candidate uses "pre-registered", "pre-specified" and "confirmatory" for no reported result and states which analyses are post hoc; Japan is no longer presented as a confirmation.
 4. **Closest prior art read at abstract level only** (Avramov-Cheng-Metzker, Management Science 2023, full text not obtained; several rows in the tracker). Required before submission regardless of results.
 5. **The tax-literature citation records are not in the bibliography** (F6) and the candidate has no citation for them.
 6. **No tracked snapshot for India's `lt_share`** or for the optimised-book summaries; the matrix flags every figure that rests on an untracked file.

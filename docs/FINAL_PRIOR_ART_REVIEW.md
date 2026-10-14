@@ -54,3 +54,17 @@ Other project-record corrections found: the generated `research/08_References/re
 ## 6. What remains blocked
 
 Full text of Avramov-Cheng-Metzker (and abstract-level reading of Cakici et al., Chen et al., Lalwani et al., Novy-Marx-Velikov 2019 and every tax source) requires publisher, SSRN or library access not available here. Until then the candidate's novelty statements rest on abstracts for those works and on full text for the works in section 2.
+
+## 7. Which novelty statements remain provisional (lockdown sprint)
+
+| Statement in the candidate | Evidence it rests on | Status |
+|---|---|---|
+| "AUM dimension of implementable performance is already established for the US" (Jensen et al.) | full text of the 2023 author version | **Firm** (as to that version) |
+| Capacity under price impact for US stocks is studied (Korajczyk-Sadka, Novy-Marx-Velikov) | full texts | **Firm** |
+| Azevedo et al. contain no AUM, capacity or tax term | full text of the author PDF (keyword counts 0) | **Firm** for the version read |
+| "Machine-learning profits come mainly from hard-to-arbitrage stocks and shrink under costs and restrictions" (Avramov et al.) | abstract only | **Provisional**; only the abstract's content is stated |
+| To our knowledge no capacity source includes a statutory tax engine and no tax source prices capacity | abstract-level or metadata-only reading for the tax sources and for Cakici et al., Chen et al., Lalwani et al.; the tax sources' texts not read | **Provisional**; requires reading the tax papers and Avramov et al. |
+| "Non-US, statute-specific and constraint-based evidence" is new | the same | **Provisional** until Avramov-Cheng-Metzker's full text is compared |
+| Cakici et al. document ML predictability across 46 markets | abstract (Crossref and search summary) | **Provisional**; no comparison made |
+
+No further novelty claims were drafted to work around the inaccessible texts; the manuscript's contribution statement is narrow and explicitly provisional on those comparisons.
