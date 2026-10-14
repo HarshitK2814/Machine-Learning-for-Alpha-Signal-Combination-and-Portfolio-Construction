@@ -83,8 +83,8 @@ All of: (1) external vendor access by someone entitled to it, with the vendor's 
 |---|---|---|
 | Candidate checker | `python tools/check_submission_candidate.py` | PASS (consistency only) |
 | Withdrawn-claims screen | `python tools/check_withdrawn_claims.py` | PASS (a screen, not verification) |
-| Focused tests | `python -m pytest tests/tools tests/docs_hygiene -q` | 53 passed |
-| Full suite | `python -m pytest tests -o addopts="" -p no:cacheprovider -q -rfE` | **684 passed, 0 failed, 337 warnings, 230 s**; log `C:/Temp/claude/full_suite_lockdown_2026-10-14.log` |
+| Focused tests | `python -m pytest tests/tools tests/docs_hygiene -q` | 54 passed |
+| Full suite | `python -m pytest tests -o addopts="" -p no:cacheprovider -q -rfE` | **685 passed, 0 failed, 337 warnings, 431 s** (novelty-gate sprint; the previous sprint's run was 684 passed); log `C:/Temp/claude/full_suite_gates_2026-10-14.log` |
 | Whitespace | `git diff --check` | clean apart from CRLF warnings |
 | Manuscript build | none possible | no TeX/Pandoc, no template |
 
