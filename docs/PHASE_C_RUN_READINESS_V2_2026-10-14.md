@@ -89,3 +89,16 @@ Recorded in the work log entry for this step (`docs/OVERNIGHT_WORK_LOG_2026-10-1
 ## 7. Not verified here
 
 The success path of every future run step; the census approximates the engine; the weight-file hashes are present-state, not run-time; no reviewer has checked this report.
+
+## 8. Closeout status (2026-10-14, after the vendor coverage feasibility report `558e143`)
+
+**Phase C is BLOCKED and NOT RUNNABLE on the current data inputs. It has not been run and must not be run.**
+
+1. **Vendor coverage conclusion: `unknown`.** Genuine month-end observation status and the total-return and corporate-action semantics of the vendor fields (`prccd`, `ajexdi`, `trfd`, `prcstd`) cannot be verified with the repository contents (`docs/PHASE_C_VENDOR_COVERAGE_FEASIBILITY_2026-10-14.md`). Nothing in it is a finding of feasibility or of infeasibility.
+2. **The 560 series (DEU 176 / IND 160 / JPN 224) stay classified not estimable** (tier above 25% for the gross, net and after-tax masks) under the current data and the pre-specified rules. Thresholds (0% / up to 5% / up to 25% / above 25%) are unchanged.
+3. **The exit-policy ruling is preserved.** No liquidation on universe departure, no vendor bridge, no imputation and no other reconstruction is implemented or authorised. Checklist item 12 (authorisation to run) remains "not given"; items 6-9 stay open and are moot while the block stands.
+4. **Prerequisites to reopen the coverage investigation (all required):** (a) external vendor access by someone entitled to it, with the vendor's own documentation of `prcstd`/`r_prc_stat`, `trfd`, `ajexdi` and corporate-action and terminal-event fields stored in the repository; (b) a month-level, aggregate-only, value-free flag query for the gap months (counts by status class and month-end flag); (c) written authorisation from the ruling owners for that query; (d) a dated addendum before any reconstruction rule is adopted. A different route, a ruling on liquidation at a certified cost, is a new decision of the owners and needs its own addendum; it is not implied by this closeout.
+5. **Separation preserved.** Historical as-run evidence (Phase 1/2 artifacts, frozen results) is unchanged. Any future revised result must be labelled revised and kept apart from it. The withdrawn-claims screen and its patterns are unchanged.
+6. Maham's acknowledgement of the exit ruling is outstanding and is not claimed.
+
+Checks for this closeout are recorded in the work log. The full suite was not rerun.

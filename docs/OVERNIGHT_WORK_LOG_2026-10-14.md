@@ -30,3 +30,7 @@ Task: correct the census classification, recover the after-tax configuration, ad
 | Readiness v2 and this log entry | the commit that contains this text |
 
 Final-tree check: full suite run serially on clean HEAD `b7b26b8` (code and tests as final; later commits are documentation only): **667 passed, 0 failed, 337 warnings, 446.55 s** (652 before this step plus 15 census v3 tests). Log outside the repository: `C:/Temp/claude/full_suite_phaseC_recovery_2026-10-14.log`. Documentation hygiene 14 passed and withdrawn-claims screen PASS were re-run after the document edits.
+
+## Third section: Phase C closeout (2026-10-14)
+
+Feasibility steps: presence-check census (`f78f9d6`, report `f57085a`: case 3 on current data) and vendor coverage audit (`c1daf37`, report `558e143`: conclusion `unknown`). Closeout: Phase C recorded as blocked and not runnable (readiness v2 section 8); 560 series remain not estimable; exit-policy ruling, thresholds and withdrawn-claims safeguards unchanged; no panel, performance output, bridge, imputation or liquidation rule created. Reopening conditions are listed in readiness v2 section 8 item 4. Checks: documentation-hygiene and tools tests and the withdrawn-claims screen, run after this edit (results in the closing message). Full suite not rerun; last full run 667 passed at `b7b26b8`.
