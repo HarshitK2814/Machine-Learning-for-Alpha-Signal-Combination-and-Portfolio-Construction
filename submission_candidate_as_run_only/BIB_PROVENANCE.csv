@@ -1,0 +1,22 @@
+key,status,verified_against,full_text_read,note
+ACM2023,metadata verified,HUJI repository record of the Management Science article (WebFetch) and publisher DOI,no,Full text not accessible (SSRN and INFORMS return 403); abstract-level only
+AHV2023,metadata partly verified,Author PDF on the AFA programme site (title, authors, abstract); first SSRN posting date not verified,yes (26 pp author version built 2024-03-12),Text contains no capacity / AUM / price-impact / tax discussion; costs use the Chen-Velikov effective spread
+CFMZ2023,metadata verified,Crossref,no,Open copy at open.icm.edu.pl returned 403; abstract-level only
+CHK2024,metadata partly verified,Web search result pages that list SSRN 5031755; no publisher record,no,SSRN not accessible
+CV2023,metadata verified,Crossref,partly (Fed FEDS 2020-039 working-paper version; the published JFQA version differs: 120 vs 204 anomalies),FEDS version read; published article not read
+GKX2020,metadata verified,Crossref,yes (NBER w25398 revised Sept 2019 version),Sample US 1957-2016; no transaction costs or taxes in the text
+GP2013,metadata verified,Crossref,yes (CBS accepted author manuscript),Quadratic trading costs; text has no AUM or capacity discussion
+JKMP2026,metadata verified,Crossref (RFS 39(10) 3035-3078 published 2026-03-15),yes (AFA author version 2023-02-12; not the published article),US CRSP common stocks; wealth-dependent market impact with a multivariate Kyle lambda; no tax
+KS2004,metadata verified,PDF header (JF LIX(3) June 2004 1039-1082) and Crossref DOI in project record,yes (Kellogg-hosted PDF),US CRSP 1967-1999
+LAL2025,metadata verified,Crossref,no,Wiley full text returned 403
+LMNS2025,metadata verified,arXiv abs 2503.00549,yes (arXiv PDF 2025-03-04 version),Confidence intervals for neural-network return forecasts; no capacity
+NMV2016,metadata verified,Crossref,yes (Rochester-hosted Aug 2015 draft; not the published RFS article),23 anomalies; Kyle lambda from linear regression; footnote on concave impact
+NMV2019,metadata verified,Crossref,no,Not accessed
+SS2018,metadata verified,Crossref (the project's note recording doi v74.n1.4 is wrong: that DOI is a different paper),no,
+IM2012,metadata partly verified,Crossref record of the SSRN working paper,no,Venue claims in the project tracker (Chicago Booth 12-20; NBER w18382) not verified
+BY2003,metadata verified,Crossref (the project's research/_build/lit_tax_online.py records doi v59.n4.2546 which is a different paper),no,
+CBLO2020,metadata verified,Crossref,no,
+KS2024,metadata verified,Crossref (project tracker says Summer 2024; Crossref lists issue 1),no,Authors: Krasner and Sosner as in Crossref
+HUANG2019,metadata verified,arXiv abs 1907.12093 (the project's primary id 1907.12085 is a cosmology paper),no,
+MKBA2021,metadata verified,Crossref and arXiv 2008.04985,no,
+DLLY2026,metadata verified,Crossref,no,Project tracker said online Feb 2026; Crossref lists Management Science 72(10) Oct 2026

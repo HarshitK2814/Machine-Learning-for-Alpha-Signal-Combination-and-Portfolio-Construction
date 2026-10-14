@@ -5,7 +5,8 @@ A **narrowed, as-run-only manuscript candidate**. Not submission-ready. The orig
 | File | Purpose |
 |---|---|
 | `manuscript.md` | the candidate (pandoc-style `[@key]` citations; format of the project's existing paper) |
-| `references.bib` | the 13 cited entries, copied verbatim from `research/08_References/references.bib` |
+| `references.bib` | the 21 cited entries: 11 copied verbatim from the generated project bibliography, 2 updated notes (`JKMP2026`, `AHV2023`), 8 tax-literature entries added from verified records |
+| `BIB_PROVENANCE.csv` | verification source and full-text status for every entry that differs from the project bibliography |
 | `TRACEABILITY.csv` | each artifact behind a quoted number, with SHA-256 |
 | figures | referenced from `results/figures/` (not duplicated) |
 
@@ -17,12 +18,12 @@ No TeX or pandoc toolchain is installed in the environment that produced this ca
 python tools/check_submission_candidate.py
 ```
 
-It verifies that citations resolve against an identical bibliography entry, that every artifact exists with the recorded hash, that the quoted headline numbers re-derive from the committed CSVs, that Table/Figure references are defined and the figure files exist, that the required disclosures (Phase C blocked and not run, `as_run` exit, amendments not countersigned, exploratory observation labelled) are present, and that banned wording is absent. Its tests (`tests/tools/test_check_submission_candidate.py`) inject each defect and require failure. It is a consistency check, **not** scientific validation.
+It verifies that every citation resolves to a bibliography entry that is identical to the project's or has a provenance row, that every artifact exists with the recorded hash, that the quoted headline numbers re-derive from the committed CSVs, that Table/Figure references are defined and the figure files exist, that the required disclosures (Phase C blocked and not run, `as_run` exit, amendments not countersigned, exploratory observation labelled) are present, and that banned wording is absent. Its tests (`tests/tools/test_check_submission_candidate.py`) inject each defect and require failure. It is a consistency check, **not** scientific validation.
 
-## Known gaps before this can be submitted (see the completion report for ordering)
+## Known gaps before this can be submitted (see `docs/PROJECT_COMPLETION_REPORT.md` for ordering)
 
-* Germany's optimised-book net-Sharpe and tax-channel figures are not in any artifact and are omitted.
-* India's `lt_share` (0.5928) rests on an untracked local file; it needs a tracked snapshot.
-* Tax-literature references have no records in the bibliography (`[CITATION PENDING]`): SS2018, IM2012, BY2003, KS2024, HUANG2019, PISH2026, CBLO2020, Dai-Lei-Liu-Yang (2026) and Moehle-Kochenderfer-Boyd-Ang (2021) as named in the project's documents. `ACM2023` was read at abstract level only.
-* Authors, affiliations, journal template, abstract length and data-availability statement are not set (author decision).
+* Germany's optimised-book net-Sharpe and tax-channel inference figures exist in no artifact and are omitted (regeneration conditions are in `docs/FINAL_NUMERICAL_TRACEABILITY_GAPS.md`; not authorised, not run).
+* Germany and India $1bn after-tax summaries are verbatim snapshots of untracked historical outputs with partly inferred provenance (disclosed in manuscript Section 7).
+* `ACM2023` (the closest prior art) is abstract level only: its full text was not accessible. Several other cited works are abstract level (`BIB_PROVENANCE.csv`, `docs/FINAL_PRIOR_ART_REVIEW.md`).
+* Authors, affiliations, journal template, abstract length, data and code availability statement are not set (author decisions).
 * Exit-treatment sensitivity is unknown; the revised analysis is blocked (Section 7 of the manuscript).

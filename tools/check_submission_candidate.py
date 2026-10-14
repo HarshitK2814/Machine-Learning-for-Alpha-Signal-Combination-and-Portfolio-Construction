@@ -2,8 +2,8 @@
 """Consistency check for ``submission_candidate_as_run_only/`` (no TeX toolchain is installed; this is the build check).
 
 It does NOT validate the science. It verifies, deterministically:
-  1. every ``[@key]`` citation resolves to an entry in the candidate ``references.bib`` and each such entry is
-     identical to the entry in ``research/08_References/references.bib``;
+  1. every ``[@key]`` citation resolves to an entry in the candidate ``references.bib``; each entry is identical to the
+     one in the generated ``research/08_References/references.bib`` or has a row in ``BIB_PROVENANCE.csv``;
   2. every artifact in ``TRACEABILITY.csv`` exists and matches its recorded SHA-256;
   3. every headline number quoted in the manuscript re-derives from the committed artifact (formatted strings
      computed here must occur in the manuscript);
@@ -43,6 +43,8 @@ ARTIFACTS = {
     "coverage": "results/phase_c_census_v3_2026-10-14/input_coverage_by_country_month.csv",
     "fig1": "results/figures/fig1_capacity_return_difference_B.png",
     "fig2": "results/figures/fig2_uncapped_terminal_wealth.png",
+    "sum_deu_1e9": ATT + "SUMMARY_AFTER_TAX_DEU_1E9_2026-10-09.csv",
+    "sum_ind_1e9": ATT + "SUMMARY_AFTER_TAX_IND_1E9_2026-10-09.csv",
     "sum_deu_1e8": ATT + "SUMMARY_AFTER_TAX_DEU_1E8_2026-10-09.csv",
     "sum_deu_1e10": ATT + "SUMMARY_AFTER_TAX_DEU_1E10_2026-10-09.csv",
     "sum_jpn_1e8": ATT + "SUMMARY_AFTER_TAX_JPN_1E8_2026-10-09.csv",
@@ -53,7 +55,7 @@ TABLE2_RUNGS = {"DEU": [(1e5, "$100k", "Germany"), (1e6, "$1mn", "Germany"), (1e
                 "IND": [(1e5, "$100k", "India"), (1e6, "$1mn", "India"), (3e7, "$30mn", "India")],
                 "JPN": [(1e5, "$100k", "Japan"), (1e9, "$1bn", "Japan"), (1e10, "$10bn", "Japan")]}
 REQUIRED_PHRASES = ["Phase C", "has **not been run**", "as_run", "not countersigned", "Not submission-ready",
-                    "[CITATION PENDING", "exploratory, not pre-specified"]
+                    "abstract level only", "exploratory, not pre-specified"]
 # Wording that must never appear in the candidate (the withdrawn-claims screen covers the figures).
 BANNED = [r"\bH-FLIP CONFIRMED\b", r"established (economic )?gain", r"cap(?: never| does not) hurts?\b(?! at)",
           r"Maham (approved|acknowledged)", r"approved by (Maham|Absar)", r"submission[- ]ready\b(?!\.)(?<!not submission-ready)"]
@@ -136,6 +138,14 @@ def derived_strings() -> dict[str, str]:
         d = pd.read_csv(art(k))
         s = d[d.regime != "tax_exempt"]
         mx, n = max(mx, float(s.lt_share_of_gains.abs().max())), n + len(s)
+    tv = {}
+    for c, k in (("DEU", "sum_deu_1e9"), ("IND", "sum_ind_1e9"), ("JPN", "sum_jpn_1e9")):
+        d = pd.read_csv(art(k))
+        sp = d[(d.regime != "tax_exempt") & d.strategy.str.contains("-P-")]
+        tv[c] = (sp.turnover_mean.mean(), sp.tax_drag_ann_bps.mean(), sp.lt_share_of_gains.mean())
+    out["turnover"] = (f"turnover {tv['DEU'][0]:.4f} / {tv['IND'][0]:.4f} / {tv['JPN'][0]:.4f} (Germany / India / Japan) "
+                       f"and tax drag {tv['DEU'][1]:.2f} / {tv['IND'][1]:.2f} / {tv['JPN'][1]:.2f} basis points per year")
+    out["lt_india"] = f"{tv['IND'][2]:.4f} in India"
     out["lt_zero"] = f"80 rows across five summaries" if (mx == 0.0 and n == 80) else f"MISMATCH max={mx} rows={n}"
     return out
 
@@ -154,11 +164,16 @@ def check() -> list[str]:
     for k in sorted(cited):
         if k not in cand_e:
             errs.append(f"citation @{k} has no entry in candidate references.bib")
+    prov = {r["key"]: r for r in csv.DictReader(open(CAND / "BIB_PROVENANCE.csv", encoding="utf-8"))}
     for k, e in cand_e.items():
-        if main_e.get(k) != e:
-            errs.append(f"bib entry {k} differs from research/08_References/references.bib")
+        # an entry that differs from (or is absent in) the generated project bibliography needs a provenance row
+        if main_e.get(k) != e and k not in prov:
+            errs.append(f"bib entry {k} differs from research/08_References/references.bib and has no BIB_PROVENANCE.csv row")
         if k not in cited:
             errs.append(f"bib entry {k} is not cited")
+    for k in prov:
+        if k not in cand_e:
+            errs.append(f"BIB_PROVENANCE.csv row {k} has no bib entry")
     # 2 artifacts
     rows = list(csv.DictReader(open(CAND / "TRACEABILITY.csv", encoding="utf-8")))
     seen = {r["key"] for r in rows}

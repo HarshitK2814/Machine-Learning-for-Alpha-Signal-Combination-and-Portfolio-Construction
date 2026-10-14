@@ -71,3 +71,10 @@ def test_missing_disclosure_fails(cand):
 def test_approval_claim_is_banned(cand):
     _edit(cand, "## 8. Conclusion", "## 8. Conclusion\n\nMaham approved this analysis.")
     assert any("banned wording" in e for e in mod.check())
+
+
+def test_bib_entry_without_provenance_fails(cand):
+    p = cand / "BIB_PROVENANCE.csv"
+    lines = [l for l in p.read_text(encoding="utf-8").splitlines() if not l.startswith("SS2018,")]
+    p.write_text(chr(10).join(lines) + chr(10), encoding="utf-8")
+    assert any("SS2018" in e and "PROVENANCE" in e for e in mod.check())
