@@ -29,4 +29,4 @@ Task: correct the census classification, recover the after-tax configuration, ad
 | Targeted corrections (survival framing; near-ruined comparators), checker extension | `b7b26b8` |
 | Readiness v2 and this log entry | the commit that contains this text |
 
-Final-tree check: full suite run serially on clean HEAD `b7b26b8` (code and tests as final; later commits are documentation only): **667 passed, 0 failed, 337 warnings, 446.55 s** (652 before this step plus 15 census v3 tests). Log outside the repository: `C:\Temp\claudeull_suite_phaseC_recovery_2026-10-14.log`. Documentation hygiene 14 passed and withdrawn-claims screen PASS were re-run after the document edits.
+Final-tree check: full suite run serially on clean HEAD `b7b26b8` (code and tests as final; later commits are documentation only): **667 passed, 0 failed, 337 warnings, 446.55 s** (652 before this step plus 15 census v3 tests). Log outside the repository: `C:/Temp/claude/full_suite_phaseC_recovery_2026-10-14.log`. Documentation hygiene 14 passed and withdrawn-claims screen PASS were re-run after the document edits.
