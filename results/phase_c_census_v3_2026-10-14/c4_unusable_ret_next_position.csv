@@ -1,0 +1,10 @@
+country,is_last_c4_row_of_name,later_usable_ret_exists,n_c4_rows_with_unusable_ret_next
+DEU,False,False,1880
+DEU,False,True,6360
+DEU,True,False,659
+IND,False,False,21665
+IND,False,True,91195
+IND,True,False,636
+JPN,False,False,2031
+JPN,False,True,19340
+JPN,True,False,858

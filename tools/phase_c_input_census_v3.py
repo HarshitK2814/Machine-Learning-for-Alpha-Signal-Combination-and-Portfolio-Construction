@@ -173,7 +173,7 @@ def run_census(ROOT: Path, out: Path, command: str = "") -> None:
     c6 = c6_flags(pd.read_csv(c6_path, usecols=c6_cols, parse_dates=["date"]))
     inputs = {str(c6_path.relative_to(ROOT)): sha(c6_path)}
 
-    series_rows, month_frames, cov_rows = [], [], []
+    series_rows, month_frames, cov_rows, crosstabs, positions = [], [], [], [], []
     for ctry in COUNTRIES:
         p1 = ROOT / f"data/intl_c1/production/{ctry}/universe.parquet"
         p4 = ROOT / f"data/intl_c4/production/{ctry}/targets.parquet"
@@ -194,6 +194,27 @@ def run_census(ROOT: Path, out: Path, command: str = "") -> None:
                                  "c4_with_c6_row": len(c4_row[m] & c6_row.get(m, set())),
                                  "c4_with_certified_c6": len(c4_row[m] & c6_cert.get(m, set())),
                                  "c4_in_c1_universe": len(c4_row[m] & c1_in.get(m, set()))})
+        # flag crosstab over ALL C4 rows in the window: counts only (which flag combinations occur)
+        x = t4.merge(u[["month", "permno", "ins"]], how="left", on=["month", "permno"]).merge(
+            cc[["month", "permno", "cert"]].assign(c6=True), how="left", on=["month", "permno"])
+        x = x[(x["month"] >= lo) & (x["month"] <= hi)]
+        x = x.assign(in_c1_universe=x["ins"].eq(True), has_c6_row=x["c6"].eq(True),
+                     c6_certified=x["cert"].eq(True))
+        ct = (x.groupby(["in_c1_universe", "has_c6_row", "c6_certified", "ret_ok", "div_ok"]).size()
+              .rename("n_c4_rows").reset_index())
+        ct.insert(0, "country", ctry)
+        crosstabs.append(ct)
+        # where do unusable ret_next flags sit in a name's life? (positions only; NOT interpreted as delisting)
+        ti = t4.assign(mi=pd.PeriodIndex(t4["month"]).asi8)
+        last_c4 = ti.groupby("permno")["mi"].max()
+        later_ok = ti[ti["ret_ok"]].groupby("permno")["mi"].max()
+        bad = ti[(~ti["ret_ok"]) & (t4["month"] >= lo) & (t4["month"] <= hi)].copy()
+        bad["is_last_c4_row_of_name"] = (bad["mi"] == bad["permno"].map(last_c4)).to_numpy()
+        bad["later_usable_ret_exists"] = (bad["permno"].map(later_ok).fillna(-1) > bad["mi"]).to_numpy()
+        pos = (bad.groupby(["is_last_c4_row_of_name", "later_usable_ret_exists"]).size()
+               .rename("n_c4_rows_with_unusable_ret_next").reset_index())
+        pos.insert(0, "country", ctry)
+        positions.append(pos)
         for adir in sorted((ROOT / "outputs/decile_weights" / ctry / "tierb").glob("aum_*")):
             aum = float(adir.name.split("_", 1)[1])
             for wp in sorted(adir.glob("*.parquet")):
@@ -229,6 +250,8 @@ def run_census(ROOT: Path, out: Path, command: str = "") -> None:
     series.to_csv(out / "support_by_series.csv", index=False)
     months_df.to_csv(out / "support_by_series_month.csv", index=False)
     pd.DataFrame(cov_rows).to_csv(out / "input_coverage_by_country_month.csv", index=False)
+    pd.concat(crosstabs, ignore_index=True).to_csv(out / "c4_support_flag_crosstab.csv", index=False)
+    pd.concat(positions, ignore_index=True).to_csv(out / "c4_unusable_ret_next_position.csv", index=False)
     tcols = [c for c in series.columns if c.startswith("tier_")]
     tiers = (series.melt(id_vars=["country"], value_vars=tcols, var_name="metric", value_name="tier")
              .groupby(["country", "metric", "tier"]).size().rename("n_series").reset_index())

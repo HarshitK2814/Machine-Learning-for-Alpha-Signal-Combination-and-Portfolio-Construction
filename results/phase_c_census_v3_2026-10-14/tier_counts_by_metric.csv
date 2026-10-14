@@ -1,0 +1,10 @@
+country,metric,tier,n_series
+DEU,tier_after_tax_valuation_cost_or_tax,>25%,176
+DEU,tier_gross_valuation,>25%,176
+DEU,tier_net_valuation_or_cost,>25%,176
+IND,tier_after_tax_valuation_cost_or_tax,>25%,160
+IND,tier_gross_valuation,>25%,160
+IND,tier_net_valuation_or_cost,>25%,160
+JPN,tier_after_tax_valuation_cost_or_tax,>25%,224
+JPN,tier_gross_valuation,>25%,224
+JPN,tier_net_valuation_or_cost,>25%,224

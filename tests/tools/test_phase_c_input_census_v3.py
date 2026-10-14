@@ -248,3 +248,15 @@ def test_refuses_to_overwrite_an_existing_output(tmp_path):
     with pytest.raises(SystemExit):
         c3.run_census(root, out)
     assert (out / "keep.txt").read_text() == "old"
+
+
+def test_flag_crosstab_and_unusable_return_positions_on_the_constructed_panel(run):
+    _, out, *_ = run
+    ct = pd.read_csv(out / "c4_support_flag_crosstab.csv")
+    d = ct[ct.country == "DEU"]
+    assert d["n_c4_rows"].sum() == 7 * 6 - 3                      # 7 names x 6 months minus name 5's three absent C4 months
+    nan_ret = d[~d.ret_ok]["n_c4_rows"].sum()
+    assert nan_ret == 1                                            # name 6, March
+    pos = pd.read_csv(out / "c4_unusable_ret_next_position.csv")
+    r = pos[pos.country == "DEU"].iloc[0]
+    assert (r.n_c4_rows_with_unusable_ret_next, bool(r.is_last_c4_row_of_name), bool(r.later_usable_ret_exists)) == (1, False, True)
