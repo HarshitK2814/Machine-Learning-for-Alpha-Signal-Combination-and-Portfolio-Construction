@@ -21,7 +21,7 @@ LIMITS (do not describe a PASS as sufficient verification)
     refers to the figure rather than to something else on that line.
   * It only knows the figures and phrases in PATTERNS. A stale claim stated in new words or with
     new numbers is invisible to it (STATUS.md's stale table passed an earlier version).
-  * It scans markdown under docs/, research/ and prereg/ plus the root README.
+  * It scans markdown under docs/, research/, prereg/ and submission_candidate_as_run_only/ plus the root README.
 
 Usage:  python tools/check_withdrawn_claims.py
 """
@@ -48,12 +48,14 @@ PATTERNS = [
     ("US-frontier comparison", r"10x to 100x|10[–-]100[x×]"),
     ("all-cell cost-over-tax ratios", r"\b53x\b|\*\*53x\*\*"),
     ("sign-flip crossover", r"\$3\.79mn|H-FLIP CONFIRMED"),
+    # Sharpe-point capacity gains against near-ruined comparators (status "unresolved - do not quote", evidence map C3).
+    ("Sharpe-point capacity gain vs near-ruined comparator", r"\+6\.80\d?|\+6\.92\d?|\+3\.19\d?"),
 ]
 
 # A label on the hit's own line, or within the same block.
 LABEL = re.compile(
     r"†|‡|withdr(?:awn|aw|ew|awal)|supersed|retract|insolvent|unconfirmed|pre-fix|"
-    r"not quotable|not interpretable|never to be restated",
+    r"not quotable|not interpretable|never to be restated|near-ruined",
     re.IGNORECASE,
 )
 # A heading that announces the whole section is a retraction.
@@ -111,7 +113,7 @@ def _heading_labels(lines: list[str], i: int) -> bool:
 
 def files() -> list[Path]:
     out: list[Path] = []
-    for sub in ("docs", "research", "prereg"):
+    for sub in ("docs", "research", "prereg", "submission_candidate_as_run_only"):
         out += sorted((ROOT / sub).rglob("*.md"))
     readme = ROOT / "README.md"
     if readme.exists():
