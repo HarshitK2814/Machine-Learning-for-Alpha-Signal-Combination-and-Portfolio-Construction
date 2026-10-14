@@ -1,6 +1,6 @@
-# Project completion report (updated 2026-10-14, after the bounded submission sprint)
+# Project completion report (updated 2026-10-14, after the technical research-completion and publication-assets sprint)
 
-Internal researcher-led report; not an external review. No approval by Maham or Absar beyond their documented responses is claimed; Maham's acknowledgement of the exit ruling is outstanding and 001A-001E are not countersigned. Sprint history on `feat/completion-sprint-2026-10-14`: `24e9a4c` (start) -> `f295d3d` (sprint 1) -> `5f206fd` (sprint 2) -> `8ad2f3c` (lockdown) -> novelty-gate and 001C-scorecard sprint (`53a04b3`) -> bounded submission sprint (this update: follow-up literature search, venue comparison, decision register).
+Internal researcher-led report; not an external review. No approval by Maham or Absar beyond their documented responses is claimed; Maham's acknowledgement of the exit ruling is outstanding and 001A-001E are not countersigned. Sprint history on `feat/completion-sprint-2026-10-14`: `24e9a4c` (start) -> `f295d3d` (sprint 1) -> `5f206fd` (sprint 2) -> `8ad2f3c` (lockdown) -> novelty-gate and 001C-scorecard sprint (`53a04b3`) -> bounded submission sprint (`807fb3a`: follow-up literature search, venue comparison, decision register) -> technical sprint (this update: Gate 1 coding-readiness audit, `paper_assets_as_run_only/`).
 
 **Overall state: not submission-ready.** A narrowed, internally consistent, traceable as-run candidate exists. It is blocked from submission by prerequisites that need external access or author decisions (below); passing the available checks does not change that.
 
@@ -91,14 +91,42 @@ All of: (1) external vendor access by someone entitled to it, with the vendor's 
 |---|---|---|
 | Candidate checker | `python tools/check_submission_candidate.py` | PASS (consistency only) |
 | Withdrawn-claims screen | `python tools/check_withdrawn_claims.py` | PASS (a screen, not verification) |
-| Focused tests | `python -m pytest tests/tools tests/docs_hygiene -o addopts="" -p no:cacheprovider -q` | 54 passed |
-| Full suite | `python -m pytest tests -o addopts="" -p no:cacheprovider -q -rfE` | **not completed this sprint**: the run was stopped by Claude Code because the machine was low on memory and was not restarted. The last complete run (685 passed, 0 failed, 431 s) predates this sprint's edits to the candidate, checker inputs and documents |
+| Focused tests | `python -m pytest tests/tools tests/docs_hygiene -o addopts="" -p no:cacheprovider -q` | 69 passed (tools 55, docs_hygiene 14), run again this sprint |
+| Full suite (single invocation) | `python -m pytest tests -o addopts="" -p no:cacheprovider -q -rfE` | **not run this sprint** (the last attempt was stopped for memory); replaced by the sequential batches in section 8a: 699 passed across 13 directories |
 | Whitespace | `git diff --check` | clean apart from CRLF warnings |
 | Manuscript build | none possible | no TeX/Pandoc, no template |
 
 ## 8. Final validation record
 
 The full suite ran on the tree after all code, test and candidate edits; the report's final wording and the commits are documentation-only. Passing tests show that code and checks behave as written; they do not validate any scientific claim or establish reproducibility.
+
+## 8a. Technical sprint: Gate 1 coding-readiness result and publication assets
+
+**Gate 1 result: PASSED for the currently authorised as-run outputs, with explicit limits.** No experiment, training, A2, cost sensitivity, capacity, optimisation or Phase C step was run; no scientific method, threshold or result-generation logic was changed.
+
+*Retained outputs, their producing code, inputs and tests.*
+
+| Retained output (candidate) | Tracked artifact | Producing code | Upstream inputs | Tests / checks |
+|---|---|---|---|---|
+| Cost-input coverage (Section 3), 560-series input-support counts | `results/phase_c_census_v3_2026-10-14/` | `tools/phase_c_input_census_v3.py` | frozen C1/C4/C6 panels and weight files (untracked, licensed) | `tests/tools/test_phase_c_input_census_v3.py` |
+| Matched-book outcomes and channels (Table 1) | `docs/attachments/MATCHED_BOOK_*` | `tools/exp_matched_book_accounting.py` | saved decile weights (untracked `outputs/`) | candidate checker re-derivation; `tests/validation/test_output_guard_extended.py` |
+| B(A), solvency, terminal wealth (Table 2, Figures 1-2) | `results/capacity_return_difference/` (Tier A, Tier B, monthly series, manifest) | `tools/exp_capacity_return_difference.py` (stages snapshot, pipeline, tables), `tools/make_figures.py` | wedge-tool series snapshotted into the tracked folder; pipeline stage needs frozen data | `tests/validation/test_capacity_return_difference.py`, `test_make_figures.py`; figures regenerate byte-identically from tracked inputs (checked this sprint) |
+| Design axes and power (Section 5.4) | `docs/attachments/DESIGN_IDENTIFIABILITY_*`, `GATE2_POWER_*` | `tools/exp_design_identifiability.py`, `tools/gate2_power.py` | untracked cell series | `tests/validation/test_inference_audit.py`, `test_output_guard_*` |
+| Stage-06 summaries, lt share, Japan rungs (Sections 5.2-5.3) | `docs/attachments/SUMMARY_AFTER_TAX_*` (verbatim snapshots) | `pipelines/06_after_tax_eval.py` | saved weights (untracked) | `tests/tax/`; candidate checker re-derivation |
+| Japan after-tax composite inference | `docs/attachments/AFTER_TAX_INFERENCE_1E9_*` | `tools/exp_after_tax_inference.py` | summaries and weights | `tests/validation/test_inference_audit.py` |
+| Statute rates for Germany and Japan | `src/alphacomb/tax/jurisdictions.py` | (configuration) | none | `tests/tax/` |
+
+*Static audit.* No TODO, FIXME, NotImplemented or XXX marker in `src/`, `tools/` or `pipelines/`. A static check that every column of each retained artifact is produced by its named script found no mismatch; the German stage-06 snapshot has 24 columns against 25 for the others because an older script version produced it (documented earlier; not a defect to fix).
+
+*Defect found and fixed.* `tests/tax/exit_fixtures.py` defined a configuration helper named `test_cfg`, which pytest collected as a test (it returned a dict and raised `PytestReturnNotNoneWarning`; under `-W error` it failed). It was renamed `build_cfg` in the fixture module and its two callers. No assertion was lost: it asserted nothing. This removes one phantom test from the count.
+
+*Limits that remain (not coding defects).* (1) The heavy stages need untracked, licensed data, so the as-run CSVs cannot be regenerated from a clean checkout; what a clean checkout can regenerate is the checker, `tools/make_figures.py` and `tools/make_paper_assets.py`. (2) Run-time hashes of code and weights were not recorded for the 2026-10-09 outputs, and the German and Indian summary snapshots rest on weight identity recovered from the weights index. (3) Phase C, the 560 non-estimable series, the Germany inference statistic and the exit-treatment sensitivity remain blocked or unknown; none is a coding task.
+
+*New code this sprint.* `tools/make_paper_assets.py` (presentation layer; verifies source hashes against `TRACEABILITY.csv`, uses only tracked CSVs, hardcodes no result values) and `tests/tools/test_make_paper_assets.py` (15 tests: byte-identical double build, manifest coverage, hash mismatch refusal, PNG dimensions, solvent-only plotting, insolvent rungs listed as n/a, no interpolation of India's single rung, banned-claim scan, 560 series with no estimable tier). `tools/check_withdrawn_claims.py` now also scans `paper_assets_as_run_only/`.
+
+**Gates 2-5: `paper_assets_as_run_only/` created** (Gate 1 passed first). 8 figures (4 main text, 4 supplementary; PDF, SVG and 300-dpi PNG each) and 8 tables (3 main text, 5 supplementary; CSV, LaTeX and Markdown each), catalogued with source paths, SHA-256 hashes, captions, limitations and a scientific-review note in `paper_assets_as_run_only/ASSET_CATALOG.md`; output hashes in `ASSET_MANIFEST.csv`. Two consecutive builds into different folders produced identical manifests. Every rendered PNG was inspected directly and corrected (overlapping labels, clipped notes, unreadable symlog ticks, legend collisions). Candidates not built (Germany inference, anything Phase C, India across AUM, Japan P1/P3/P4/P5 diagnostics, long-term-share plot, scorecard chart, unapproved attachments, duplicate restyles) are listed with reasons. Findings worth the authors' notice: India's cost-input coverage collapses in 2009-10 (1 of 274 in-universe securities certified), which is inside the mean of 0.989 quoted in Section 3 and is now annotated; `FIG_S4` is `DIAGNOSTIC_ONLY`.
+
+*Validation this sprint.* Sequential, non-overlapping batches over every test directory (`python -m pytest <dir> -o addopts="" -p no:cacheprovider -q -rfE`, one directory at a time, no parallel workers): tools 55, docs_hygiene 14, validation 210, tax 117, portfolio 50, risk 6, theory 33, models 78, interpret 5, contracts 76, adaptive 15, synthetic 5, c14 35 = **699 passed, 0 failed** (the previous 685 minus the one phantom test, plus 15 new asset tests); log `C:/Temp/claude/batches_2026-10-14.log`. These batches together cover every test file under `tests/`; they are reported as batches, not as a single full-suite invocation.
 
 ## 9. Outstanding limitations affecting validity
 

@@ -110,7 +110,7 @@ All items below are **withdrawn** or unsupported and must not be restated as fin
 
 ## Appendix B. Reproducibility
 
-See `README.md` in this directory and the repository README. The numbers in this manuscript are re-derived from the committed artifacts listed in `TRACEABILITY.csv` by `python tools/check_submission_candidate.py`. The raw vendor data, the C4/C6 staging files and the original SAS inputs are not in the repository (data-access restrictions); the figures and tables here do not require them.
+See `README.md` in this directory and the repository README. The numbers in this manuscript are re-derived from the committed artifacts listed in `TRACEABILITY.csv` by `python tools/check_submission_candidate.py`. The raw vendor data, the C4/C6 staging files and the original SAS inputs are not in the repository (data-access restrictions); the figures and tables here do not require them. Publication-format versions of the tables and figures (vector figures, CSV, LaTeX and Markdown tables, captions and a source-hash catalog) are generated from the same committed artifacts by `python tools/make_paper_assets.py` into `paper_assets_as_run_only/`; they add no result that is not in this manuscript's artifacts and are not a substitute for the checks above.
 
 ## References
 

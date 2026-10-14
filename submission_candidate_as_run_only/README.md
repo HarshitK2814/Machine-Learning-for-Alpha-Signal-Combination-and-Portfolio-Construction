@@ -28,3 +28,7 @@ It verifies that every citation resolves to a bibliography entry that is identic
 * Amendment 001C's Japan predictions: P2 not met, four not scoreable from committed artifacts (`docs/AMENDMENT_001C_JAPAN_PREDICTION_SCORECARD.md`); the authors must decide whether to approve any further descriptive scoring.
 * Authors, affiliations, journal template, abstract length, data and code availability statement are not set (author decisions).
 * Exit-treatment sensitivity is unknown; the revised analysis is blocked (Section 7 of the manuscript).
+
+## Publication assets
+
+`paper_assets_as_run_only/` (at the repository root) holds generated figures and tables with a catalog (`ASSET_CATALOG.md`); regenerate with `python tools/make_paper_assets.py`. They are presentation of the committed artifacts listed in `TRACEABILITY.csv` and are not part of the checked manuscript text.
