@@ -111,3 +111,16 @@ These are historical records and were qualified by dated notes on 2026-10-14; th
 | WITHDRAWN | 7 | N3, N4, C2, C3, T6, D4, D5 (plus the exact-match sub-claim of T4) |
 | BLOCKED | 4 | C4, C9, M4, M8 |
 | UNVERIFIABLE | 5 | H1c, T4 (Germany), T5, C10, M7 |
+
+## 5. Update after sprint 2 (2026-10-14, later)
+
+| Item | Change |
+|---|---|
+| F4 (no tracked India or Germany $1bn summary) | Verbatim snapshots committed (`docs/attachments/SUMMARY_AFTER_TAX_{IND,DEU}_1E9_2026-10-09.csv`); contents reproduce all values the project quoted. T2 (India `lt_share` 0.5928) is now tracked and re-derived by the candidate checker: SUPPORTED_WITH_QUALIFICATION (weight identity inferred; no run-time hashes; Germany's file from an older script). |
+| T5 (drag ordered by turnover at $1bn) | No longer unverifiable: turnover 0.0135 / 0.0067 / 0.0290 and tax drag 6.38 / 0.11 / 11.49 bps (Germany / India / Japan) re-derived. SUPPORTED_WITH_QUALIFICATION, descriptive only (turnover endogenous, n = 3, inferred weights). |
+| F1 / H1c / T4 (Germany inference row) | Unchanged: UNVERIFIABLE. Regeneration conditions are in `docs/FINAL_NUMERICAL_TRACEABILITY_GAPS.md` (`RECOVERABLE_WITH_EXACT_REGENERATION`, conditional); not run. |
+| F6 (`AHV2025` vs `AHV2023`; missing tax references) | Resolved for the candidate: same working paper, key `AHV2023`; eight tax entries added with verified metadata. Two project-record errors found (BY2003 DOI, HUANG2019 arXiv id). See `docs/FINAL_PRIOR_ART_REVIEW.md`. |
+| N1 (novelty) | Narrowed: AUM indexing is not a contribution (Jensen et al.); the claim is non-US, statute-specific and constraint-based evidence, to our knowledge, on an abstract-level search for several works. The Gârleanu-Pedersen capacity attribution in the full-account paper is not supported by the text read. |
+| Closest prior art (Avramov-Cheng-Metzker) | Full text not accessible; abstract level only. No detailed comparison is permitted. |
+
+Revised counts (one row per ID, T4 split by country): SUPPORTED_AS_RUN 8; SUPPORTED_WITH_QUALIFICATION 18 (adds T5); WITHDRAWN 7; BLOCKED 4; UNVERIFIABLE 4 (H1c, T4 Germany, C10, M7).
